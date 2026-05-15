@@ -1,0 +1,73 @@
+<div id="theme-settings-panel" class="fixed bottom-6 right-6 p-6 rounded-2xl border border-gray-200 shadow-xl z-50 transition-all duration-300" style="background-color: var(--color-light);">
+    
+    <div class="flex items-center justify-between mb-4">
+        <h3 class="text-sm font-semibold tracking-wide uppercase" style="color: var(--color-muted);">
+            Apariencia
+        </h3>
+        <!-- Botón para cerrar panel -->
+        <button id="close-panel-btn" class="p-1 rounded hover:opacity-70 transition-opacity" style="color: var(--color-dark);">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+    </div>
+
+    <div class="space-y-4">
+        <!-- Control de Color de Fondo -->
+        <div class="flex items-center justify-between gap-4">
+            <label for="bgColorPicker" class="text-sm font-medium" style="color: var(--color-dark);">Fondo</label>
+            <input type="color" id="bgColorPicker" value="#fafafa" class="w-8 h-8 rounded cursor-pointer border-0 p-0">
+        </div>
+
+        <!-- Control de Color de Acento -->
+        <div class="flex items-center justify-between gap-4">
+            <label for="accentColorPicker" class="text-sm font-medium" style="color: var(--color-dark);">Acento</label>
+            <input type="color" id="accentColorPicker" value="#2563eb" class="w-8 h-8 rounded cursor-pointer border-0 p-0">
+        </div>
+        
+        <!-- Control de Texto Principal -->
+        <div class="flex items-center justify-between gap-4">
+            <label for="textColorPicker" class="text-sm font-medium" style="color: var(--color-dark);">Texto</label>
+            <input type="color" id="textColorPicker" value="#171717" class="w-8 h-8 rounded cursor-pointer border-0 p-0">
+        </div>
+    </div>
+
+    <!-- Botón de ejemplo de restauración -->
+    <button id="reset-theme-btn" class="w-full mt-6 text-xs font-medium py-2 rounded transition-opacity hover:opacity-90" style="background-color: var(--color-accent); color: #fff;">
+        Restaurar Valores
+    </button>
+
+</div>
+
+<script>
+    // Lógica del Panel de Configuración
+    document.addEventListener('DOMContentLoaded', () => {
+        const root = document.documentElement;
+        
+        const bgColorPicker = document.getElementById('bgColorPicker');
+        const accentColorPicker = document.getElementById('accentColorPicker');
+        const textColorPicker = document.getElementById('textColorPicker');
+        const resetBtn = document.getElementById('reset-theme-btn');
+
+        // Función para inyectar CSS variable globalmente
+        function updateCSSVariable(variable, value) {
+            root.style.setProperty(variable, value);
+            // Aquí llamarías a localStorage.setItem(...) para guardarlo
+        }
+
+        // Event Listeners (El evento 'input' actualiza en tiempo real mientras mueves el selector)
+        bgColorPicker.addEventListener('input', (e) => updateCSSVariable('--color-light', e.target.value));
+        accentColorPicker.addEventListener('input', (e) => updateCSSVariable('--color-accent', e.target.value));
+        textColorPicker.addEventListener('input', (e) => updateCSSVariable('--color-dark', e.target.value));
+
+        // Restaurar valores por defecto
+        resetBtn.addEventListener('click', () => {
+            updateCSSVariable('--color-light', '#fafafa');
+            updateCSSVariable('--color-accent', '#2563eb');
+            updateCSSVariable('--color-dark', '#171717');
+            
+            // Actualizar el valor visual de los inputs
+            bgColorPicker.value = '#fafafa';
+            accentColorPicker.value = '#2563eb';
+            textColorPicker.value = '#171717';
+        });
+    });
+</script>

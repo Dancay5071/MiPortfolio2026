@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Acceso Admin</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Theme Script (Blocks rendering to prevent FOUC) -->
+    <script>
+        (function() {
+            const palettes = {
+                neon: { primary: '0 242 254', secondary: '254 9 121', tertiary: '138 43 226' },
+                cyberpunk: { primary: '0 240 255', secondary: '255 0 60', tertiary: '252 238 9' },
+                matrix: { primary: '0 255 65', secondary: '0 143 17', tertiary: '0 255 65' }
+            };
+            try {
+                const savedTheme = localStorage.getItem('portfolio_theme') || 'neon';
+                const palette = palettes[savedTheme] || palettes.neon;
+                const root = document.documentElement;
+                
+                root.style.setProperty('--color-primary', palette.primary);
+                root.style.setProperty('--color-secondary', palette.secondary);
+                root.style.setProperty('--color-tertiary', palette.tertiary);
+            } catch (e) {}
+        })();
+    </script>
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: 'rgba(255, 255, 255, 0.03)',
+                        glassBorder: 'rgba(255, 255, 255, 0.08)',
+                        themePrimary: 'rgb(var(--color-primary) / <alpha-value>)',
+                        themeSecondary: 'rgb(var(--color-secondary) / <alpha-value>)',
+                        themeTertiary: 'rgb(var(--color-tertiary) / <alpha-value>)'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-glass backdrop-blur-xl border border-glassBorder rounded-2xl shadow-2xl;
+            }
+            .text-glow {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            }
+        }
+        
+        body {
+            background-color: #030712; 
+            overflow-x: hidden;
+        }
+
+        /* Ambient glowing orbs */
+        .orb-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(var(--color-primary), 0.12) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            filter: blur(80px);
+        }
+        .orb-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(var(--color-secondary), 0.12) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            filter: blur(80px);
+        }
+    </style>
+</head>
+<body class="text-white min-h-screen flex items-center justify-center p-4 relative font-sans">
+
+    <!-- Ambient Background Orbs -->
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+
+    <div class="w-full max-w-md relative z-10">
+        <!-- Logo / Regresar -->
+        <div class="mb-8 text-center flex flex-col items-center">
+            <a href="index.html" class="inline-flex items-center text-xs font-semibold tracking-widest text-gray-400 hover:text-themePrimary transition-colors mb-6 border border-white/5 bg-white/5 px-4 py-2 rounded-full backdrop-blur-sm shadow-[0_0_15px_rgba(255,255,255,0.05)] hover:border-themePrimary/50">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                VOLVER AL PORTAFOLIO
+            </a>
+            <h1 class="text-3xl lg:text-4xl font-bold tracking-tight text-glow mb-2">Acceso Admin</h1>
+            <p class="text-gray-400 text-sm">Ingresa con tus credenciales simuladas.</p>
+        </div>
+
+        <!-- Formulario Glassmorphism -->
+        <form id="login-form" class="glass-panel p-8 lg:p-10 relative overflow-hidden">
+             <!-- Glowing gradient accent inside card -->
+             <div class="absolute top-0 right-0 w-32 h-32 bg-themePrimary/10 blur-3xl pointer-events-none"></div>
+
+            <!-- Contenedor de Error -->
+            <div id="error-message" class="hidden mb-6 p-4 bg-red-500/10 text-red-400 border border-red-500/20 rounded-xl text-sm font-medium backdrop-blur-md">
+                <!-- Mensaje de error inyectado vía JS -->
+            </div>
+
+            <div class="space-y-6 relative z-10">
+                <div>
+                    <label for="email" class="block text-xs font-bold tracking-widest text-gray-300 mb-2">CORREO ELECTRÓNICO</label>
+                    <input type="email" id="email" name="email" placeholder="admin@admin.com" 
+                        class="w-full px-4 py-3.5 rounded-xl border border-white/10 bg-white/5 focus:ring-2 focus:ring-themePrimary/50 focus:border-themePrimary/50 outline-none transition-all text-white placeholder-gray-500 font-medium" required>
+                </div>
+
+                <div>
+                    <label for="password" class="block text-xs font-bold tracking-widest text-gray-300 mb-2">CONTRASEÑA</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" 
+                        class="w-full px-4 py-3.5 rounded-xl border border-white/10 bg-white/5 focus:ring-2 focus:ring-themeSecondary/50 focus:border-themeSecondary/50 outline-none transition-all text-white placeholder-gray-500 font-medium" required>
+                </div>
+
+                <button type="submit" id="submit-btn" 
+                    class="w-full py-4 px-4 rounded-xl text-white font-bold tracking-widest bg-white/10 hover:bg-white/20 border border-white/20 hover:border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.05)] transition-all mt-6 flex justify-center items-center gap-3">
+                    <span>INICIAR SESIÓN</span>
+                    <svg id="loading-spinner" class="hidden animate-spin h-5 w-5 text-themePrimary" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="mt-8 text-center pt-6 border-t border-white/5 relative z-10">
+                <p class="text-xs font-medium text-gray-500 tracking-wider">Demo: admin@admin.com / admin123</p>
+            </div>
+        </form>
+    </div>
+
+    <!-- Supabase CDN & Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="src/supabase-client.js"></script>
+
+    <!-- Script de Auth.js (Maneja la lógica del form y botones) -->
+    <script src="src/auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,69 @@
+@layer base {
+  :root {
+    /* Paleta Principal por Defecto (Clara) */
+    --color-dark: #171717;     /* Usado para texto principal y bordes fuertes */
+    --color-light: #fafafa;    /* Usado para el fondo principal */
+    --color-accent: #2563eb;   /* Usado para botones principales y enlaces (Azul) */
+    --color-muted: #737373;    /* Usado para texto secundario o descriptivo */
+  }
+
+  /* 
+    Opcional: Soporte nativo para modo oscuro basado en el sistema del usuario
+    Descomenta esto si quieres que cambie automáticamente sin tocar botones.
+  */
+  /*
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --color-dark: #fafafa;
+      --color-light: #171717;
+      --color-accent: #3b82f6;
+      --color-muted: #a3a3a3;
+    }
+  }
+  */
+
+  body {
+    /* Aplicamos los colores globales al body para herencia automática */
+    background-color: var(--color-light);
+    color: var(--color-dark);
+    /* Transición suave para todo el body cuando las variables cambien */
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+}
+
+/*
+  2. Componentes (Usando Tailwind o CSS puro)
+  Estos componentes reaccionarán dinámicamente si --color-accent o --color-light cambian en JS.
+*/
+@layer components {
+  
+  /* Ejemplo 1: Tarjeta Dinámica */
+  .card-dynamic {
+    /* Usa la variable para el fondo, si la variable cambia en JS, el fondo cambia */
+    background-color: var(--color-light); 
+    border: 1px solid var(--color-muted);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    /* Sombras usando variables nativas mezcladas con opacidad */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .card-dynamic:hover {
+    border-color: var(--color-accent);
+  }
+
+  /* Ejemplo 2: Botón Dinámico */
+  .btn-dynamic {
+    background-color: var(--color-accent);
+    color: #ffffff; /* El texto en un botón de acento suele ser siempre blanco */
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px; /* Pill shape */
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+  }
+
+  .btn-dynamic:hover {
+    opacity: 0.9;
+  }
+}

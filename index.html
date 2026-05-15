@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daniela | Portafolio</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        glass: 'rgba(255, 255, 255, 0.03)',
+                        glassBorder: 'rgba(255, 255, 255, 0.08)',
+                        glassHover: 'rgba(255, 255, 255, 0.1)',
+                        neonCyan: '#00f2fe',
+                        neonPink: '#fe0979',
+                        neonPurple: '#8a2be2'
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-panel {
+                @apply bg-glass backdrop-blur-xl border border-glassBorder rounded-2xl shadow-2xl;
+            }
+            .text-glow {
+                text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+            }
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2); 
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3); 
+        }
+        
+        body {
+            background-color: #030712; /* Very dark background (gray-950) */
+            overflow-x: hidden;
+        }
+
+        /* Ambient glowing orbs */
+        .orb-1 {
+            position: fixed;
+            top: -10%;
+            left: -10%;
+            width: 50vw;
+            height: 50vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0,242,254,0.12) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            filter: blur(80px);
+        }
+        .orb-2 {
+            position: fixed;
+            bottom: -20%;
+            right: -10%;
+            width: 60vw;
+            height: 60vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(254,9,121,0.12) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            filter: blur(80px);
+        }
+        .orb-3 {
+            position: fixed;
+            top: 30%;
+            left: 20%;
+            width: 40vw;
+            height: 40vw;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(138,43,226,0.08) 0%, rgba(0,0,0,0) 70%);
+            z-index: -1;
+            filter: blur(80px);
+        }
+        
+        /* Animación para pestañas */
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .tab-active {
+            animation: fadeInTab 0.4s ease-out forwards;
+        }
+    </style>
+</head>
+
+<body
+    class="text-white min-h-screen p-4 md:p-6 lg:p-8 flex flex-col xl:flex-row gap-6 max-w-[1800px] mx-auto relative font-sans">
+
+    <!-- Ambient Background Orbs -->
+    <div class="orb-1"></div>
+    <div class="orb-2"></div>
+    <div class="orb-3"></div>
+
+    <!-- Left Column: Hero & Nav -->
+    <div class="glass-panel w-full xl:w-[60%] 2xl:w-[65%] flex flex-col overflow-hidden relative min-h-[85vh]">
+
+        <!-- Glowing gradient accent top-left inside hero -->
+        <div
+            class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-500/5 via-transparent to-pink-500/5 pointer-events-none">
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex items-center justify-between p-6 md:p-8 relative z-10 border-b border-white/5">
+            <div class="flex items-center gap-2">
+                <span class="text-cyan-400 font-mono text-xl">&lt;/&gt;</span>
+                <span class="font-bold text-lg tracking-wider">DAN.CODE</span>
+            </div>
+
+            <div class="hidden lg:flex items-center space-x-8 text-xs font-semibold tracking-widest text-gray-400">
+                <button data-target="section-inicio"
+                    class="nav-btn text-cyan-400 border-b-2 border-cyan-400 pb-1 transition-all">INICIO</button>
+                <button data-target="section-experiencia"
+                    class="nav-btn hover:text-white transition-all pb-1 border-b-2 border-transparent">EXPERIENCIA</button>
+                <button data-target="section-educacion"
+                    class="nav-btn hover:text-white transition-all pb-1 border-b-2 border-transparent">EDUCACIÓN</button>
+                <button data-target="section-proyectos"
+                    class="nav-btn hover:text-white transition-all pb-1 border-b-2 border-transparent">PROYECTOS</button>
+            </div>
+
+            <button id="btn-login"
+                class="glass-panel !bg-white/5 hover:!bg-white/10 px-5 py-2 rounded-full text-xs font-semibold tracking-wider flex items-center gap-2 transition-all border-white/20 hover:border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
+                    <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+                    <path d="M12 2v2" />
+                    <path d="M12 22v-2" />
+                    <path d="m17 20.66-1-1.73" />
+                    <path d="M11 10.27 7 3.34" />
+                    <path d="m20.66 17-1.73-1" />
+                    <path d="m3.34 7 1.73 1" />
+                    <path d="M14 12h8" />
+                    <path d="M2 12h2" />
+                    <path d="m20.66 7-1.73 1" />
+                    <path d="m3.34 17 1.73-1" />
+                    <path d="m17 3.34-1 1.73" />
+                    <path d="m11 13.73-4 6.93" />
+                </svg>
+                Login
+            </button>
+        </nav>
+
+        <!-- Hero Content (Inicio) -->
+        <div id="section-inicio"
+            class="portfolio-section tab-active flex-1 flex flex-col md:flex-row items-center justify-center p-8 lg:p-16 relative z-10 gap-10 lg:gap-16">
+            <!-- Portrait -->
+            <div class="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 shrink-0">
+                <div
+                    class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-pink-500 rounded-full blur-3xl opacity-30">
+                </div>
+                <img src="https://prmrhdxmvgueyduztiii.supabase.co/storage/v1/object/public/imagenes-portfolio/profile_1778880986580_889.png"
+                    alt="Daniela"
+                    id="foto-perfil"
+                    class="w-full h-full object-cover rounded-full border border-white/20 shadow-[0_0_50px_rgba(255,255,255,0.05)] relative z-10">
+            </div>
+
+            <!-- Text Content -->
+            <div class="flex flex-col items-center md:items-start text-center md:text-left">
+                <h2 class="text-gray-300 text-2xl lg:text-3xl font-light mb-3">Hola, Soy Daniela Cabrera.</h2>
+                <h2 class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-10 text-glow">
+                    Programadora<br>& Desarrolladora de software.
+                </h2>
+                <button
+                    class="glass-panel !bg-white/5 hover:!bg-white/10 px-8 py-3.5 rounded-full text-xs font-bold tracking-widest transition-all border border-white/20 hover:border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                    DESCUBRE MI MUNDO.
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column: Sections -->
+    <div class="w-full xl:w-[40%] 2xl:w-[35%] flex flex-col gap-6">
+
+        <!-- Experiencia -->
+        <div id="section-experiencia"
+            class="portfolio-section hidden glass-panel p-6 lg:p-8 flex-1 flex flex-col relative overflow-hidden min-h-[250px]">
+            <!-- Glowing gradient accent -->
+            <div class="absolute top-0 right-0 w-40 h-40 bg-pink-500/10 blur-3xl pointer-events-none"></div>
+
+            <h3 class="text-center text-sm font-bold tracking-widest mb-8 text-gray-200">EXPERIENCIA</h3>
+
+            <div id="experience-container" class="relative pl-6 border-l border-white/10 space-y-6 flex-1 ml-4">
+                <div class="text-center text-gray-400 text-sm py-10">Cargando experiencia...</div>
+            </div>
+        </div>
+
+        <!-- Educación -->
+        <div id="section-educacion"
+            class="portfolio-section hidden glass-panel p-6 lg:p-8 relative overflow-hidden min-h-[200px] flex flex-col justify-center">
+            <!-- Glowing gradient accent -->
+            <div class="absolute bottom-0 left-0 w-40 h-40 bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+
+            <h3 class="text-center text-sm font-bold tracking-widest mb-8 text-gray-200">EDUCACIÓN</h3>
+
+            <div id="education-container" class="flex flex-wrap justify-center gap-12 lg:gap-16 items-center">
+                <div class="text-center text-gray-400 text-sm py-10">Cargando educación...</div>
+            </div>
+        </div>
+
+        <!-- Proyectos -->
+        <div id="section-proyectos"
+            class="portfolio-section hidden glass-panel p-6 lg:p-8 flex-1 flex flex-col relative overflow-hidden min-h-[300px]">
+            <!-- Glowing gradient accent -->
+            <div
+                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/10 blur-[80px] pointer-events-none">
+            </div>
+
+            <h3 class="text-center text-sm font-bold tracking-widest mb-6 text-gray-200">PROYECTOS</h3>
+
+            <!-- Filters -->
+            <div class="flex flex-wrap justify-center gap-2 mb-8" id="project-filters">
+                <button data-filter="all"
+                    class="filter-btn active px-5 py-2 rounded-full text-[10px] font-bold bg-white text-black tracking-widest shadow-[0_0_15px_rgba(255,255,255,0.2)]">TODOS</button>
+                <button data-filter="web"
+                    class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors tracking-widest border border-white/5">WEB
+                    APPS</button>
+                <button data-filter="mini"
+                    class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors tracking-widest border border-white/5 relative group">
+                    MINIJUEGOS
+                    <!-- Cursor interaction hint -->
+                    <span class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg class="w-4 h-4 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2 1-3.2-7.4-4.4 4.8z" />
+                        </svg>
+                    </span>
+                </button>
+                <button data-filter="backend"
+                    class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors tracking-widest border border-white/5">BACKEND</button>
+            </div>
+
+            <!-- Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pr-2 custom-scrollbar flex-1 content-start"
+                id="project-grid">
+                <div class="col-span-full text-center text-gray-400 text-sm py-10">
+                    Cargando proyectos desde Supabase...
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Supabase CDN & Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="src/supabase-client.js"></script>
+
+    <!-- Scripts -->
+    <script>
+        // --- Theme Setter Logic (For buttons) ---
+        async function changeTheme(themeName) {
+            const palettes = {
+                neon: { primary: '0 242 254', secondary: '254 9 121', tertiary: '138 43 226' },
+                cyberpunk: { primary: '0 240 255', secondary: '255 0 60', tertiary: '252 238 9' },
+                matrix: { primary: '0 255 65', secondary: '0 143 17', tertiary: '0 255 65' }
+            };
+            const palette = palettes[themeName];
+            if (palette) {
+                // Instantly apply and cache
+                localStorage.setItem('portfolio_theme', themeName);
+                localStorage.removeItem('custom_theme'); // Clear any custom colors to favor preset
+                const root = document.documentElement;
+                root.style.setProperty('--color-primary', palette.primary);
+                root.style.setProperty('--color-secondary', palette.secondary);
+                root.style.setProperty('--color-tertiary', palette.tertiary);
+
+                // Sync to Supabase in background
+                try {
+                    await window.supabaseClient.from('configuracion').delete().eq('id', 'custom_theme'); // clean custom
+                    await window.supabaseClient.from('configuracion').upsert({ id: 'current_theme', theme: themeName });
+                } catch (e) {
+                    console.error("No se pudo guardar el tema en la BD", e);
+                }
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
+
+            // --- Profile & Dynamic Data Loading ---
+            const loadProfile = async () => {
+                try {
+                    const { data } = await window.supabaseClient.from('configuracion').select('*').eq('id', 'perfil_data').single();
+                    if (data && data.theme) {
+                        const p = JSON.parse(data.theme);
+                        if(p.name) document.getElementById('portfolio-name').innerHTML = p.name;
+                        if(p.title) document.getElementById('portfolio-title').innerHTML = p.title;
+                        if(p.btnText) document.getElementById('portfolio-btn').innerHTML = p.btnText;
+                        if(p.image || p.url_foto) {
+                            const imageSource = p.image || p.url_foto;
+                            // Limpieza de Caché: parámetro dinámico
+                            const timestamp = new Date().getTime();
+                            const imageUrl = imageSource.includes('?') ? `${imageSource}&t=${timestamp}` : `${imageSource}?t=${timestamp}`;
+                            
+                            const imgElem = document.getElementById('foto-perfil');
+                            if(imgElem) imgElem.src = imageUrl;
+                        }
+                    }
+                } catch (e) { console.log('Sin perfil personalizado aún.'); }
+            };
+
+            const loadExperience = async () => {
+                const container = document.getElementById('experience-container');
+                if(!container) return;
+                try {
+                    const { data, error } = await window.supabaseClient.from('experiencia').select('*').order('created_at', { ascending: false });
+                    if (error || !data || data.length === 0) {
+                        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No hay experiencia cargada aún.</div>';
+                        return;
+                    }
+                    container.innerHTML = '';
+                    data.forEach((exp, index) => {
+                        const isFirst = index === 0;
+                        const techStack = exp.tecnologias.split(',').map(t => t.trim());
+                        
+                        const el = document.createElement('div');
+                        el.className = 'relative';
+                        el.innerHTML = `
+                            <div class="absolute -left-[31px] top-1.5 w-${isFirst ? '3.5' : '2.5'} h-${isFirst ? '3.5' : '2.5'} rounded-full ${isFirst ? 'bg-cyan-400 shadow-[0_0_12px_#00f2fe]' : 'border border-gray-500 bg-[#030712]'}"></div>
+                            <div class="glass-panel !bg-white/5 p-4 lg:p-5 !border-white/10 ml-2 ${isFirst ? '' : 'opacity-60 hover:opacity-100 transition-opacity'}">
+                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
+                                    <h4 class="font-medium text-sm lg:text-base">${exp.empresa} - ${exp.cargo}</h4>
+                                    <span class="text-xs ${isFirst ? 'text-cyan-400 font-medium' : 'text-gray-400'} whitespace-nowrap">${exp.fecha}</span>
+                                </div>
+                                <div class="flex flex-wrap gap-2 mt-3">
+                                    ${techStack.map(t => `
+                                        <span class="text-[11px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-md text-gray-300 flex items-center gap-1.5 font-medium">
+                                            <span class="w-2 h-2 rounded-full bg-white/20 inline-block"></span> ${t}
+                                        </span>
+                                    `).join('')}
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(el);
+                    });
+                } catch (e) {
+                    container.innerHTML = '<div class="text-center text-red-400 text-sm py-10">Error al cargar experiencia.</div>';
+                }
+            };
+
+            const loadEducation = async () => {
+                const container = document.getElementById('education-container');
+                if(!container) return;
+                try {
+                    const { data, error } = await window.supabaseClient.from('educacion').select('*').order('created_at', { ascending: false });
+                    if (error || !data || data.length === 0) {
+                        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No hay educación cargada aún.</div>';
+                        return;
+                    }
+                    container.innerHTML = '';
+                    data.forEach(edu => {
+                        const colors = {
+                            red: 'text-red-400 bg-red-500/10 border-red-500/20 hover:border-red-400/50',
+                            yellow: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20 hover:border-yellow-400/50',
+                            cyan: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20 hover:border-cyan-400/50',
+                            pink: 'text-pink-400 bg-pink-500/10 border-pink-500/20 hover:border-pink-400/50',
+                            purple: 'text-purple-400 bg-purple-500/10 border-purple-500/20 hover:border-purple-400/50'
+                        };
+                        const c = colors[edu.color_badge] || colors.cyan;
+                        const [textColor, bgColor, borderColor, hoverBorderColor] = c.split(' ');
+
+                        const el = document.createElement('div');
+                        el.className = 'flex flex-col items-center gap-4';
+                        el.innerHTML = `
+                            <div class="relative w-24 h-24 lg:w-28 lg:h-28 flex items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md group ${hoverBorderColor} transition-colors shadow-lg">
+                                <div class="absolute inset-0 border border-white/5 rounded-full scale-[1.15]"></div>
+                                <div class="absolute inset-0 border border-white/5 rounded-full scale-[1.3] opacity-50"></div>
+                                <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full ${bgColor} border ${borderColor} flex items-center justify-center">
+                                    <span class="${textColor} text-xl lg:text-2xl font-bold">${edu.siglas}</span>
+                                </div>
+                            </div>
+                            <p class="text-[11px] lg:text-xs text-center text-gray-400 max-w-[120px] leading-tight font-medium">${edu.titulo} en ${edu.institucion}</p>
+                        `;
+                        container.appendChild(el);
+                    });
+                } catch (e) {
+                    container.innerHTML = '<div class="text-center text-red-400 text-sm py-10">Error al cargar educación.</div>';
+                }
+            };
+
+            // --- Sync theme with Supabase in background ---
+            try {
+                // First try to load custom colors
+                const { data: customData } = await window.supabaseClient.from('configuracion').select('*').eq('id', 'custom_theme').single();
+                if (customData && customData.theme) {
+                    localStorage.setItem('custom_theme', customData.theme);
+                    const palette = JSON.parse(customData.theme);
+                    const root = document.documentElement;
+                    root.style.setProperty('--color-primary', palette.primary);
+                    root.style.setProperty('--color-secondary', palette.secondary);
+                    root.style.setProperty('--color-tertiary', palette.tertiary);
+                } else {
+                    // Load preset theme
+                    const { data: presetData } = await window.supabaseClient.from('configuracion').select('*').eq('id', 'current_theme').single();
+                    if (presetData && presetData.theme) {
+                        const localTheme = localStorage.getItem('portfolio_theme');
+                        if (localTheme !== presetData.theme) {
+                            changeTheme(presetData.theme); // Update to match DB
+                        }
+                    }
+                }
+            } catch (e) {
+                console.log("No Supabase configuration available yet or error fetching theme.", e);
+            }
+
+            // Theme ButtonsButton Logic ---
+            const btnLogin = document.getElementById('btn-login');
+            if (btnLogin) {
+                btnLogin.addEventListener('click', () => {
+                    // Navigate to login.html
+                    window.location.href = 'login.html';
+                });
+            }
+
+            // --- Project Loading Logic ---
+            const loadProjects = async () => {
+                const projectGrid = document.getElementById('project-grid');
+
+                try {
+                    const { data: projects, error } = await window.supabaseClient
+                        .from('proyectos')
+                        .select('*')
+                        .order('created_at', { ascending: false });
+
+                    if (error) throw error;
+
+                    projectGrid.innerHTML = ''; // Clear loading text
+
+                    if (!projects || projects.length === 0) {
+                        projectGrid.innerHTML = '<div class="col-span-full text-center text-gray-400 text-sm py-10">No hay proyectos para mostrar aún.</div>';
+                        return;
+                    }
+
+                    projects.forEach(p => {
+                        const techStack = p.tech_stack ? p.tech_stack.split(',').slice(0, 2) : [];
+
+                        const card = document.createElement('div');
+                        card.className = 'project-card glass-panel !bg-white/5 !border-white/10 rounded-xl overflow-hidden group hover:border-themePrimary/20 transition-all';
+                        card.setAttribute('data-category', p.category);
+
+                        // Default image if none (since we didn't add image upload, using placeholder based on category)
+                        let imgUrl = 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=600&h=400';
+                        if (p.category === 'game') imgUrl = 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600&h=400';
+                        if (p.category === 'backend') imgUrl = 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600&h=400';
+
+                        // Check if demo or github
+                        const actionUrl = p.demo_url || p.github_url || '#';
+
+                        card.innerHTML = `
+                            <a href="${actionUrl}" target="_blank" class="block h-full relative cursor-pointer">
+                                <div class="h-32 bg-gray-900 relative overflow-hidden">
+                                    <img src="${imgUrl}" alt="${p.title}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
+                                    <div class="absolute bottom-2 left-2 flex gap-2">
+                                        <span class="bg-black/50 backdrop-blur-md p-1.5 rounded-md text-white shadow-lg">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="p-4 flex items-center justify-between bg-white/5 border-t border-white/5">
+                                    <span class="text-sm font-semibold truncate pr-2">${p.title}</span>
+                                    <div class="flex gap-1.5 shrink-0">
+                                        ${techStack.map(tech => `
+                                            <span class="w-6 h-6 rounded-full bg-themePrimary/20 border border-themePrimary/30 flex items-center justify-center text-[8px] font-bold text-themePrimary truncate px-1">${tech.substring(0, 2).toUpperCase()}</span>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                            </a>
+                        `;
+                        projectGrid.appendChild(card);
+                    });
+
+                    // Re-bind filter logic since elements changed
+                    bindFilters();
+
+                } catch (e) {
+                    projectGrid.innerHTML = '<div class="col-span-full text-center text-red-400 text-sm py-10">Error al cargar proyectos.</div>';
+                    console.error(e);
+                }
+            };
+
+            // --- Project Filtering Logic ---
+            const bindFilters = () => {
+                const filterBtns = document.querySelectorAll('.filter-btn');
+                const projectCards = document.querySelectorAll('.project-card');
+
+                filterBtns.forEach(btn => {
+                    // Remove old listeners to avoid duplicates if re-bound
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+
+                    newBtn.addEventListener('click', () => {
+                        document.querySelectorAll('.filter-btn').forEach(b => {
+                            b.classList.remove('bg-white', 'text-black', 'shadow-[0_0_15px_rgba(255,255,255,0.2)]');
+                            b.classList.add('bg-white/5', 'text-gray-300');
+                        });
+
+                        newBtn.classList.add('bg-white', 'text-black', 'shadow-[0_0_15px_rgba(255,255,255,0.2)]');
+                        newBtn.classList.remove('bg-white/5', 'text-gray-300');
+
+                        const filterValue = newBtn.getAttribute('data-filter');
+
+                        projectCards.forEach(card => {
+                            const category = card.getAttribute('data-category');
+
+                            if (filterValue === 'all' || filterValue === category) {
+                                card.style.display = 'block';
+                                card.animate([
+                                    { opacity: 0, transform: 'scale(0.95)' },
+                                    { opacity: 1, transform: 'scale(1)' }
+                                ], { duration: 300, easing: 'ease-out' });
+                            } else {
+                                card.style.display = 'none';
+                            }
+                        });
+                    });
+                });
+            };
+
+            // --- Tab Navigation Logic ---
+            const navBtns = document.querySelectorAll('.nav-btn');
+            const sections = document.querySelectorAll('.portfolio-section');
+
+            navBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetId = btn.getAttribute('data-target');
+
+                    // 1. Actualizar estado visual de los botones
+                    navBtns.forEach(nav => {
+                        nav.classList.remove('text-cyan-400', 'border-cyan-400');
+                        nav.classList.add('text-gray-400', 'border-transparent');
+                    });
+                    btn.classList.remove('text-gray-400', 'border-transparent');
+                    btn.classList.add('text-cyan-400', 'border-cyan-400');
+
+                    // 2. Ocultar todas las secciones y mostrar la seleccionada
+                    sections.forEach(sec => {
+                        if (sec.id === targetId) {
+                            sec.classList.remove('hidden');
+                            // Reiniciar animación para efecto fluido
+                            sec.classList.remove('tab-active');
+                            void sec.offsetWidth; // Force reflow
+                            sec.classList.add('tab-active');
+                        } else {
+                            sec.classList.add('hidden');
+                            sec.classList.remove('tab-active');
+                        }
+                    });
+                });
+            });
+
+            // Initialize Dynamic Data
+            loadProfile();
+            loadExperience();
+            loadEducation();
+            loadProjects();
+
+            // Sincronización Inmediata (Realtime)
+            try {
+                window.supabaseClient
+                    .channel('schema-db-changes')
+                    .on(
+                        'postgres_changes',
+                        { event: '*', schema: 'public', table: 'configuracion' },
+                        (payload) => {
+                            // Al detectar un cambio en la tabla, repintar el perfil
+                            loadProfile();
+                        }
+                    )
+                    .subscribe();
+            } catch (err) {
+                console.log('Realtime no configurado completamente.');
+            }
+        });
+    </script>
+</body>
+
+</html>
