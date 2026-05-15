@@ -13,6 +13,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
                 extend: {
                     fontFamily: {
@@ -33,10 +34,10 @@
     <style type="text/tailwindcss">
         @layer utilities {
             .glass-panel {
-                @apply bg-glass backdrop-blur-xl border border-glassBorder rounded-2xl shadow-2xl;
+                @apply bg-white/70 dark:bg-[#030712]/60 backdrop-blur-md border border-white/40 dark:border-white/10 rounded-2xl shadow-xl dark:shadow-[0_0_40px_rgba(0,242,254,0.05)];
             }
             .text-glow {
-                text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+                text-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
             }
         }
         
@@ -48,54 +49,48 @@
             background: transparent; 
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(255, 255, 255, 0.2); 
+            background: rgba(0, 0, 0, 0.15); 
             border-radius: 10px;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(255, 255, 255, 0.3); 
+            background: rgba(0, 0, 0, 0.25); 
         }
         
         body {
-            background-color: #030712; /* Very dark background (gray-950) */
-            overflow-x: hidden;
+            /* Handled via tailwind classes now */
         }
 
-        /* Ambient glowing orbs */
-        .orb-1 {
-            position: fixed;
-            top: -10%;
-            left: -10%;
-            width: 50vw;
-            height: 50vw;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(0,242,254,0.12) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1;
-            filter: blur(80px);
+        /* Animaciones para Blurry Blobs */
+        @keyframes float-glow {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
-        .orb-2 {
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 60vw;
-            height: 60vw;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(254,9,121,0.12) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1;
-            filter: blur(80px);
+        @keyframes float-glow-reverse {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(-30px, 50px) scale(1.2); }
+            66% { transform: translate(20px, -20px) scale(0.8); }
+            100% { transform: translate(0px, 0px) scale(1); }
         }
-        .orb-3 {
-            position: fixed;
-            top: 30%;
-            left: 20%;
-            width: 40vw;
-            height: 40vw;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(138,43,226,0.08) 0%, rgba(0,0,0,0) 70%);
-            z-index: -1;
-            filter: blur(80px);
+        @keyframes float-glow-alt {
+            0% { transform: translate(0px, 0px) scale(1); }
+            33% { transform: translate(40px, 40px) scale(0.9); }
+            66% { transform: translate(-40px, -10px) scale(1.1); }
+            100% { transform: translate(0px, 0px) scale(1); }
+        }
+
+        .animate-float-glow {
+            animation: float-glow 15s infinite ease-in-out;
+        }
+        .animate-float-reverse {
+            animation: float-glow-reverse 20s infinite ease-in-out;
+        }
+        .animate-float-alt {
+            animation: float-glow-alt 18s infinite ease-in-out;
         }
         
-        /* Animación para pestañas */
+        /* AnimaciÃ³n para pestaÃ±as */
         @keyframes fadeInTab {
             from { opacity: 0; transform: translateY(15px); }
             to { opacity: 1; transform: translateY(0); }
@@ -106,163 +101,127 @@
     </style>
 </head>
 
-<body
-    class="text-white min-h-screen p-4 md:p-6 lg:p-8 flex flex-col xl:flex-row gap-6 max-w-[1800px] mx-auto relative font-sans">
+<body class="text-slate-800 dark:text-gray-100 bg-slate-50 dark:bg-[#030712] transition-colors duration-300 min-h-screen flex flex-col items-center max-w-[1200px] mx-auto relative font-sans overflow-x-hidden">
+    <!-- Ambient Background Orbs (Blurry Blobs) -->
+    <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-cyan-400/20 dark:bg-cyan-400/10 blur-[100px] z-0 animate-float-glow pointer-events-none"></div>
+    <div class="fixed bottom-[-20%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-pink-500/20 dark:bg-pink-500/10 blur-[100px] z-0 animate-float-reverse pointer-events-none"></div>
+    <div class="fixed top-[30%] left-[20%] w-[40vw] h-[40vw] rounded-full bg-purple-500/10 dark:bg-purple-500/5 blur-[100px] z-0 animate-float-alt pointer-events-none"></div>
 
-    <!-- Ambient Background Orbs -->
-    <div class="orb-1"></div>
-    <div class="orb-2"></div>
-    <div class="orb-3"></div>
-
-    <!-- Left Column: Hero & Nav -->
-    <div class="glass-panel w-full xl:w-[60%] 2xl:w-[65%] flex flex-col overflow-hidden relative min-h-[85vh]">
-
-        <!-- Glowing gradient accent top-left inside hero -->
-        <div
-            class="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-cyan-500/5 via-transparent to-pink-500/5 pointer-events-none">
+    <!-- Top Navigation -->
+    <header class="w-full p-6 md:p-8 relative z-20 flex flex-col items-center gap-6">
+        <div class="w-full flex items-center justify-between">
+            <div class="w-24"></div> <!-- Spacer -->
+            <div class="flex items-center gap-2">
+                <span class="text-cyan-500 font-mono text-xl">&lt;/&gt;</span>
+                <span class="font-bold text-lg tracking-wider text-slate-800 dark:text-white">DAN.CODE</span>
+            </div>
+            <div class="flex justify-end gap-3">
+                <button id="btn-theme-toggle" class="glass-panel !bg-white/80 dark:!bg-white/10 hover:!bg-white dark:hover:!bg-white/20 p-2.5 rounded-full transition-all border-white/60 dark:border-white/20 shadow-sm text-slate-700 dark:text-gray-300 flex items-center justify-center">
+                    <!-- Luna: Se muestra en modo claro -->
+                    <svg id="icon-moon" class="w-4 h-4 block dark:hidden" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>
+                    <!-- Sol: Se muestra en modo oscuro -->
+                    <svg id="icon-sun" class="w-4 h-4 hidden dark:block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.66l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" /></svg>
+                </button>
+                <button id="btn-login" class="glass-panel !bg-white/80 dark:!bg-white/10 hover:!bg-white dark:hover:!bg-white/20 px-4 py-2 rounded-full text-xs font-semibold tracking-wider flex items-center gap-2 transition-all border-white/60 dark:border-white/20 shadow-sm text-slate-700 dark:text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
+                        <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
+                        <path d="M12 2v2" />
+                        <path d="M12 22v-2" />
+                        <path d="m17 20.66-1-1.73" />
+                        <path d="M11 10.27 7 3.34" />
+                        <path d="m20.66 17-1.73-1" />
+                        <path d="m3.34 7 1.73 1" />
+                        <path d="M14 12h8" />
+                        <path d="M2 12h2" />
+                        <path d="m20.66 7-1.73 1" />
+                        <path d="m3.34 17 1.73-1" />
+                        <path d="m17 3.34-1 1.73" />
+                        <path d="m11 13.73-4 6.93" />
+                    </svg>
+                    Login
+                </button>
+            </div>
         </div>
 
-        <!-- Navigation -->
-        <nav class="flex items-center justify-between p-6 md:p-8 relative z-10 border-b border-white/5">
-            <div class="flex items-center gap-2">
-                <span class="text-cyan-400 font-mono text-xl">&lt;/&gt;</span>
-                <span class="font-bold text-lg tracking-wider">DAN.CODE</span>
-            </div>
-
-            <div class="hidden lg:flex items-center space-x-8 text-xs font-semibold tracking-widest text-gray-400">
-                <button data-target="section-inicio"
-                    class="nav-btn text-cyan-400 border-b-2 border-cyan-400 pb-1 transition-all">INICIO</button>
-                <button data-target="section-experiencia"
-                    class="nav-btn hover:text-white transition-all pb-1 border-b-2 border-transparent">EXPERIENCIA</button>
-                <button data-target="section-educacion"
-                    class="nav-btn hover:text-white transition-all pb-1 border-b-2 border-transparent">EDUCACIÓN</button>
-                <button data-target="section-proyectos"
-                    class="nav-btn hover:text-white transition-all pb-1 border-b-2 border-transparent">PROYECTOS</button>
-            </div>
-
-            <button id="btn-login"
-                class="glass-panel !bg-white/5 hover:!bg-white/10 px-5 py-2 rounded-full text-xs font-semibold tracking-wider flex items-center gap-2 transition-all border-white/20 hover:border-white/40 shadow-[0_0_15px_rgba(255,255,255,0.05)]">
-                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 20a8 8 0 1 0 0-16 8 8 0 0 0 0 16Z" />
-                    <path d="M12 14a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z" />
-                    <path d="M12 2v2" />
-                    <path d="M12 22v-2" />
-                    <path d="m17 20.66-1-1.73" />
-                    <path d="M11 10.27 7 3.34" />
-                    <path d="m20.66 17-1.73-1" />
-                    <path d="m3.34 7 1.73 1" />
-                    <path d="M14 12h8" />
-                    <path d="M2 12h2" />
-                    <path d="m20.66 7-1.73 1" />
-                    <path d="m3.34 17 1.73-1" />
-                    <path d="m17 3.34-1 1.73" />
-                    <path d="m11 13.73-4 6.93" />
-                </svg>
-                Login
-            </button>
+        <nav class="flex items-center space-x-6 md:space-x-10 text-[11px] md:text-xs font-semibold tracking-widest text-gray-600 dark:text-gray-400">
+            <button data-target="section-inicio" class="nav-btn text-cyan-600 dark:text-cyan-400 border-b-2 border-cyan-500 dark:border-cyan-400 pb-1 transition-all">INICIO</button>
+            <button data-target="section-experiencia" class="nav-btn hover:text-cyan-600 dark:hover:text-cyan-400 transition-all pb-1 border-b-2 border-transparent">EXPERIENCIA</button>
+            <button data-target="section-educacion" class="nav-btn hover:text-cyan-600 dark:hover:text-cyan-400 transition-all pb-1 border-b-2 border-transparent">EDUCACIÓN</button>
+            <button data-target="section-proyectos" class="nav-btn hover:text-cyan-600 dark:hover:text-cyan-400 transition-all pb-1 border-b-2 border-transparent">PROYECTOS</button>
         </nav>
+    </header>
 
-        <!-- Hero Content (Inicio) -->
-        <div id="section-inicio"
-            class="portfolio-section tab-active flex-1 flex flex-col md:flex-row items-center justify-center p-8 lg:p-16 relative z-10 gap-10 lg:gap-16">
-            <!-- Portrait -->
-            <div class="relative w-64 h-64 md:w-80 md:h-80 lg:w-96 lg:h-96 shrink-0">
-                <div
-                    class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-pink-500 rounded-full blur-3xl opacity-30">
+    <!-- Main Content Area -->
+    <main class="w-full flex-1 flex flex-col items-center justify-center p-4 md:p-8 relative z-10 pb-20">
+        
+        <!-- Único Contenedor Central Glassmorphism -->
+        <div class="glass-panel w-full max-w-5xl p-8 md:p-12 relative overflow-hidden flex flex-col min-h-[70vh]">
+            
+            <!-- Acentos de neón integrados en el contenedor general -->
+            <div class="absolute top-0 right-0 w-40 h-40 bg-pink-500/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute bottom-0 left-0 w-40 h-40 bg-cyan-500/10 blur-3xl pointer-events-none"></div>
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/10 blur-[80px] pointer-events-none"></div>
+
+            <!-- Hero Content (Inicio) -->
+            <div id="section-inicio" class="portfolio-section tab-active w-full h-full flex flex-col items-center justify-center text-center relative flex-1">
+                <div class="relative w-48 h-48 md:w-56 md:h-56 lg:w-64 lg:h-64 mb-8 shrink-0">
+                    <div class="absolute inset-0 bg-gradient-to-tr from-cyan-400 to-pink-500 rounded-full blur-2xl opacity-20 dark:opacity-40"></div>
+                    <img src="https://prmrhdxmvgueyduztiii.supabase.co/storage/v1/object/public/imagenes-portfolio/profile_1778880986580_889.png"
+                        alt="Daniela"
+                        id="foto-perfil"
+                        class="w-full h-full object-cover rounded-full border border-white dark:border-white/20 shadow-lg relative z-10 bg-pink-100 dark:bg-pink-400">
                 </div>
-                <img src="https://prmrhdxmvgueyduztiii.supabase.co/storage/v1/object/public/imagenes-portfolio/profile_1778880986580_889.png"
-                    alt="Daniela"
-                    id="foto-perfil"
-                    class="w-full h-full object-cover rounded-full border border-white/20 shadow-[0_0_50px_rgba(255,255,255,0.05)] relative z-10">
-            </div>
 
-            <!-- Text Content -->
-            <div class="flex flex-col items-center md:items-start text-center md:text-left">
-                <h2 class="text-gray-300 text-2xl lg:text-3xl font-light mb-3">Hola, Soy Daniela Cabrera.</h2>
-                <h2 class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold leading-tight mb-10 text-glow">
-                    Programadora<br>& Desarrolladora de software.
-                </h2>
-                <button
-                    class="glass-panel !bg-white/5 hover:!bg-white/10 px-8 py-3.5 rounded-full text-xs font-bold tracking-widest transition-all border border-white/20 hover:border-white/40 shadow-[0_0_20px_rgba(255,255,255,0.1)]">
+                <h2 class="text-slate-600 dark:text-gray-300 text-xl md:text-2xl font-light mb-3 transition-colors" id="portfolio-name">Hola, Soy Daniela Cabrera.</h2>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight mb-10 text-slate-800 dark:text-white text-glow transition-colors" id="portfolio-title">
+                    Programadora &<br>Desarrolladora de software
+                </h1>
+                
+                <button id="portfolio-btn" class="glass-panel !bg-white/80 dark:!bg-white/5 hover:!bg-white dark:hover:!bg-white/10 px-8 py-3.5 rounded-full text-xs font-bold tracking-widest transition-all border border-cyan-200 dark:border-white/20 hover:border-cyan-400 dark:hover:border-white/40 shadow-md dark:shadow-[0_0_20px_rgba(255,255,255,0.1)] text-slate-800 dark:text-white">
                     DESCUBRE MI MUNDO.
                 </button>
             </div>
-        </div>
-    </div>
 
-    <!-- Right Column: Sections -->
-    <div class="w-full xl:w-[40%] 2xl:w-[35%] flex flex-col gap-6">
-
-        <!-- Experiencia -->
-        <div id="section-experiencia"
-            class="portfolio-section hidden glass-panel p-6 lg:p-8 flex-1 flex flex-col relative overflow-hidden min-h-[250px]">
-            <!-- Glowing gradient accent -->
-            <div class="absolute top-0 right-0 w-40 h-40 bg-pink-500/10 blur-3xl pointer-events-none"></div>
-
-            <h3 class="text-center text-sm font-bold tracking-widest mb-8 text-gray-200">EXPERIENCIA</h3>
-
-            <div id="experience-container" class="relative pl-6 border-l border-white/10 space-y-6 flex-1 ml-4">
-                <div class="text-center text-gray-400 text-sm py-10">Cargando experiencia...</div>
-            </div>
-        </div>
-
-        <!-- Educación -->
-        <div id="section-educacion"
-            class="portfolio-section hidden glass-panel p-6 lg:p-8 relative overflow-hidden min-h-[200px] flex flex-col justify-center">
-            <!-- Glowing gradient accent -->
-            <div class="absolute bottom-0 left-0 w-40 h-40 bg-cyan-500/10 blur-3xl pointer-events-none"></div>
-
-            <h3 class="text-center text-sm font-bold tracking-widest mb-8 text-gray-200">EDUCACIÓN</h3>
-
-            <div id="education-container" class="flex flex-wrap justify-center gap-12 lg:gap-16 items-center">
-                <div class="text-center text-gray-400 text-sm py-10">Cargando educación...</div>
-            </div>
-        </div>
-
-        <!-- Proyectos -->
-        <div id="section-proyectos"
-            class="portfolio-section hidden glass-panel p-6 lg:p-8 flex-1 flex flex-col relative overflow-hidden min-h-[300px]">
-            <!-- Glowing gradient accent -->
-            <div
-                class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-purple-500/10 blur-[80px] pointer-events-none">
+            <!-- Experiencia -->
+            <div id="section-experiencia" class="portfolio-section hidden w-full h-full flex flex-col flex-1">
+                <h3 class="text-center text-sm font-bold tracking-widest mb-8 text-slate-700 dark:text-gray-200 transition-colors">EXPERIENCIA</h3>
+                <div id="experience-container" class="relative pl-6 border-l border-slate-200 dark:border-white/10 space-y-6 flex-1 ml-4 mx-auto w-full max-w-2xl overflow-y-auto pr-4 custom-scrollbar">
+                    <div class="text-center text-slate-500 dark:text-gray-400 text-sm py-10">Cargando experiencia...</div>
+                </div>
             </div>
 
-            <h3 class="text-center text-sm font-bold tracking-widest mb-6 text-gray-200">PROYECTOS</h3>
-
-            <!-- Filters -->
-            <div class="flex flex-wrap justify-center gap-2 mb-8" id="project-filters">
-                <button data-filter="all"
-                    class="filter-btn active px-5 py-2 rounded-full text-[10px] font-bold bg-white text-black tracking-widest shadow-[0_0_15px_rgba(255,255,255,0.2)]">TODOS</button>
-                <button data-filter="web"
-                    class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors tracking-widest border border-white/5">WEB
-                    APPS</button>
-                <button data-filter="mini"
-                    class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors tracking-widest border border-white/5 relative group">
-                    MINIJUEGOS
-                    <!-- Cursor interaction hint -->
-                    <span class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <svg class="w-4 h-4 text-white drop-shadow-md" fill="currentColor" viewBox="0 0 24 24">
-                            <path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2 1-3.2-7.4-4.4 4.8z" />
-                        </svg>
-                    </span>
-                </button>
-                <button data-filter="backend"
-                    class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/5 text-gray-300 hover:text-white hover:bg-white/10 transition-colors tracking-widest border border-white/5">BACKEND</button>
+            <!-- Educación -->
+            <div id="section-educacion" class="portfolio-section hidden w-full h-full flex flex-col justify-center flex-1">
+                <h3 class="text-center text-sm font-bold tracking-widest mb-8 text-slate-700 dark:text-gray-200 transition-colors">EDUCACIÓN</h3>
+                <div id="education-container" class="flex flex-wrap justify-center gap-12 lg:gap-16 items-center">
+                    <div class="text-center text-slate-500 dark:text-gray-400 text-sm py-10">Cargando educación...</div>
+                </div>
             </div>
 
-            <!-- Grid -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 overflow-y-auto pr-2 custom-scrollbar flex-1 content-start"
-                id="project-grid">
-                <div class="col-span-full text-center text-gray-400 text-sm py-10">
-                    Cargando proyectos desde Supabase...
+            <!-- Proyectos -->
+            <div id="section-proyectos" class="portfolio-section hidden w-full h-full flex flex-col flex-1">
+                <h3 class="text-center text-sm font-bold tracking-widest mb-6 text-slate-700 dark:text-gray-200 transition-colors">PROYECTOS</h3>
+                
+                <div class="flex flex-wrap justify-center gap-2 mb-8 shrink-0" id="project-filters">
+                    <button data-filter="all" class="filter-btn active px-5 py-2 rounded-full text-[10px] font-bold bg-slate-800 dark:bg-white text-white dark:text-black tracking-widest shadow-md dark:shadow-[0_0_15px_rgba(255,255,255,0.2)]">TODOS</button>
+                    <button data-filter="web" class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/60 dark:bg-white/5 text-slate-600 dark:text-gray-300 hover:text-slate-800 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition-colors tracking-widest border border-slate-200 dark:border-white/5 shadow-sm">WEB APPS</button>
+                    <button data-filter="mini" class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/60 dark:bg-white/5 text-slate-600 dark:text-gray-300 hover:text-slate-800 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition-colors tracking-widest border border-slate-200 dark:border-white/5 shadow-sm relative group">
+                        MINIJUEGOS
+                        <span class="absolute -right-2 -bottom-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <svg class="w-4 h-4 text-slate-800 dark:text-white drop-shadow-sm" fill="currentColor" viewBox="0 0 24 24"><path d="M7 2l12 11.2-5.8.5 3.3 7.3-2.2 1-3.2-7.4-4.4 4.8z"/></svg>
+                        </span>
+                    </button>
+                    <button data-filter="backend" class="filter-btn px-5 py-2 rounded-full text-[10px] font-bold bg-white/60 dark:bg-white/5 text-slate-600 dark:text-gray-300 hover:text-slate-800 dark:hover:text-white hover:bg-white dark:hover:bg-white/10 transition-colors tracking-widest border border-slate-200 dark:border-white/5 shadow-sm">BACKEND</button>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 overflow-y-auto pr-2 custom-scrollbar flex-1 content-start max-h-[60vh]" id="project-grid">
+                    <div class="col-span-full text-center text-slate-500 dark:text-gray-400 text-sm py-10">Cargando proyectos desde Supabase...</div>
                 </div>
             </div>
 
         </div>
-
-    </div>
-
+    </main>
     <!-- Supabase CDN & Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="src/supabase-client.js"></script>
@@ -298,6 +257,10 @@
 
         document.addEventListener('DOMContentLoaded', async () => {
 
+            // Check if user is logged in to enable inline editing
+            const { data: { session } } = await window.supabaseClient.auth.getSession();
+            const isAdmin = !!session;
+
             // --- Profile & Dynamic Data Loading ---
             const loadProfile = async () => {
                 try {
@@ -309,7 +272,7 @@
                         if(p.btnText) document.getElementById('portfolio-btn').innerHTML = p.btnText;
                         if(p.image || p.url_foto) {
                             const imageSource = p.image || p.url_foto;
-                            // Limpieza de Caché: parámetro dinámico
+                            // Limpieza de CachÃ©: parÃ¡metro dinÃ¡mico
                             const timestamp = new Date().getTime();
                             const imageUrl = imageSource.includes('?') ? `${imageSource}&t=${timestamp}` : `${imageSource}?t=${timestamp}`;
                             
@@ -317,7 +280,7 @@
                             if(imgElem) imgElem.src = imageUrl;
                         }
                     }
-                } catch (e) { console.log('Sin perfil personalizado aún.'); }
+                } catch (e) { console.log('Sin perfil personalizado aÃºn.'); }
             };
 
             const loadExperience = async () => {
@@ -326,7 +289,7 @@
                 try {
                     const { data, error } = await window.supabaseClient.from('experiencia').select('*').order('created_at', { ascending: false });
                     if (error || !data || data.length === 0) {
-                        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No hay experiencia cargada aún.</div>';
+                        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No hay experiencia cargada aÃºn.</div>';
                         return;
                     }
                     container.innerHTML = '';
@@ -334,22 +297,50 @@
                         const isFirst = index === 0;
                         const techStack = exp.tecnologias.split(',').map(t => t.trim());
                         
+                        const adminControls = isAdmin ? `
+                            <div class="mt-4 flex gap-2 justify-end border-t border-slate-200 dark:border-white/10 pt-3">
+                                <button onclick="habilitarEdicion('${exp.id}')" id="btn-edit-${exp.id}" class="text-xs px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 transition-colors shadow-sm">Editar</button>
+                                <button onclick="guardarCambios('experiencia', '${exp.id}')" id="btn-save-${exp.id}" class="hidden text-xs px-3 py-1.5 rounded-full bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-200 dark:hover:bg-cyan-500/30 transition-colors shadow-sm">Guardar</button>
+                                <button onclick="cancelarEdicion('${exp.id}')" id="btn-cancel-${exp.id}" class="hidden text-xs px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors shadow-sm">Cancelar</button>
+                            </div>
+                        ` : '';
+
                         const el = document.createElement('div');
                         el.className = 'relative';
                         el.innerHTML = `
-                            <div class="absolute -left-[31px] top-1.5 w-${isFirst ? '3.5' : '2.5'} h-${isFirst ? '3.5' : '2.5'} rounded-full ${isFirst ? 'bg-cyan-400 shadow-[0_0_12px_#00f2fe]' : 'border border-gray-500 bg-[#030712]'}"></div>
-                            <div class="glass-panel !bg-white/5 p-4 lg:p-5 !border-white/10 ml-2 ${isFirst ? '' : 'opacity-60 hover:opacity-100 transition-opacity'}">
-                                <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
-                                    <h4 class="font-medium text-sm lg:text-base">${exp.empresa} - ${exp.cargo}</h4>
-                                    <span class="text-xs ${isFirst ? 'text-cyan-400 font-medium' : 'text-gray-400'} whitespace-nowrap">${exp.fecha}</span>
+                            <div class="absolute -left-[31px] top-1.5 w-${isFirst ? '3.5' : '2.5'} h-${isFirst ? '3.5' : '2.5'} rounded-full ${isFirst ? 'bg-cyan-500 dark:bg-cyan-400 shadow-[0_0_10px_#00f2fe]' : 'border border-slate-300 dark:border-gray-500 bg-slate-100 dark:bg-[#030712]'}"></div>
+                            <div class="glass-panel !bg-white/60 dark:!bg-white/5 p-4 lg:p-5 !border-white/60 dark:!border-white/10 ml-2 ${isFirst ? '' : 'opacity-80 dark:opacity-60 hover:opacity-100 transition-opacity'}" id="card-${exp.id}">
+                                
+                                <!-- ESTADO: VISTA -->
+                                <div id="view-state-${exp.id}" class="block">
+                                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2 mb-2">
+                                        <h4 class="font-medium text-sm lg:text-base text-slate-800 dark:text-white" id="view-cargo-${exp.id}">${exp.empresa} - ${exp.cargo}</h4>
+                                        <span class="text-xs ${isFirst ? 'text-cyan-600 dark:text-cyan-400 font-medium' : 'text-slate-500 dark:text-gray-400'} whitespace-nowrap" id="view-fecha-${exp.id}">${exp.fecha}</span>
+                                    </div>
+                                    <div class="flex flex-wrap gap-2 mt-3" id="view-tech-${exp.id}">
+                                        ${techStack.map(t => `
+                                            <span class="text-[11px] bg-slate-100/50 dark:bg-white/5 border border-slate-200 dark:border-white/10 px-2.5 py-1 rounded-md text-slate-600 dark:text-gray-300 flex items-center gap-1.5 font-medium">
+                                                <span class="w-2 h-2 rounded-full bg-cyan-400 dark:bg-white/20 inline-block"></span> ${t}
+                                            </span>
+                                        `).join('')}
+                                    </div>
+                                    <!-- Hidden storage for raw tech stack so edit can retrieve it easily -->
+                                    <span id="raw-tech-${exp.id}" class="hidden">${exp.tecnologias}</span>
+                                    <span id="raw-empresa-${exp.id}" class="hidden">${exp.empresa}</span>
+                                    <span id="raw-cargo-${exp.id}" class="hidden">${exp.cargo}</span>
                                 </div>
-                                <div class="flex flex-wrap gap-2 mt-3">
-                                    ${techStack.map(t => `
-                                        <span class="text-[11px] bg-white/5 border border-white/10 px-2.5 py-1 rounded-md text-gray-300 flex items-center gap-1.5 font-medium">
-                                            <span class="w-2 h-2 rounded-full bg-white/20 inline-block"></span> ${t}
-                                        </span>
-                                    `).join('')}
+
+                                <!-- ESTADO: EDICIÓN -->
+                                <div id="edit-state-${exp.id}" class="hidden flex-col gap-3">
+                                    <div class="flex gap-2">
+                                        <input type="text" id="input-empresa-${exp.id}" value="${exp.empresa}" placeholder="Empresa" class="w-1/2 bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-2 text-slate-800 dark:text-white text-sm focus:border-cyan-400 focus:outline-none shadow-inner">
+                                        <input type="text" id="input-cargo-${exp.id}" value="${exp.cargo}" placeholder="Cargo" class="w-1/2 bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-2 text-slate-800 dark:text-white text-sm focus:border-cyan-400 focus:outline-none shadow-inner">
+                                    </div>
+                                    <input type="text" id="input-fecha-${exp.id}" value="${exp.fecha}" placeholder="Fecha (ej: 2021 - 2023)" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-2 text-slate-800 dark:text-white text-sm focus:border-cyan-400 focus:outline-none shadow-inner">
+                                    <textarea id="input-tech-${exp.id}" placeholder="Tecnologías (separadas por coma)" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-2 text-slate-800 dark:text-white text-sm focus:border-cyan-400 focus:outline-none shadow-inner" rows="2">${exp.tecnologias}</textarea>
                                 </div>
+
+                                ${adminControls}
                             </div>
                         `;
                         container.appendChild(el);
@@ -365,37 +356,67 @@
                 try {
                     const { data, error } = await window.supabaseClient.from('educacion').select('*').order('created_at', { ascending: false });
                     if (error || !data || data.length === 0) {
-                        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No hay educación cargada aún.</div>';
+                        container.innerHTML = '<div class="text-center text-gray-400 text-sm py-10">No hay educaciÃ³n cargada aÃºn.</div>';
                         return;
                     }
                     container.innerHTML = '';
                     data.forEach(edu => {
                         const colors = {
-                            red: 'text-red-400 bg-red-500/10 border-red-500/20 hover:border-red-400/50',
-                            yellow: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20 hover:border-yellow-400/50',
-                            cyan: 'text-cyan-400 bg-cyan-500/10 border-cyan-500/20 hover:border-cyan-400/50',
-                            pink: 'text-pink-400 bg-pink-500/10 border-pink-500/20 hover:border-pink-400/50',
-                            purple: 'text-purple-400 bg-purple-500/10 border-purple-500/20 hover:border-purple-400/50'
+                            red: 'text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-500/10 border-red-200 dark:border-red-500/20 hover:border-red-300 dark:hover:border-red-400/50',
+                            yellow: 'text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-500/10 border-yellow-200 dark:border-yellow-500/20 hover:border-yellow-300 dark:hover:border-yellow-400/50',
+                            cyan: 'text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-500/10 border-cyan-200 dark:border-cyan-500/20 hover:border-cyan-300 dark:hover:border-cyan-400/50',
+                            pink: 'text-pink-600 dark:text-pink-400 bg-pink-50 dark:bg-pink-500/10 border-pink-200 dark:border-pink-500/20 hover:border-pink-300 dark:hover:border-pink-400/50',
+                            purple: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-500/10 border-purple-200 dark:border-purple-500/20 hover:border-purple-300 dark:hover:border-purple-400/50'
                         };
                         const c = colors[edu.color_badge] || colors.cyan;
                         const [textColor, bgColor, borderColor, hoverBorderColor] = c.split(' ');
 
-                        const el = document.createElement('div');
-                        el.className = 'flex flex-col items-center gap-4';
-                        el.innerHTML = `
-                            <div class="relative w-24 h-24 lg:w-28 lg:h-28 flex items-center justify-center rounded-full border border-white/10 bg-white/5 backdrop-blur-md group ${hoverBorderColor} transition-colors shadow-lg">
-                                <div class="absolute inset-0 border border-white/5 rounded-full scale-[1.15]"></div>
-                                <div class="absolute inset-0 border border-white/5 rounded-full scale-[1.3] opacity-50"></div>
-                                <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full ${bgColor} border ${borderColor} flex items-center justify-center">
-                                    <span class="${textColor} text-xl lg:text-2xl font-bold">${edu.siglas}</span>
-                                </div>
+                        const adminControls = isAdmin ? `
+                            <div class="mt-3 flex gap-2 justify-center w-full">
+                                <button onclick="habilitarEdicion('${edu.id}')" id="btn-edit-${edu.id}" class="text-xs px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 transition-colors shadow-sm">Editar</button>
+                                <button onclick="guardarCambios('educacion', '${edu.id}')" id="btn-save-${edu.id}" class="hidden text-xs px-3 py-1.5 rounded-full bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-200 dark:hover:bg-cyan-500/30 transition-colors shadow-sm">Guardar</button>
+                                <button onclick="cancelarEdicion('${edu.id}')" id="btn-cancel-${edu.id}" class="hidden text-xs px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors shadow-sm">Cancelar</button>
                             </div>
-                            <p class="text-[11px] lg:text-xs text-center text-gray-400 max-w-[120px] leading-tight font-medium">${edu.titulo} en ${edu.institucion}</p>
+                        ` : '';
+
+                        const el = document.createElement('div');
+                        el.className = 'flex flex-col items-center gap-4 relative';
+                        el.innerHTML = `
+                            <!-- ESTADO: VISTA -->
+                            <div id="view-state-${edu.id}" class="flex flex-col items-center gap-4 w-full block">
+                                <div class="relative w-24 h-24 lg:w-28 lg:h-28 flex items-center justify-center rounded-full border border-white dark:border-white/10 bg-white/70 dark:bg-white/5 backdrop-blur-md group ${hoverBorderColor} transition-colors shadow-sm dark:shadow-lg">
+                                    <div class="absolute inset-0 border border-slate-100 dark:border-white/5 rounded-full scale-[1.15]"></div>
+                                    <div class="absolute inset-0 border border-slate-50 dark:border-white/5 rounded-full scale-[1.3] opacity-50"></div>
+                                    <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full ${bgColor} border ${borderColor} flex items-center justify-center shadow-sm dark:shadow-none">
+                                        <span class="${textColor} text-xl lg:text-2xl font-bold" id="view-siglas-${edu.id}">${edu.siglas}</span>
+                                    </div>
+                                </div>
+                                <p class="text-[11px] lg:text-xs text-center text-slate-600 dark:text-gray-400 max-w-[120px] leading-tight font-medium" id="view-titulo-${edu.id}">${edu.titulo} en ${edu.institucion}</p>
+                                <span id="raw-titulo-${edu.id}" class="hidden">${edu.titulo}</span>
+                                <span id="raw-institucion-${edu.id}" class="hidden">${edu.institucion}</span>
+                                <span id="raw-color-${edu.id}" class="hidden">${edu.color_badge}</span>
+                            </div>
+
+                            <!-- ESTADO: EDICIÓN -->
+                            <div id="edit-state-${edu.id}" class="hidden flex-col gap-2 w-full max-w-[180px] p-4 glass-panel !bg-white/90 dark:!bg-black/60 shadow-lg absolute top-0 z-50">
+                                <input type="text" id="input-siglas-${edu.id}" value="${edu.siglas}" placeholder="Siglas" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                <input type="text" id="input-titulo-${edu.id}" value="${edu.titulo}" placeholder="Título" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                <input type="text" id="input-institucion-${edu.id}" value="${edu.institucion}" placeholder="Institución" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                <select id="input-color-${edu.id}" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                    <option value="cyan" ${edu.color_badge === 'cyan' ? 'selected' : ''}>Cian</option>
+                                    <option value="pink" ${edu.color_badge === 'pink' ? 'selected' : ''}>Rosa</option>
+                                    <option value="purple" ${edu.color_badge === 'purple' ? 'selected' : ''}>Púrpura</option>
+                                    <option value="yellow" ${edu.color_badge === 'yellow' ? 'selected' : ''}>Amarillo</option>
+                                    <option value="red" ${edu.color_badge === 'red' ? 'selected' : ''}>Rojo</option>
+                                </select>
+                            </div>
+
+                            ${adminControls}
                         `;
                         container.appendChild(el);
                     });
                 } catch (e) {
-                    container.innerHTML = '<div class="text-center text-red-400 text-sm py-10">Error al cargar educación.</div>';
+                    container.innerHTML = '<div class="text-center text-red-400 text-sm py-10">Error al cargar educaciÃ³n.</div>';
                 }
             };
 
@@ -424,7 +445,27 @@
                 console.log("No Supabase configuration available yet or error fetching theme.", e);
             }
 
-            // Theme ButtonsButton Logic ---
+            // Theme Toggle Logic ---
+            const btnThemeToggle = document.getElementById('btn-theme-toggle');
+            if (btnThemeToggle) {
+                // Initial check for dark mode
+                if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    document.documentElement.classList.add('dark');
+                } else {
+                    document.documentElement.classList.remove('dark');
+                }
+
+                btnThemeToggle.addEventListener('click', () => {
+                    document.documentElement.classList.toggle('dark');
+                    if (document.documentElement.classList.contains('dark')) {
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        localStorage.setItem('theme', 'light');
+                    }
+                });
+            }
+
+            // Login Button Logic ---
             const btnLogin = document.getElementById('btn-login');
             if (btnLogin) {
                 btnLogin.addEventListener('click', () => {
@@ -448,7 +489,7 @@
                     projectGrid.innerHTML = ''; // Clear loading text
 
                     if (!projects || projects.length === 0) {
-                        projectGrid.innerHTML = '<div class="col-span-full text-center text-gray-400 text-sm py-10">No hay proyectos para mostrar aún.</div>';
+                        projectGrid.innerHTML = '<div class="col-span-full text-center text-gray-400 text-sm py-10">No hay proyectos para mostrar aÃºn.</div>';
                         return;
                     }
 
@@ -456,7 +497,7 @@
                         const techStack = p.tech_stack ? p.tech_stack.split(',').slice(0, 2) : [];
 
                         const card = document.createElement('div');
-                        card.className = 'project-card glass-panel !bg-white/5 !border-white/10 rounded-xl overflow-hidden group hover:border-themePrimary/20 transition-all';
+                        card.className = 'project-card glass-panel !bg-white/80 dark:!bg-white/5 !border-white/60 dark:!border-white/10 rounded-xl overflow-hidden group hover:border-cyan-300 dark:hover:border-themePrimary/20 transition-all shadow-md';
                         card.setAttribute('data-category', p.category);
 
                         // Default image if none (since we didn't add image upload, using placeholder based on category)
@@ -467,25 +508,57 @@
                         // Check if demo or github
                         const actionUrl = p.demo_url || p.github_url || '#';
 
+                        const adminControls = isAdmin ? `
+                            <div class="mt-2 flex gap-2 justify-end w-full px-4 pb-4">
+                                <button onclick="habilitarEdicion('${p.id}')" id="btn-edit-${p.id}" class="relative z-50 text-xs px-3 py-1.5 rounded-full bg-slate-100 dark:bg-white/10 hover:bg-slate-200 dark:hover:bg-white/20 text-slate-600 dark:text-slate-300 transition-colors shadow-sm">Editar</button>
+                                <button onclick="guardarCambios('proyectos', '${p.id}')" id="btn-save-${p.id}" class="hidden relative z-50 text-xs px-3 py-1.5 rounded-full bg-cyan-100 dark:bg-cyan-500/20 text-cyan-700 dark:text-cyan-400 hover:bg-cyan-200 dark:hover:bg-cyan-500/30 transition-colors shadow-sm">Guardar</button>
+                                <button onclick="cancelarEdicion('${p.id}')" id="btn-cancel-${p.id}" class="hidden relative z-50 text-xs px-3 py-1.5 rounded-full bg-red-100 dark:bg-red-500/10 text-red-600 dark:text-red-400 hover:bg-red-200 dark:hover:bg-red-500/20 transition-colors shadow-sm">Cancelar</button>
+                            </div>
+                        ` : '';
+
                         card.innerHTML = `
-                            <a href="${actionUrl}" target="_blank" class="block h-full relative cursor-pointer">
-                                <div class="h-32 bg-gray-900 relative overflow-hidden">
-                                    <img src="${imgUrl}" alt="${p.title}" class="w-full h-full object-cover opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
-                                    <div class="absolute bottom-2 left-2 flex gap-2">
-                                        <span class="bg-black/50 backdrop-blur-md p-1.5 rounded-md text-white shadow-lg">
-                                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
-                                        </span>
+                            <!-- ESTADO: VISTA -->
+                            <div id="view-state-${p.id}" class="block h-full">
+                                <a href="${actionUrl}" target="_blank" class="block h-full relative cursor-pointer">
+                                    <div class="h-32 bg-slate-100 dark:bg-gray-900 relative overflow-hidden">
+                                        <img src="${imgUrl}" alt="${p.title}" class="w-full h-full object-cover opacity-90 dark:opacity-70 group-hover:opacity-100 group-hover:scale-105 transition-all duration-500">
+                                        <div class="absolute bottom-2 left-2 flex gap-2">
+                                            <span class="bg-white/80 dark:bg-black/50 backdrop-blur-md p-1.5 rounded-md text-slate-800 dark:text-white shadow-sm dark:shadow-lg">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+                                            </span>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="p-4 flex items-center justify-between bg-white/5 border-t border-white/5">
-                                    <span class="text-sm font-semibold truncate pr-2">${p.title}</span>
-                                    <div class="flex gap-1.5 shrink-0">
-                                        ${techStack.map(tech => `
-                                            <span class="w-6 h-6 rounded-full bg-themePrimary/20 border border-themePrimary/30 flex items-center justify-center text-[8px] font-bold text-themePrimary truncate px-1">${tech.substring(0, 2).toUpperCase()}</span>
-                                        `).join('')}
+                                    <div class="p-4 flex items-center justify-between bg-white dark:bg-white/5 border-t border-slate-100 dark:border-white/5">
+                                        <span class="text-sm font-semibold truncate pr-2 text-slate-800 dark:text-white" id="view-title-${p.id}">${p.title}</span>
+                                        <div class="flex gap-1.5 shrink-0" id="view-tech-${p.id}">
+                                            ${techStack.map(tech => `
+                                                <span class="w-6 h-6 rounded-full bg-cyan-50 dark:bg-themePrimary/20 border border-cyan-100 dark:border-themePrimary/30 flex items-center justify-center text-[8px] font-bold text-cyan-600 dark:text-themePrimary truncate px-1">${tech.substring(0, 2).toUpperCase()}</span>
+                                            `).join('')}
+                                        </div>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
+                                <span id="raw-title-${p.id}" class="hidden">${p.title}</span>
+                                <span id="raw-category-${p.id}" class="hidden">${p.category}</span>
+                                <span id="raw-tech-${p.id}" class="hidden">${p.tech_stack}</span>
+                                <span id="raw-demo-${p.id}" class="hidden">${p.demo_url || ''}</span>
+                                <span id="raw-github-${p.id}" class="hidden">${p.github_url || ''}</span>
+                            </div>
+
+                            <!-- ESTADO: EDICIÓN -->
+                            <div id="edit-state-${p.id}" class="hidden flex-col gap-2 p-4 h-full bg-white dark:bg-[#030712]/90 backdrop-blur-md">
+                                <input type="text" id="input-title-${p.id}" value="${p.title}" placeholder="Título del Proyecto" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                <select id="input-category-${p.id}" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                    <option value="web" ${p.category === 'web' ? 'selected' : ''}>Web App</option>
+                                    <option value="backend" ${p.category === 'backend' ? 'selected' : ''}>Backend / API</option>
+                                    <option value="game" ${p.category === 'game' ? 'selected' : ''}>Videojuego</option>
+                                    <option value="other" ${p.category === 'other' ? 'selected' : ''}>Otro</option>
+                                </select>
+                                <input type="text" id="input-demo-${p.id}" value="${p.demo_url || ''}" placeholder="URL Demo" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                <input type="text" id="input-github-${p.id}" value="${p.github_url || ''}" placeholder="URL GitHub" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none">
+                                <textarea id="input-tech-${p.id}" placeholder="Tecnologías (separadas por coma)" class="w-full bg-white/50 dark:bg-black/30 border border-slate-200 dark:border-white/10 rounded-md p-1.5 text-slate-800 dark:text-white text-xs focus:border-cyan-400 focus:outline-none" rows="2">${p.tech_stack}</textarea>
+                            </div>
+
+                            ${adminControls}
                         `;
                         projectGrid.appendChild(card);
                     });
@@ -511,12 +584,12 @@
 
                     newBtn.addEventListener('click', () => {
                         document.querySelectorAll('.filter-btn').forEach(b => {
-                            b.classList.remove('bg-white', 'text-black', 'shadow-[0_0_15px_rgba(255,255,255,0.2)]');
-                            b.classList.add('bg-white/5', 'text-gray-300');
+                            b.classList.remove('bg-slate-800', 'text-white', 'shadow-md', 'dark:bg-white', 'dark:text-black', 'dark:shadow-[0_0_15px_rgba(255,255,255,0.2)]');
+                            b.classList.add('bg-white/60', 'text-slate-600', 'dark:bg-white/5', 'dark:text-gray-300');
                         });
 
-                        newBtn.classList.add('bg-white', 'text-black', 'shadow-[0_0_15px_rgba(255,255,255,0.2)]');
-                        newBtn.classList.remove('bg-white/5', 'text-gray-300');
+                        newBtn.classList.add('bg-slate-800', 'text-white', 'shadow-md', 'dark:bg-white', 'dark:text-black', 'dark:shadow-[0_0_15px_rgba(255,255,255,0.2)]');
+                        newBtn.classList.remove('bg-white/60', 'text-slate-600', 'dark:bg-white/5', 'dark:text-gray-300');
 
                         const filterValue = newBtn.getAttribute('data-filter');
 
@@ -547,17 +620,17 @@
 
                     // 1. Actualizar estado visual de los botones
                     navBtns.forEach(nav => {
-                        nav.classList.remove('text-cyan-400', 'border-cyan-400');
-                        nav.classList.add('text-gray-400', 'border-transparent');
+                        nav.classList.remove('text-cyan-600', 'border-cyan-500', 'dark:text-cyan-400', 'dark:border-cyan-400');
+                        nav.classList.add('text-gray-600', 'border-transparent', 'dark:text-gray-400');
                     });
-                    btn.classList.remove('text-gray-400', 'border-transparent');
-                    btn.classList.add('text-cyan-400', 'border-cyan-400');
+                    btn.classList.remove('text-gray-600', 'border-transparent', 'dark:text-gray-400');
+                    btn.classList.add('text-cyan-600', 'border-cyan-500', 'dark:text-cyan-400', 'dark:border-cyan-400');
 
                     // 2. Ocultar todas las secciones y mostrar la seleccionada
                     sections.forEach(sec => {
                         if (sec.id === targetId) {
                             sec.classList.remove('hidden');
-                            // Reiniciar animación para efecto fluido
+                            // Reiniciar animaciÃ³n para efecto fluido
                             sec.classList.remove('tab-active');
                             void sec.offsetWidth; // Force reflow
                             sec.classList.add('tab-active');
@@ -575,7 +648,7 @@
             loadEducation();
             loadProjects();
 
-            // Sincronización Inmediata (Realtime)
+            // SincronizaciÃ³n Inmediata (Realtime)
             try {
                 window.supabaseClient
                     .channel('schema-db-changes')
@@ -592,7 +665,92 @@
                 console.log('Realtime no configurado completamente.');
             }
         });
+
+        // --- GLOBAL INLINE EDITING FUNCTIONS ---
+        window.habilitarEdicion = (id) => {
+            document.getElementById(`view-state-${id}`).classList.add('hidden');
+            document.getElementById(`view-state-${id}`).classList.remove('block');
+            document.getElementById(`edit-state-${id}`).classList.remove('hidden');
+            document.getElementById(`edit-state-${id}`).classList.add('flex');
+
+            document.getElementById(`btn-edit-${id}`).classList.add('hidden');
+            document.getElementById(`btn-save-${id}`).classList.remove('hidden');
+            document.getElementById(`btn-cancel-${id}`).classList.remove('hidden');
+        };
+
+        window.cancelarEdicion = (id) => {
+            // Revert inputs to raw values just in case they were modified before canceling
+            if(document.getElementById(`input-cargo-${id}`)) document.getElementById(`input-cargo-${id}`).value = document.getElementById(`raw-cargo-${id}`).innerText;
+            if(document.getElementById(`input-empresa-${id}`)) document.getElementById(`input-empresa-${id}`).value = document.getElementById(`raw-empresa-${id}`).innerText;
+            if(document.getElementById(`input-tech-${id}`)) document.getElementById(`input-tech-${id}`).value = document.getElementById(`raw-tech-${id}`).innerText;
+            if(document.getElementById(`input-titulo-${id}`)) document.getElementById(`input-titulo-${id}`).value = document.getElementById(`raw-titulo-${id}`).innerText;
+            if(document.getElementById(`input-institucion-${id}`)) document.getElementById(`input-institucion-${id}`).value = document.getElementById(`raw-institucion-${id}`).innerText;
+            if(document.getElementById(`input-title-${id}`)) document.getElementById(`input-title-${id}`).value = document.getElementById(`raw-title-${id}`).innerText;
+
+            document.getElementById(`edit-state-${id}`).classList.add('hidden');
+            document.getElementById(`edit-state-${id}`).classList.remove('flex');
+            document.getElementById(`view-state-${id}`).classList.remove('hidden');
+            document.getElementById(`view-state-${id}`).classList.add('block');
+
+            document.getElementById(`btn-save-${id}`).classList.add('hidden');
+            document.getElementById(`btn-cancel-${id}`).classList.add('hidden');
+            document.getElementById(`btn-edit-${id}`).classList.remove('hidden');
+        };
+
+        window.guardarCambios = async (tabla, id) => {
+            const btnSave = document.getElementById(`btn-save-${id}`);
+            btnSave.innerText = 'Guardando...';
+            btnSave.disabled = true;
+
+            try {
+                let datosActualizados = {};
+                
+                if (tabla === 'experiencia') {
+                    datosActualizados = {
+                        cargo: document.getElementById(`input-cargo-${id}`).value,
+                        empresa: document.getElementById(`input-empresa-${id}`).value,
+                        fecha: document.getElementById(`input-fecha-${id}`).value,
+                        tecnologias: document.getElementById(`input-tech-${id}`).value
+                    };
+                } else if (tabla === 'educacion') {
+                    datosActualizados = {
+                        siglas: document.getElementById(`input-siglas-${id}`).value,
+                        titulo: document.getElementById(`input-titulo-${id}`).value,
+                        institucion: document.getElementById(`input-institucion-${id}`).value,
+                        color_badge: document.getElementById(`input-color-${id}`).value
+                    };
+                } else if (tabla === 'proyectos') {
+                    datosActualizados = {
+                        title: document.getElementById(`input-title-${id}`).value,
+                        category: document.getElementById(`input-category-${id}`).value,
+                        demo_url: document.getElementById(`input-demo-${id}`).value,
+                        github_url: document.getElementById(`input-github-${id}`).value,
+                        tech_stack: document.getElementById(`input-tech-${id}`).value
+                    };
+                }
+
+                const { error } = await window.supabaseClient
+                    .from(tabla)
+                    .update(datosActualizados)
+                    .eq('id', id);
+
+                if (error) throw error;
+
+                // Optimistic UI Update - Reload to apply component rendering (like colored tags) perfectly
+                window.location.reload();
+
+            } catch (error) {
+                console.error(`Error actualizando ${tabla}:`, error);
+                alert('Hubo un error al guardar los cambios.');
+                btnSave.innerText = 'Guardar';
+                btnSave.disabled = false;
+            }
+        };
+
     </script>
 </body>
 
 </html>
+
+
+

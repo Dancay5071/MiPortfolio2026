@@ -276,32 +276,52 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Función Global de Subida de Imagen solicitada
     window.uploadImage = async (file) => {
-        // Generar nombre único con timestamp
-        const fileExt = file.name.split('.').pop();
-        const fileName = `profile_${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
+        try {
+            // Generar nombre único con timestamp
+            const fileExt = file.name.split('.').pop();
+            const fileName = `profile_${Date.now()}_${Math.floor(Math.random() * 1000)}.${fileExt}`;
 
-        // Subir al bucket especificado
-        const { error: uploadError } = await window.supabaseClient.storage
-            .from('imagenes-portfolio')
-            .upload(fileName, file);
+            // Subir al bucket especificado
+            const { data: uploadData, error: uploadError } = await window.supabaseClient.storage
+                .from('imagenes-portfolio')
+                .upload(fileName, file);
 
-        if (uploadError) throw uploadError;
+            if (uploadError) {
+                console.error("Error al subir a Supabase Storage:", uploadError);
+                throw uploadError;
+            }
 
-        // Obtener URL pública
-        const { data } = window.supabaseClient.storage.from('IMAGENES-PORTFOLIO').getPublicUrl(fileName);
-        const publicUrl = data.publicUrl;
+            // Obtener URL pública (Aseguramos que el bucket esté en minúsculas)
+            const { data } = window.supabaseClient.storage.from('imagenes-portfolio').getPublicUrl(fileName);
+            
+            // Verificación solicitada en consola
+            const publicUrl = data.publicUrl;
+            console.log("URL generada:", publicUrl);
 
-        // Actualizar en la tabla configuracion (se hace un upsert para asegurar que exista)
-        await window.supabaseClient.from('configuracion').upsert({ id: 'url_foto', theme: publicUrl });
+            // Actualizar en la tabla configuracion
+            const { error: dbError } = await window.supabaseClient.from('configuracion').upsert({ id: 'url_foto', theme: publicUrl });
+            if (dbError) {
+                console.error("Error al hacer upsert en base de datos:", dbError);
+            }
 
-        // Actualizar el DOM inmediatamente como se solicitó
-        const imgElem = document.getElementById('foto-perfil');
-        if (imgElem) {
-            const timestamp = new Date().getTime();
-            imgElem.src = `${publicUrl}?t=${timestamp}`;
+            // Actualizar la previsualización en el Admin
+            const imgPreview = document.getElementById('profile-image-preview');
+            if (imgPreview) {
+                imgPreview.src = publicUrl;
+            }
+
+            // (Opcional) Si ambos estuvieran en el mismo DOM, busca el id exacto de la etiqueta <img>
+            const imgElem = document.getElementById('foto-perfil');
+            if (imgElem) {
+                imgElem.src = publicUrl;
+            }
+
+            return publicUrl;
+        } catch (error) {
+            console.error("Excepción en uploadImage:", error);
+            alert("Hubo un problema al procesar y subir la imagen. Por favor, revisa la consola.");
+            throw error; // Propagar error para que el submit lo atrape
         }
-
-        return publicUrl;
     };
 
     profileForm?.addEventListener('submit', async (e) => {

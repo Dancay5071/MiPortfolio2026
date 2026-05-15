@@ -1,10 +1,10 @@
 @layer base {
   :root {
-    /* Paleta Principal por Defecto (Clara) */
-    --color-dark: #171717;     /* Usado para texto principal y bordes fuertes */
-    --color-light: #fafafa;    /* Usado para el fondo principal */
-    --color-accent: #2563eb;   /* Usado para botones principales y enlaces (Azul) */
-    --color-muted: #737373;    /* Usado para texto secundario o descriptivo */
+
+    --color-dark: #fafafa;
+    --color-light: #171717;
+    --color-accent: #3b82f6;
+    --color-muted: #a3a3a3;
   }
 
   /* 
@@ -36,11 +36,11 @@
   Estos componentes reaccionarán dinámicamente si --color-accent o --color-light cambian en JS.
 */
 @layer components {
-  
+
   /* Ejemplo 1: Tarjeta Dinámica */
   .card-dynamic {
     /* Usa la variable para el fondo, si la variable cambia en JS, el fondo cambia */
-    background-color: var(--color-light); 
+    background-color: var(--color-light);
     border: 1px solid var(--color-muted);
     padding: 1.5rem;
     border-radius: 1rem;
@@ -56,9 +56,11 @@
   /* Ejemplo 2: Botón Dinámico */
   .btn-dynamic {
     background-color: var(--color-accent);
-    color: #ffffff; /* El texto en un botón de acento suele ser siempre blanco */
+    color: #ffffff;
+    /* El texto en un botón de acento suele ser siempre blanco */
     padding: 0.75rem 1.5rem;
-    border-radius: 9999px; /* Pill shape */
+    border-radius: 9999px;
+    /* Pill shape */
     font-weight: 500;
     transition: opacity 0.2s ease;
   }
