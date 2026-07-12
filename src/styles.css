@@ -1,0 +1,43 @@
+@layer base {
+  :root {
+
+    --color-dark: #fafafa;
+    --color-light: #171717;
+    --color-accent: #3b82f6;
+    --color-muted: #a3a3a3;
+  }
+
+  body {
+    background-color: var(--color-light);
+    color: var(--color-dark);
+    transition: background-color 0.4s ease, color 0.4s ease;
+  }
+}
+@layer components {
+
+  .card-dynamic {
+    background-color: var(--color-light);
+    border: 1px solid var(--color-muted);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+  }
+
+  .card-dynamic:hover {
+    border-color: var(--color-accent);
+  }
+
+  .btn-dynamic {
+    background-color: var(--color-accent);
+    color: #ffffff;
+    padding: 0.75rem 1.5rem;
+    border-radius: 9999px;
+    font-weight: 500;
+    transition: opacity 0.2s ease;
+  }
+
+  .btn-dynamic:hover {
+    opacity: 0.9;
+  }
+}
