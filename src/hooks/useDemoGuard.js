@@ -1,5 +1,4 @@
 export const DEMO_EMAIL    = 'demo@code.com';
-export const DEMO_PASSWORD = 'demo1234';
 
 export function useDemoGuard(session, addToast) {
   const isDemoUser = session?.user?.email === DEMO_EMAIL;
