@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { sendContactMessage } from '../services/api';
 
 export default function ContactModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
-  const [status, setStatus] = useState('idle'); 
+  const [status, setStatus] = useState('idle');
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -12,25 +13,13 @@ export default function ContactModal({ isOpen, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     setStatus('submitting');
-
     try {
-      const response = await fetch('https://formspree.io/f/xgojrjpb', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        setStatus('success');
-        setFormData({ name: '', email: '', message: '' });
-      } else {
-        setStatus('error');
-      }
+      await sendContactMessage(formData);
+      setStatus('success');
+      setFormData({ name: '', email: '', message: '' });
     } catch (error) {
+      console.error("Error al enviar mensaje:", error);
       setStatus('error');
     }
   };
@@ -47,7 +36,7 @@ export default function ContactModal({ isOpen, onClose }) {
             onClick={onClose}
             aria-hidden="true"
           />
-          
+
           {/* Modal */}
           <div className="fixed inset-0 z-[101] flex items-center justify-center p-4 pointer-events-none">
             <motion.div
@@ -64,7 +53,7 @@ export default function ContactModal({ isOpen, onClose }) {
                 aria-label="Cerrar modal"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                  <path d="M18 6 6 18" /><path d="m6 6 12 12" />
                 </svg>
               </button>
 
