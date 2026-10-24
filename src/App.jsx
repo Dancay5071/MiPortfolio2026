@@ -14,7 +14,7 @@ import MouseGlowLayout from './components/MouseGlowLayout';
 import MysticalCursor from './components/MysticalCursor';
 import ContactModal from './components/ContactModal';
 import { DEMO_EMAIL } from './hooks/useDemoGuard';
-import { getProfile, recordVisit } from './services/api';
+import { getProfile, recordVisit, getVisitStats } from './services/api';
 
 const GLOW_VARIANTS = {
   proyectos: [
@@ -191,6 +191,8 @@ function App() {
     }
   };
 
+  const [totalVisits, setTotalVisits] = useState(null);
+
   // Auth
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -207,16 +209,26 @@ function App() {
   useEffect(() => {
     if (typeof window === 'undefined') return;
     const STORAGE_KEY = 'portfolio_visited_v2';
-    if (localStorage.getItem(STORAGE_KEY)) return;
+
     (async () => {
       try {
-        await recordVisit();
-        localStorage.setItem(STORAGE_KEY, 'true');
+        //Registra la visita solo si es nueva en este navegador
+        if (!localStorage.getItem(STORAGE_KEY)) {
+          await recordVisit();
+          localStorage.setItem(STORAGE_KEY, 'true');
+        }
+
+        // Consulta siempre el total para mostrarlo en el footer
+        const stats = await getVisitStats();
+        if (stats !== null) {
+          setTotalVisits(stats);
+        }
       } catch (err) {
-        console.error("Error al registrar visita:", err);
+        console.error("Error al gestionar visitas:", err);
       }
     })();
   }, []);
+
 
   useEffect(() => {
     async function fetchProfile() {
@@ -371,10 +383,20 @@ function App() {
           >
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
 
-              <div className="flex items-center gap-2 text-indigo-300 text-xs tracking-widest">
-                <span className="text-indigo-400/70" aria-hidden="true">◊</span>
-                <span>Frecuencia Estable</span>
+              <div className="flex items-center gap-3 text-indigo-300 text-xs tracking-widest">
+                <div className="flex items-center gap-2">
+                  <span className="text-indigo-400/70" aria-hidden="true">◊</span>
+                  <span>Frecuencia Estable</span>
+                </div>
+
+                {totalVisits !== null && (
+                  <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-indigo-500/20 bg-indigo-950/40 text-[10px] text-indigo-200/70 font-mono-hud shadow-[0_0_10px_rgba(99,102,241,0.15)]">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>{totalVisits.toLocaleString('es-AR')} visitas</span>
+                  </div>
+                )}
               </div>
+
 
               <p className="text-[11px] tracking-wider text-indigo-200/40 text-center">
                 © {new Date().getFullYear()}&nbsp;

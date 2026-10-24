@@ -52,3 +52,15 @@ export const recordVisit = async () => {
         console.warn('No se pudo registrar la visita:', error.message);
     }
 };
+// Obtener Total de Visitas
+export const getVisitStats = async () => {
+    try {
+        const res = await fetch(`${API_URL}/visits/stats`);
+        if (!res.ok) throw new Error('Error al cargar visitas');
+        const json = await res.json();
+        return json.totalVisits ?? 0;
+    } catch (error) {
+        console.warn('No se pudo obtener estadísticas de visitas:', error.message);
+        return null;
+    }
+};

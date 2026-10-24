@@ -1048,15 +1048,6 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                     </Field>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Field label="FECHA DE INICIO">
-                      <input
-                        type="text"
-                        value={eduFechaInicio}
-                        onChange={(e) => setEduFechaInicio(e.target.value)}
-                        placeholder="Ej: 2020"
-                        className={CX.input}
-                      />
-                    </Field>
                     <DatePickerFields
                       fechaInicio={eduFechaInicio}
                       onChangeInicio={setEduFechaInicio}
