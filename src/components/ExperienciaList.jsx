@@ -21,14 +21,50 @@ const itemVariants = {
 };
 
 
+// Diccionario para interpretar meses en español
+const MESES = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
+
+// Parser inteligente: convierte 'Mar 2026', '2021' o 'Actualidad' a fecha comparable
+const parseFechaExperiencia = (fechaStr, esFin = false) => {
+  if (!fechaStr) return esFin ? new Date(9999, 0, 1) : new Date(0);
+  const s = String(fechaStr).toLowerCase().trim();
+
+  // Si dice Actualidad o Presente
+  if (s.includes('actual') || s.includes('presente')) {
+    return new Date(9999, 0, 1);
+  }
+
+  // Formato "Mes AAAA"
+  const matchMesAno = s.match(/([a-z]{3})[a-z]*[\s\/\-]+(\d{4})/i);
+  if (matchMesAno) {
+    const mes = MESES[matchMesAno[1].slice(0, 3)] ?? 0;
+    const ano = parseInt(matchMesAno[2], 10);
+    return new Date(ano, mes, 1);
+  }
+
+  // Formato solo año ej: "2024"
+  const matchAno = s.match(/(\d{4})/);
+  if (matchAno) {
+    const ano = parseInt(matchAno[1], 10);
+    return new Date(ano, esFin ? 11 : 0, 1);
+  }
+
+  return new Date(0);
+};
+
+// Formatea el rango visualmente
 const formatRango = (inicio, fin) => {
   const i = inicio ? String(inicio).trim() : '';
   const f = fin ? String(fin).trim() : '';
   if (!i && !f) return 'S/F';
   if (!i) return f;
-  if (!f) return `${i} · Actualidad`;
+  if (!f || f.toLowerCase() === 'actualidad' || f.toLowerCase() === 'presente') {
+    return `${i} · Actualidad`;
+  }
+  if (i === f) return i;
   return `${i} · ${f}`;
 };
+
 
 const mapExperiencia = (data) => ({
   id: data.id,
@@ -257,7 +293,17 @@ export default function ExperienciaList({ isAdmin = false, onEdit, onDelete }) {
     try {
       const resData = await getExperience();
       const mapped = (resData || []).map(mapExperiencia);
-      setData(mapped);
+      const sorted = mapped.sort((a, b) => {
+        const finA = parseFechaExperiencia(a.fecha_fin, true).getTime();
+        const finB = parseFechaExperiencia(b.fecha_fin, true).getTime();
+        if (finB !== finA) return finB - finA;
+
+        const inicioA = parseFechaExperiencia(a.fecha_inicio).getTime();
+        const inicioB = parseFechaExperiencia(b.fecha_inicio).getTime();
+        return inicioB - inicioA;
+      });
+
+      setData(sorted);
       setError(null);
     } catch (err) {
       console.error('Error al cargar experiencia desde la API:', err);
