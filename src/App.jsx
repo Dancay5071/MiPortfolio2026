@@ -14,6 +14,7 @@ import MouseGlowLayout from './components/MouseGlowLayout';
 import MysticalCursor from './components/MysticalCursor';
 import ContactModal from './components/ContactModal';
 import { DEMO_EMAIL } from './hooks/useDemoGuard';
+import { getProfile, recordVisit } from './services/api';
 
 const GLOW_VARIANTS = {
   proyectos: [
@@ -205,58 +206,31 @@ function App() {
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
-
-    const STORAGE_KEY = 'codaDot_visited';
+    const STORAGE_KEY = 'portfolio_visited_v2';
     if (localStorage.getItem(STORAGE_KEY)) return;
-
-    // Detectar tipo de dispositivo
-    const getDeviceType = () => {
-      const ua = navigator.userAgent || '';
-      if (/tablet|ipad|playbook|silk/i.test(ua)) return 'tablet';
-      if (/mobile|android|iphone|ipod|blackberry|windows phone/i.test(ua)) return 'mobile';
-      return 'desktop';
-    };
-
     (async () => {
       try {
-        console.log("Attempting to insert new visit into analytics table...");
-        const { error } = await supabase
-          .from('analytics')
-          .insert([{ device_type: getDeviceType() }]);
-
-        if (error) {
-          console.error("Error inserting visit:", error);
-        } else {
-          console.log("Visit inserted successfully!");
-          localStorage.setItem(STORAGE_KEY, 'true');
-        }
+        await recordVisit();
+        localStorage.setItem(STORAGE_KEY, 'true');
       } catch (err) {
-        console.error("Catch error inserting visit:", err);
+        console.error("Error al registrar visita:", err);
       }
     })();
   }, []);
 
-
   useEffect(() => {
     async function fetchProfile() {
       try {
-        const { data, error } = await supabase
-          .from('configuracion')
-          .select('*')
-          .eq('id', 'perfil_data')
-          .single();
-
-        if (error) throw error;
-
-        if (data && data.theme) {
-          const parsed = JSON.parse(data.theme);
+        const data = await getProfile();
+        if (data) {
           setProfile({
-            name: parsed.name || 'Daniela Cabrera',
-            title: parsed.title || 'Técnica en programación & Desarrolladora de software',
-            url_foto: parsed.image || parsed.url_foto,
+            name: data.name || 'Daniela Cabrera',
+            title: data.title || 'Técnica en Programación & Desarrolladora de Software',
+            url_foto: data.url_foto || '',
           });
         }
       } catch (err) {
+        console.error("Error cargando perfil desde el backend:", err);
       } finally {
         setIsLoading(false);
       }
@@ -320,55 +294,55 @@ function App() {
                     onTouchMove={onTouchMove}
                     onTouchEnd={onTouchEnd}
                   >
-                  {activeTab === 'inicio' && (
-                    <TabPanel key="inicio" maxWidth="max-w-6xl" className="py-12 md:py-16 px-4 md:px-8" glow="inicio">
-                      <Hero
-                        profile={profile}
-                        onContactClick={() => setIsContactOpen(true)}
-                      />
-                    </TabPanel>
-                  )}
+                    {activeTab === 'inicio' && (
+                      <TabPanel key="inicio" maxWidth="max-w-6xl" className="py-12 md:py-16 px-4 md:px-8" glow="inicio">
+                        <Hero
+                          profile={profile}
+                          onContactClick={() => setIsContactOpen(true)}
+                        />
+                      </TabPanel>
+                    )}
 
-                  {activeTab === 'experiencia' && (
-                    <TabPanel key="experiencia" glow="experiencia">
-                      <h2 className="font-serif-display text-2xl md:text-3xl font-semibold mb-8 text-center text-glow text-white tracking-widest">
-                        Experiencia Laboral
-                      </h2>
-                      <ExperienciaList isAdmin={false} />
-                    </TabPanel>
-                  )}
+                    {activeTab === 'experiencia' && (
+                      <TabPanel key="experiencia" glow="experiencia">
+                        <h2 className="font-serif-display text-2xl md:text-3xl font-semibold mb-8 text-center text-glow text-white tracking-widest">
+                          Experiencia Laboral
+                        </h2>
+                        <ExperienciaList isAdmin={false} />
+                      </TabPanel>
+                    )}
 
-                  {activeTab === 'educacion' && (
-                    <TabPanel key="educacion" glow="educacion">
-                      <h2 className="font-serif-display text-2xl md:text-3xl font-semibold mb-8 text-center text-glow text-white tracking-widest">
-                        Educación y Títulos
-                      </h2>
-                      <EducacionList isAdmin={false} />
-                    </TabPanel>
-                  )}
+                    {activeTab === 'educacion' && (
+                      <TabPanel key="educacion" glow="educacion">
+                        <h2 className="font-serif-display text-2xl md:text-3xl font-semibold mb-8 text-center text-glow text-white tracking-widest">
+                          Educación y Títulos
+                        </h2>
+                        <EducacionList isAdmin={false} />
+                      </TabPanel>
+                    )}
 
-                  {activeTab === 'proyectos' && (
-                    <TabPanel key="proyectos" maxWidth="max-w-5xl" glow="proyectos">
-                      <h2 className="font-serif-display text-2xl md:text-3xl font-semibold mb-8 text-center text-glow text-white tracking-widest">
-                        Mis Proyectos
-                      </h2>
-                      <ProjectList isAdmin={false} />
-                    </TabPanel>
-                  )}
+                    {activeTab === 'proyectos' && (
+                      <TabPanel key="proyectos" maxWidth="max-w-5xl" glow="proyectos">
+                        <h2 className="font-serif-display text-2xl md:text-3xl font-semibold mb-8 text-center text-glow text-white tracking-widest">
+                          Mis Proyectos
+                        </h2>
+                        <ProjectList isAdmin={false} />
+                      </TabPanel>
+                    )}
 
-                  {activeTab === 'admin' && (
-                    <TabPanel key="admin" glow="admin">
-                      <AdminPanel
-                        session={effectiveSession}
-                        addToast={addToast}
-                        onGuestLogin={handleGuestAccess}
-                        onDemoLogout={handleDemoLogout}
-                      />
-                    </TabPanel>
-                  )}
-                </div>
-              </motion.div>
-            </AnimatePresence>
+                    {activeTab === 'admin' && (
+                      <TabPanel key="admin" glow="admin">
+                        <AdminPanel
+                          session={effectiveSession}
+                          addToast={addToast}
+                          onGuestLogin={handleGuestAccess}
+                          onDemoLogout={handleDemoLogout}
+                        />
+                      </TabPanel>
+                    )}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </main>
 

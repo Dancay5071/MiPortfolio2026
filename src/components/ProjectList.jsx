@@ -3,29 +3,30 @@ import { useInView } from 'framer-motion';
 import { supabase } from '../supabaseClient';
 import TiltedScroll from './TiltedScroll';
 import CatHeadLoader from './CatHeadLoader';
+import { getProjects } from '../services/api';
 
 //Mapeo de datos
 const mapProyecto = (data) => ({
-  id:          data.id,
-  title:       data.title       || 'Proyecto Sin Nombre',
-  category:    data.category    || 'other',
+  id: data.id,
+  title: data.title || 'Proyecto Sin Nombre',
+  category: data.category || 'other',
   description: data.description || 'Sin descripción',
-  tech_stack:  data.tech_stack
+  tech_stack: data.tech_stack
     ? data.tech_stack.split(',').map(t => t.trim()).filter(Boolean)
     : [],
-  raw_tech:   data.tech_stack || '',
-  demo_url:   data.demo_url   || '',
+  raw_tech: data.tech_stack || '',
+  demo_url: data.demo_url || '',
   github_url: data.github_url || '',
-  image_url:  data.image_url  || '',
+  image_url: data.image_url || '',
 });
 
 //Fallback de imagen por categoría
 const CATEGORY_FALLBACK = {
-  Minijuegos:                   'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600&h=400',
-  Android:                      'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600&h=400',
-  'Aplicaciones Web':           'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=600&h=400',
+  Minijuegos: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&q=80&w=600&h=400',
+  Android: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600&h=400',
+  'Aplicaciones Web': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=600&h=400',
   'Aplicaciones de Escritorio': 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=600&h=400',
-  other:                        'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=600&h=400',
+  other: 'https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&q=80&w=600&h=400',
 };
 
 const getImgUrl = (p) =>
@@ -33,11 +34,11 @@ const getImgUrl = (p) =>
 
 // Íconos de categoría
 const CATEGORY_GLYPHS = {
-  Minijuegos:                   '○',
-  Android:                      '◉',
-  'Aplicaciones Web':           '◊',
+  Minijuegos: '○',
+  Android: '◉',
+  'Aplicaciones Web': '◊',
   'Aplicaciones de Escritorio': '◈',
-  other:                        '·',
+  other: '·',
 };
 
 function ProjectPortal({ src, alt, isActive }) {
@@ -50,8 +51,8 @@ function ProjectPortal({ src, alt, isActive }) {
   }
 
   const hasSrc = Boolean(src);
-  const imgActiveClass   = 'grayscale-0 opacity-100 contrast-100 scale-[1.04]';
-  const imgDormantClass  = 'grayscale opacity-55 contrast-125 scale-100';
+  const imgActiveClass = 'grayscale-0 opacity-100 contrast-100 scale-[1.04]';
+  const imgDormantClass = 'grayscale opacity-55 contrast-125 scale-100';
 
   return (
     <div
@@ -62,7 +63,7 @@ function ProjectPortal({ src, alt, isActive }) {
       {(!hasSrc || !loaded) && (
         <div className="absolute inset-0 flex items-center justify-center bg-[#0B0914]/80 z-10 overflow-hidden">
           <div className="absolute inset-0 bg-indigo-400/5 animate-pulse" />
-          <div 
+          <div
             className="absolute inset-0 bg-gradient-to-tr from-transparent via-indigo-300/10 to-transparent animate-pulse"
             style={{ animationDuration: '3s' }}
           />
@@ -121,9 +122,9 @@ function ProjectPortal({ src, alt, isActive }) {
 }
 
 function ProjectCard({ p, index }) {
-  const imgUrl    = getImgUrl(p);
+  const imgUrl = getImgUrl(p);
   const actionUrl = p.demo_url || p.github_url || '#';
-  const glyph     = CATEGORY_GLYPHS[p.category] || '·';
+  const glyph = CATEGORY_GLYPHS[p.category] || '·';
   const cardRef = useRef(null);
   const isInView = useInView(cardRef, {
     amount: 0.5,
@@ -136,9 +137,9 @@ function ProjectCard({ p, index }) {
       ref={cardRef}
       className="group block h-full focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0914] rounded-none relative"
       style={window.innerWidth < 768 ? { opacity: 1 } : {
-        animation:      'fadeInTab 0.45s ease-out forwards',
+        animation: 'fadeInTab 0.45s ease-out forwards',
         animationDelay: `${index * 0.08}s`,
-        opacity:        0,
+        opacity: 0,
       }}
     >
       <div
@@ -151,7 +152,7 @@ function ProjectCard({ p, index }) {
           isActive
             ? 'border-indigo-400/40 shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_30px_rgba(79,70,229,0.25),inset_0_1px_0_rgba(196,181,253,0.09)] -translate-y-1.5'
             : 'border-indigo-300/8  shadow-[0_8px_32px_rgba(0,0,0,0.50),inset_0_1px_0_rgba(196,181,253,0.05)]',
-    
+
           'hover:border-indigo-400/40',
           'hover:shadow-[0_20px_60px_rgba(0,0,0,0.55),0_0_30px_rgba(79,70,229,0.25),inset_0_1px_0_rgba(196,181,253,0.09)]',
           'hover:-translate-y-1.5',
@@ -201,7 +202,7 @@ function ProjectCard({ p, index }) {
             title={p.title}
           >
             {actionUrl !== '#' ? (
-              <a 
+              <a
                 href={actionUrl}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -248,7 +249,7 @@ function ProjectCard({ p, index }) {
           {/*Footer: links interactivos */}
           <div className="flex items-center gap-4 md:gap-6 pt-4 border-t border-white/5 mt-auto relative z-20">
             {p.github_url && (
-              <a 
+              <a
                 href={p.github_url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -263,7 +264,7 @@ function ProjectCard({ p, index }) {
               </a>
             )}
             {p.demo_url && (
-              <a 
+              <a
                 href={p.demo_url}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -317,11 +318,11 @@ function SkeletonGrid() {
 }
 
 const FILTERS = [
-  { id: 'all',                          label: 'Todos',    glyph: '·' },
-  { id: 'Minijuegos',                   label: 'Juegos',   glyph: '○' },
-  { id: 'Android',                      label: 'Android',  glyph: '◉' },
-  { id: 'Aplicaciones Web',             label: 'Web',      glyph: '◊' },
-  { id: 'Aplicaciones de Escritorio',   label: 'Desktop',  glyph: '◈' },
+  { id: 'all', label: 'Todos', glyph: '·' },
+  { id: 'Minijuegos', label: 'Juegos', glyph: '○' },
+  { id: 'Android', label: 'Android', glyph: '◉' },
+  { id: 'Aplicaciones Web', label: 'Web', glyph: '◊' },
+  { id: 'Aplicaciones de Escritorio', label: 'Desktop', glyph: '◈' },
 ];
 
 function FilterBar({ activeFilter, onFilter }) {
@@ -360,9 +361,9 @@ function FilterBar({ activeFilter, onFilter }) {
 }
 
 export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
-  const [data,         setData]         = useState([]);
-  const [loading,      setLoading]      = useState(true);
-  const [error,        setError]        = useState(null);
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
 
   const fetchProyectos = async (isBackground = false) => {
@@ -370,23 +371,20 @@ export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
       setTimeout(() => setLoading(true), 0);
     }
     try {
-      const { data: resData, error: resError } = await supabase
-        .from('proyectos')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (resError) throw resError;
+      // Ahora consume tu Backend Node.js
+      const resData = await getProjects();
 
       const mapped = (resData || []).map(mapProyecto);
       setData(mapped);
       setError(null);
     } catch (err) {
-      console.error('Error al cargar proyectos:', err);
+      console.error('Error al cargar proyectos desde la API:', err);
       setError('No se pudieron cargar los proyectos.');
     } finally {
       setLoading(false);
     }
   };
+
 
   useEffect(() => {
     fetchProyectos();
