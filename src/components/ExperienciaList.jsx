@@ -1,21 +1,22 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView, useAnimation, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabaseClient';
+import { getExperience } from '../services/api';
 
 const pathVariants = {
-  hidden:  { scaleY: 0, opacity: 0 },
+  hidden: { scaleY: 0, opacity: 0 },
   visible: {
-    scaleY:  1,
+    scaleY: 1,
     opacity: 1,
     transition: { duration: 1.4, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.1 },
   },
 };
 
 const itemVariants = {
-  hidden:  { opacity: 0, y: 40 },
+  hidden: { opacity: 0, y: 40 },
   visible: {
     opacity: 1,
-    y:       0,
+    y: 0,
     transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
   },
 };
@@ -23,22 +24,22 @@ const itemVariants = {
 
 const formatRango = (inicio, fin) => {
   const i = inicio ? String(inicio).trim() : '';
-  const f = fin    ? String(fin).trim()    : '';
+  const f = fin ? String(fin).trim() : '';
   if (!i && !f) return 'S/F';
-  if (!i)       return f;
-  if (!f)       return `${i} · Actualidad`;
+  if (!i) return f;
+  if (!f) return `${i} · Actualidad`;
   return `${i} · ${f}`;
 };
 
 const mapExperiencia = (data) => ({
-  id:           data.id,
-  empresa:      data.empresa      || 'Empresa Desconocida',
-  cargo:        data.cargo        || 'Cargo Desconocido',
+  id: data.id,
+  empresa: data.empresa || 'Empresa Desconocida',
+  cargo: data.cargo || 'Cargo Desconocido',
   fecha_inicio: data.fecha_inicio || data.fecha || '',
-  fecha_fin:    data.fecha_fin    || null,
-  rango:        formatRango(data.fecha_inicio || data.fecha, data.fecha_fin),
-  descripcion:  data.descripcion  || '',
-  tecnologias:  data.tecnologias
+  fecha_fin: data.fecha_fin || null,
+  rango: formatRango(data.fecha_inicio || data.fecha, data.fecha_fin),
+  descripcion: data.descripcion || '',
+  tecnologias: data.tecnologias
     ? data.tecnologias.split(',').map(t => t.trim()).filter(Boolean)
     : [],
   raw_tech: data.tecnologias || '',
@@ -112,7 +113,7 @@ function SkeletonTimeline() {
 }
 
 function TimelineItem({ exp, isLatest }) {
-  const ref  = useRef(null);
+  const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-100px 0px -100px 0px' });
   const [isExpanded, setIsExpanded] = useState(false);
 
@@ -128,7 +129,7 @@ function TimelineItem({ exp, isLatest }) {
       <div
         className={`stellar-node${isLatest ? ' stellar-node--active' : ''}`}
         style={exp.rango.includes('Actualidad') && isLatest ? {
-          borderColor: 'rgba(251, 191, 36, 0.6)', 
+          borderColor: 'rgba(251, 191, 36, 0.6)',
           boxShadow: '0 0 15px rgba(217, 119, 6, 0.4)'
         } : undefined}
         aria-hidden="true"
@@ -216,7 +217,7 @@ function TimelineItem({ exp, isLatest }) {
 
 function TimelineView({ data }) {
 
-  const pathRef   = useRef(null);
+  const pathRef = useRef(null);
   const pathInView = useInView(pathRef, { once: true, margin: '-60px 0px 0px 0px' });
 
   return (
@@ -248,25 +249,20 @@ function TimelineView({ data }) {
 
 //Componente principal
 export default function ExperienciaList({ isAdmin = false, onEdit, onDelete }) {
-  const [data, setData]       = useState([]);
+  const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError]     = useState(null);
+  const [error, setError] = useState(null);
 
   const fetchExperiencia = async () => {
     setLoading(true);
     try {
-      const { data: resData, error: resError } = await supabase
-        .from('experiencia')
-        .select('*')
-        .order('fecha_fin', { ascending: false, nullsFirst: true })
-        .order('fecha_inicio', { ascending: false });
-
-      if (resError) throw resError;
-      setData((resData || []).map(mapExperiencia));
+      const resData = await getExperience();
+      const mapped = (resData || []).map(mapExperiencia);
+      setData(mapped);
       setError(null);
     } catch (err) {
-      console.error('Error al cargar experiencia:', err);
-      setError('No se pudo cargar la experiencia.');
+      console.error('Error al cargar experiencia desde la API:', err);
+      setError('No se pudo cargar la experiencia laboral.');
     } finally {
       setLoading(false);
     }

@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { supabase } from '../supabaseClient';
+import { getEducation } from '../services/api';
 
 const gridContainerVariants = {
   hidden: {},
   visible: {
     transition: {
       staggerChildren: 0.05,
-      delayChildren:   0.02,
+      delayChildren: 0.02,
     },
   },
 };
@@ -15,13 +16,13 @@ const gridContainerVariants = {
 const cardVariants = {
   hidden: {
     opacity: 0,
-    y:       40,
-    scale:   0.97,
+    y: 40,
+    scale: 0.97,
   },
   visible: {
     opacity: 1,
-    y:       0,
-    scale:   1,
+    y: 0,
+    scale: 1,
     transition: {
       duration: 0.80,
       ease: [0.25, 0.46, 0.45, 0.94],
@@ -31,10 +32,10 @@ const cardVariants = {
 
 const formatRango = (fechaInicio, fechaFin) => {
   const inicio = fechaInicio ? String(fechaInicio).trim() : '';
-  const fin    = fechaFin    ? String(fechaFin).trim()    : '';
+  const fin = fechaFin ? String(fechaFin).trim() : '';
   if (!inicio && !fin) return 'S/F';
   if (!inicio) return fin;
-  if (!fin)    return `${inicio} – Actualidad`;
+  if (!fin) return `${inicio} – Actualidad`;
   if (inicio === fin) return inicio;
   return `${inicio} – ${fin}`;
 };
@@ -47,8 +48,8 @@ const mapEducacion = (data) => {
     institucion: data.institucion || 'Institución Desconocida',
     titulo,
     fecha_inicio: data.fecha_inicio || '',
-    fecha_fin:    data.fecha_fin    || '',
-    rango:  formatRango(data.fecha_inicio, data.fecha_fin),
+    fecha_fin: data.fecha_fin || '',
+    rango: formatRango(data.fecha_inicio, data.fecha_fin),
     siglas: data.siglas || titulo.substring(0, 2).toUpperCase(),
     color_badge: data.color_badge || 'indigo',
     tipo: validTipos.includes(data.color_badge) ? data.color_badge : 'Curso',
@@ -88,28 +89,28 @@ function DescripcionBlock({ text }) {
 //Tema por tipos
 const TIPO_THEME = {
   Carrera: {
-    badgeBorder:  'border-violet-400/40',
-    badgeText:    'text-violet-200',
-    iconBorder:   'border-violet-300/40',
-    iconGlow:     '0 0 14px rgba(139,92,246,0.35), 0 0 4px rgba(192,132,252,0.2)',
-    siglasClass:  'font-serif text-violet-200 text-[10px]',
-    adminBadge:   'text-violet-300 border-violet-500/30',
+    badgeBorder: 'border-violet-400/40',
+    badgeText: 'text-violet-200',
+    iconBorder: 'border-violet-300/40',
+    iconGlow: '0 0 14px rgba(139,92,246,0.35), 0 0 4px rgba(192,132,252,0.2)',
+    siglasClass: 'font-serif text-violet-200 text-[10px]',
+    adminBadge: 'text-violet-300 border-violet-500/30',
   },
   'Formación Prof.': {
-    badgeBorder:  'border-fuchsia-400/30',
-    badgeText:    'text-fuchsia-200',
-    iconBorder:   'border-fuchsia-300/30',
-    iconGlow:     '0 0 12px rgba(217,70,239,0.25)',
-    siglasClass:  'font-serif text-fuchsia-200 text-[10px]',
-    adminBadge:   'text-fuchsia-300 border-fuchsia-500/30',
+    badgeBorder: 'border-fuchsia-400/30',
+    badgeText: 'text-fuchsia-200',
+    iconBorder: 'border-fuchsia-300/30',
+    iconGlow: '0 0 12px rgba(217,70,239,0.25)',
+    siglasClass: 'font-serif text-fuchsia-200 text-[10px]',
+    adminBadge: 'text-fuchsia-300 border-fuchsia-500/30',
   },
   Curso: {
-    badgeBorder:  'border-indigo-400/30',
-    badgeText:    'text-indigo-200',
-    iconBorder:   'border-indigo-300/25',
-    iconGlow:     '0 0 10px rgba(165,180,252,0.20)',
-    siglasClass:  'font-serif text-indigo-200 text-[10px]',
-    adminBadge:   'text-indigo-300 border-indigo-500/30',
+    badgeBorder: 'border-indigo-400/30',
+    badgeText: 'text-indigo-200',
+    iconBorder: 'border-indigo-300/25',
+    iconGlow: '0 0 10px rgba(165,180,252,0.20)',
+    siglasClass: 'font-serif text-indigo-200 text-[10px]',
+    adminBadge: 'text-indigo-300 border-indigo-500/30',
   },
 };
 
@@ -146,7 +147,7 @@ function EduCard({ edu }) {
 
           {/* fecha */}
           {edu.rango && edu.rango !== 'S/F' && (
-            <span 
+            <span
               className={[
                 'text-xs tracking-wider',
                 edu.rango.includes('Actualidad')
@@ -211,7 +212,7 @@ function EduCard({ edu }) {
 }
 
 function GrimoireGrid({ data }) {
-  const ref    = useRef(null);
+  const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: '-80px 0px -80px 0px' });
 
   return (
@@ -238,17 +239,12 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
   const fetchEducacion = async () => {
     setLoading(true);
     try {
-      const { data: resData, error: resError } = await supabase
-        .from('educacion')
-        .select('*')
-        .order('fecha_fin', { ascending: false, nullsFirst: true })
-        .order('fecha_inicio', { ascending: false });
-
-      if (resError) throw resError;
-      setData((resData || []).map(mapEducacion));
+      const resData = await getEducation();
+      const mapped = (resData || []).map(mapEducacion);
+      setData(mapped);
       setError(null);
     } catch (err) {
-      console.error('Error al cargar educacion:', err);
+      console.error('Error al cargar educación desde la API:', err);
       setError('No se pudo cargar la educación.');
     } finally {
       setLoading(false);
