@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useInView } from 'framer-motion';
-import { supabase } from '../supabaseClient';
 import TiltedScroll from './TiltedScroll';
 import CatHeadLoader from './CatHeadLoader';
 import { getProjects } from '../services/api';
@@ -388,11 +387,6 @@ export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
 
   useEffect(() => {
     fetchProyectos();
-    const channel = supabase
-      .channel('realtime-proyectos')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'proyectos' }, () => fetchProyectos(true))
-      .subscribe();
-    return () => supabase.removeChannel(channel);
   }, []);
 
   const filteredData = activeFilter === 'all' ? data : data.filter(p => p.category === activeFilter);

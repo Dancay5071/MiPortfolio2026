@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
-import { supabase } from '../supabaseClient';
 import { getEducation } from '../services/api';
 
 const gridContainerVariants = {
@@ -253,11 +252,6 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
 
   useEffect(() => {
     fetchEducacion();
-    const channel = supabase
-      .channel('realtime-educacion')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'educacion' }, fetchEducacion)
-      .subscribe();
-    return () => supabase.removeChannel(channel);
   }, []);
 
   if (loading) {

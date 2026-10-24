@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, useInView, useAnimation, AnimatePresence } from 'framer-motion';
-import { supabase } from '../supabaseClient';
 import { getExperience } from '../services/api';
 
 const pathVariants = {
@@ -270,11 +269,6 @@ export default function ExperienciaList({ isAdmin = false, onEdit, onDelete }) {
 
   useEffect(() => {
     fetchExperiencia();
-    const channel = supabase
-      .channel('realtime-experiencia')
-      .on('postgres_changes', { event: '*', schema: 'public', table: 'experiencia' }, fetchExperiencia)
-      .subscribe();
-    return () => supabase.removeChannel(channel);
   }, []);
 
   if (loading) return <SkeletonTimeline />;
