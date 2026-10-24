@@ -166,6 +166,111 @@ function Field({ label, children }) {
     </div>
   );
 }
+// Selector de Mes / Año y Checkbox de Actualidad
+function DatePickerFields({ fechaInicio, onChangeInicio, fechaFin, onChangeFin, checkboxLabel = 'Puesto actual (Actualidad)' }) {
+  const parseParts = (str) => {
+    if (!str) return { mes: '', anio: '' };
+    const s = String(str).trim();
+    const match = s.match(/([a-zA-Z]{3})[\s\/\-]+(\d{4})/);
+    if (match) {
+      const mesCap = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
+      return { mes: mesCap, anio: match[2] };
+    }
+    const matchYear = s.match(/(\d{4})/);
+    if (matchYear) return { mes: '', anio: matchYear[1] };
+    return { mes: '', anio: '' };
+  };
+  const inicioParts = parseParts(fechaInicio);
+  const finParts = parseParts(fechaFin);
+  const esActual = !fechaFin || String(fechaFin).toLowerCase().includes('actual');
+  const handleInicioChange = (nuevoMes, nuevoAnio) => {
+    if (!nuevoAnio) { onChangeInicio(''); return; }
+    onChangeInicio(nuevoMes ? `${nuevoMes} ${nuevoAnio}` : `${nuevoAnio}`);
+  };
+  const handleFinChange = (nuevoMes, nuevoAnio) => {
+    if (!nuevoAnio) { onChangeFin(''); return; }
+    onChangeFin(nuevoMes ? `${nuevoMes} ${nuevoAnio}` : `${nuevoAnio}`);
+  };
+  const handleToggleActual = (checked) => {
+    if (checked) {
+      onChangeFin('Actualidad');
+    } else {
+      onChangeFin(new Date().getFullYear().toString());
+    }
+  };
+  const currentYear = new Date().getFullYear();
+  const anios = Array.from({ length: 16 }, (_, i) => currentYear + 1 - i);
+  const meses = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+  return (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      {/* Fecha Inicio */}
+      <Field label="FECHA DE INICIO">
+        <div className="grid grid-cols-2 gap-2">
+          <select
+            value={inicioParts.mes}
+            onChange={(e) => handleInicioChange(e.target.value, inicioParts.anio || currentYear)}
+            className={CX.select}
+          >
+            <option value="" className="bg-[#131127] text-white">Mes (opcional)</option>
+            {meses.map(m => (
+              <option key={m} value={m} className="bg-[#131127] text-white">{m}</option>
+            ))}
+          </select>
+          <select
+            value={inicioParts.anio}
+            onChange={(e) => handleInicioChange(inicioParts.mes, e.target.value)}
+            className={CX.select}
+            required
+          >
+            <option value="" className="bg-[#131127] text-white">Año</option>
+            {anios.map(y => (
+              <option key={y} value={y} className="bg-[#131127] text-white">{y}</option>
+            ))}
+          </select>
+        </div>
+      </Field>
+      {/* Fecha Fin */}
+      <Field label="FECHA DE FIN">
+        <div className="space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <select
+              value={finParts.mes}
+              onChange={(e) => handleFinChange(e.target.value, finParts.anio || currentYear)}
+              disabled={esActual}
+              className={`${CX.select} ${esActual ? 'opacity-40 cursor-not-allowed' : ''}`}
+            >
+              <option value="" className="bg-[#131127] text-white">Mes (opcional)</option>
+              {meses.map(m => (
+                <option key={m} value={m} className="bg-[#131127] text-white">{m}</option>
+              ))}
+            </select>
+            <select
+              value={finParts.anio}
+              onChange={(e) => handleFinChange(finParts.mes, e.target.value)}
+              disabled={esActual}
+              className={`${CX.select} ${esActual ? 'opacity-40 cursor-not-allowed' : ''}`}
+            >
+              <option value="" className="bg-[#131127] text-white">Año</option>
+              {anios.map(y => (
+                <option key={y} value={y} className="bg-[#131127] text-white">{y}</option>
+              ))}
+            </select>
+          </div>
+          <label className="flex items-center gap-2 cursor-pointer text-xs text-indigo-200/80 select-none pt-1">
+            <input
+              type="checkbox"
+              checked={esActual}
+              onChange={(e) => handleToggleActual(e.target.checked)}
+              className="w-4 h-4 rounded bg-white/5 border border-white/20 text-indigo-500 focus:ring-0 cursor-pointer"
+            />
+            <span>{checkboxLabel}</span>
+          </label>
+        </div>
+      </Field>
+    </div>
+  );
+}
+
 
 function CatSaveButton({ isLoading, label, variant = 'violet', className = '' }) {
   if (variant === 'mystic') {
@@ -249,14 +354,14 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
   //Experiencia 
   const [isExpFormOpen, setIsExpFormOpen] = useState(false);
-  const [expId, setExpId]           = useState('');
+  const [expId, setExpId] = useState('');
   const [expCompany, setExpCompany] = useState('');
-  const [expRole, setExpRole]       = useState('');
-  const [expDate, setExpDate]       = useState('');      
-  const [expFechaFin, setExpFechaFin] = useState('');   
-  const [expTech, setExpTech]       = useState('');
-  const [expDesc, setExpDesc]       = useState('');
-  const [expSaving, setExpSaving]   = useState(false);
+  const [expRole, setExpRole] = useState('');
+  const [expDate, setExpDate] = useState('');
+  const [expFechaFin, setExpFechaFin] = useState('');
+  const [expTech, setExpTech] = useState('');
+  const [expDesc, setExpDesc] = useState('');
+  const [expSaving, setExpSaving] = useState(false);
 
   //Educacion 
   const [isEduFormOpen, setIsEduFormOpen] = useState(false);
@@ -365,7 +470,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     e.preventDefault();
     //Demo intercept
     if (demoIntercept()) { return; }
-    
+
     setProfileSaving(true);
     try {
       let finalImgUrl = profileImageUrl;
@@ -402,7 +507,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     if (window.confirm('¿Eliminar esta experiencia?')) {
       //Demo 
       if (demoIntercept()) return;
-    
+
       try {
         const { error } = await supabase.from('experiencia').delete().eq('id', id);
         if (error) throw error;
@@ -419,12 +524,12 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
     try {
       const data = {
-        empresa:      expCompany,
-        cargo:        expRole,
+        empresa: expCompany,
+        cargo: expRole,
         fecha_inicio: expDate,
-        fecha_fin:    expFechaFin.trim() || null, 
-        tecnologias:  expTech,
-        descripcion:  expDesc,
+        fecha_fin: expFechaFin.trim() || null,
+        tecnologias: expTech,
+        descripcion: expDesc,
       };
       if (expId) {
         const { error } = await supabase.from('experiencia').update(data).eq('id', expId);
@@ -441,14 +546,14 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   };
   const resetExpForm = () => {
     setExpId(''); setExpCompany(''); setExpRole('');
-    setExpDate(''); setExpFechaFin('');  
+    setExpDate(''); setExpFechaFin('');
     setExpTech(''); setExpDesc('');
   };
 
   //CRUD Educación 
   const handleEditEducation = (edu) => {
     setEduId(edu.id); setEduInst(edu.institucion); setEduDegree(edu.titulo);
-    setEduSiglas(edu.siglas); 
+    setEduSiglas(edu.siglas);
     setEduTipo(['Carrera', 'Formación Prof.', 'Curso'].includes(edu.color_badge) ? edu.color_badge : 'Curso');
     setEduFechaInicio(edu.fecha_inicio || ''); setEduFechaFin(edu.fecha_fin || '');
     setEduDesc(edu.descripcion || '');
@@ -458,7 +563,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     if (window.confirm('¿Eliminar este título?')) {
       //Demo intercept 
       if (demoIntercept()) return;
-    
+
       try {
         const { error } = await supabase.from('educacion').delete().eq('id', id);
         if (error) throw error;
@@ -472,7 +577,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     if (demoIntercept(() => { setIsEduFormOpen(false); resetEduForm(); })) {
       setEduSaving(false); return;
     }
-    
+
     try {
       const data = {
         institucion: eduInst,
@@ -509,7 +614,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     if (window.confirm('¿Eliminar este proyecto?')) {
       //Demo intercept 
       if (demoIntercept()) return;
-  
+
       try {
         const { error } = await supabase.from('proyectos').delete().eq('id', id);
         if (error) throw error;
@@ -532,7 +637,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     if (demoIntercept(() => { setIsProjFormOpen(false); resetProjForm(); })) {
       setProjSaving(false); return;
     }
-  
+
     try {
       let finalImgUrl = projImageUrl;
       if (projFile) {
@@ -635,7 +740,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                 Modo Invitado
               </MysticButton>
               <p className="text-center text-[9px] font-mono-hud tracking-widest text-indigo-300/30 uppercase">
-              Solo lectura
+                Solo lectura
               </p>
             </div>
 
@@ -650,17 +755,17 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     );
   }
 
- 
+
   //Sidebar nav items
   const navItems = [
-    !isDemoUser && { id: 'overview',   label: 'Overview',    icon: '◊' },
-    { id: 'profile',     label: 'Perfil',      icon: '◊' },
-    { id: 'experience',  label: 'Experiencia', icon: '◊' },
-    { id: 'education',   label: 'Educación',   icon: '◊' },
-    { id: 'projects',    label: 'Proyectos',   icon: '◊' },
+    !isDemoUser && { id: 'overview', label: 'Overview', icon: '◊' },
+    { id: 'profile', label: 'Perfil', icon: '◊' },
+    { id: 'experience', label: 'Experiencia', icon: '◊' },
+    { id: 'education', label: 'Educación', icon: '◊' },
+    { id: 'projects', label: 'Proyectos', icon: '◊' },
   ].filter(Boolean);
 
-  
+
   const validTabs = ['overview', 'profile', 'experience', 'education', 'projects'];
   let currentTab = validTabs.includes(activeSubTab) ? activeSubTab : 'profile';
   if (isDemoUser && currentTab === 'overview') {
@@ -753,7 +858,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                 <div className="my-3 h-px" style={{ background: 'linear-gradient(90deg,transparent,rgba(165,180,252,0.12),transparent)' }} />
 
                 <p className="text-[10px] tracking-wider text-indigo-300/30">
-                  {new Date().toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' })}
+                  {new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
                 </p>
               </div>
 
@@ -847,7 +952,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
             </form>
           </div>
         )}
- 
+
         {/* SUB-TAB: EXPERIENCIAS */}
         {currentTab === 'experience' && (
           <div>
@@ -876,28 +981,13 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                       <input type="text" value={expRole} onChange={(e) => setExpRole(e.target.value)} className={CX.input} required />
                     </Field>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <Field label="FECHA DE INICIO">
-                      <input
-                        type="text"
-                        value={expDate}
-                        onChange={(e) => setExpDate(e.target.value)}
-                        placeholder="Ej: Ene 2024"
-                        className={CX.input}
-                        required
-                      />
-                    </Field>
-                    <Field label="FECHA DE FIN (vacío = Actualidad)">
-                      <input
-                        type="text"
-                        value={expFechaFin}
-                        onChange={(e) => setExpFechaFin(e.target.value)}
-                        placeholder="Ej: Dic 2024"
-                        className={CX.input}
-                      />
-                    </Field>
-                  </div>
+                  <DatePickerFields
+                    fechaInicio={expDate}
+                    onChangeInicio={setExpDate}
+                    fechaFin={expFechaFin}
+                    onChangeFin={setExpFechaFin}
+                    checkboxLabel="Puesto actual (Actualidad)"
+                  />
                   <Field label="DESCRIPCIÓN">
                     <textarea value={expDesc} onChange={(e) => setExpDesc(e.target.value)} rows="3" className={CX.input} />
                   </Field>
@@ -967,15 +1057,14 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                         className={CX.input}
                       />
                     </Field>
-                    <Field label="FECHA DE FIN (vacío = Actualidad)">
-                      <input
-                        type="text"
-                        value={eduFechaFin}
-                        onChange={(e) => setEduFechaFin(e.target.value)}
-                        placeholder="Ej: 2024"
-                        className={CX.input}
-                      />
-                    </Field>
+                    <DatePickerFields
+                      fechaInicio={eduFechaInicio}
+                      onChangeInicio={setEduFechaInicio}
+                      fechaFin={eduFechaFin}
+                      onChangeFin={setEduFechaFin}
+                      checkboxLabel="En curso (Actualidad)"
+                    />
+
                   </div>
                   <Field label="DESCRIPCIÓN (Opcional)">
                     <textarea value={eduDesc} onChange={(e) => setEduDesc(e.target.value)} rows="3" className={CX.input} placeholder="Descripción de los estudios..." />
