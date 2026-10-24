@@ -1,9 +1,19 @@
 import { createClient } from '@supabase/supabase-js';
 
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://prmrhdxmvgueyduztiii.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InBybXJoZHhtdmd1ZXlkdXp0aWlpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzg4NjI3ODksImV4cCI6MjA5NDQzODc4OX0.s60OdhcEGeEL8mpSNI0VYt0QCzTjsTNBMYVZ0GsGA9I';
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
+  console.warn('[Supabase] Faltan las variables de entorno VITE_SUPABASE_URL o VITE_SUPABASE_ANON_KEY.');
+}
+
+// Inicialización limpia sin credenciales hardcodeadas en texto plano
+export const supabase = createClient(
+  SUPABASE_URL || 'https://placeholder.supabase.co',
+  SUPABASE_ANON_KEY || 'placeholder-key'
+);
+
+// Mantener la referencia global para los managers del panel de administración
 if (typeof window !== 'undefined') {
   window.supabaseClient = supabase;
 }
