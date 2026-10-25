@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from './supabaseClient';
 import Navbar from './components/Navbar';
@@ -6,7 +6,6 @@ import Hero from './components/Hero';
 import ExperienciaList from './components/ExperienciaList';
 import EducacionList from './components/EducacionList';
 import ProjectList from './components/ProjectList';
-import AdminPanel from './components/AdminPanel';
 import Toast from './components/Toast';
 import MysticalBackground from './components/MysticalBackground';
 import LoaderGlobal from './components/LoaderGlobal';
@@ -15,6 +14,8 @@ import MysticalCursor from './components/MysticalCursor';
 import ContactModal from './components/ContactModal';
 import { DEMO_EMAIL } from './hooks/useDemoGuard';
 import { getProfile, recordVisit, getVisitStats } from './services/api';
+
+const AdminPanel = lazy(() => import('./components/AdminPanel'));
 
 const GLOW_VARIANTS = {
   proyectos: [
@@ -354,14 +355,26 @@ function App() {
 
                     {activeTab === 'admin' && (
                       <TabPanel key="admin" glow="admin">
-                        <AdminPanel
-                          session={effectiveSession}
-                          addToast={addToast}
-                          onGuestLogin={handleGuestAccess}
-                          onDemoLogout={handleDemoLogout}
-                        />
+                        <Suspense
+                          fallback={
+                            <div className="py-24 flex flex-col items-center justify-center gap-4">
+                              <div className="w-8 h-8 rounded-full border-2 border-indigo-400/20 border-t-indigo-400 animate-spin" />
+                              <span className="font-mono-hud text-[10px] tracking-[0.25em] text-indigo-300/50 uppercase">
+                                Cargando Panel Administrativo...
+                              </span>
+                            </div>
+                          }
+                        >
+                          <AdminPanel
+                            session={effectiveSession}
+                            addToast={addToast}
+                            onGuestLogin={handleGuestAccess}
+                            onDemoLogout={handleDemoLogout}
+                          />
+                        </Suspense>
                       </TabPanel>
                     )}
+
                   </div>
                 </motion.div>
               </AnimatePresence>
