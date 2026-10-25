@@ -239,6 +239,8 @@ function App() {
             name: data.name || 'Daniela Cabrera',
             title: data.title || 'Técnica en Programación & Desarrolladora de Software',
             url_foto: data.url_foto || '',
+            description: data.description || '',
+            cv_url: data.cv_url || '',
           });
         }
       } catch (err) {

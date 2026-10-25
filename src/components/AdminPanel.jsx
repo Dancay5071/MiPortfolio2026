@@ -344,9 +344,12 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const [loginLoading, setLoginLoading] = useState(false);
 
   //Profile 
+  const [profileId, setProfileId] = useState(null);
   const [profileName, setProfileName] = useState('');
   const [profileTitle, setProfileTitle] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
+  const [profileDesc, setProfileDesc] = useState('');
+  const [profileCvUrl, setProfileCvUrl] = useState('');
   const [profileFile, setProfileFile] = useState(null);
   const [profilePreview, setProfilePreview] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
@@ -443,17 +446,27 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   //CRUD Perfil
   const fetchProfile = async () => {
     try {
-      const { data } = await supabase.from('configuracion').select('*').eq('id', 'perfil_data').single();
-      if (data && data.theme) {
-        const parsed = JSON.parse(data.theme);
-        setProfileName(parsed.name || '');
-        setProfileTitle(parsed.title || '');
-        setProfileImageUrl(parsed.image || '');
-        setProfilePreview(parsed.image || '');
+      const { data, error } = await supabase
+        .from('perfil')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setProfileId(data.id);
+        setProfileName(data.nombre || '');
+        setProfileTitle(data.titulo || '');
+        setProfileDesc(data.descripcion || '');
+        setProfileImageUrl(data.avatar_url || '');
+        setProfilePreview(data.avatar_url || '');
+        setProfileCvUrl(data.cv_url || '');
       }
     } catch (err) {
+      console.error('Error al cargar perfil en Admin:', err);
     }
   };
+
 
   const handleProfileFileChange = (e) => {
     const file = e.target.files[0];
@@ -467,8 +480,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
   const handleProfileSubmit = async (e) => {
     e.preventDefault();
-    //Demo intercept
-    if (demoIntercept()) { return; }
+    if (demoIntercept()) return;
 
     setProfileSaving(true);
     try {
@@ -478,18 +490,36 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         setProfileImageUrl(finalImgUrl);
         setProfileFile(null);
       }
-      const { error } = await supabase.from('configuracion').upsert({
-        id: 'perfil_data',
-        theme: JSON.stringify({ name: profileName, title: profileTitle, image: finalImgUrl })
-      });
+
+      const payload = {
+        nombre: profileName.trim(),
+        titulo: profileTitle.trim(),
+        descripcion: profileDesc.trim(),
+        avatar_url: finalImgUrl,
+        cv_url: profileCvUrl.trim(),
+        updated_at: new Date().toISOString()
+      };
+
+      let error;
+      if (profileId) {
+        const res = await supabase.from('perfil').update(payload).eq('id', profileId);
+        error = res.error;
+      } else {
+        const res = await supabase.from('perfil').insert([payload]).select().single();
+        if (res.data) setProfileId(res.data.id);
+        error = res.error;
+      }
+
       if (error) throw error;
       addToast('Perfil guardado exitosamente.', 'success');
     } catch (err) {
+      console.error('Error al guardar perfil:', err);
       addToast('Error al guardar el perfil.', 'error');
     } finally {
       setProfileSaving(false);
     }
   };
+
 
   //CRUD Experiencias 
   const handleEditExperience = (exp) => {
@@ -841,6 +871,26 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                   onChange={(e) => setProfileTitle(e.target.value)}
                   className={CX.input}
                   required
+                />
+              </Field>
+
+              <Field label="DESCRIPCIÓN / BIO">
+                <textarea
+                  value={profileDesc}
+                  onChange={(e) => setProfileDesc(e.target.value)}
+                  className={`${CX.input} resize-none`}
+                  rows={3}
+                  placeholder="Breve reseña sobre vos..."
+                />
+              </Field>
+
+              <Field label="ENLACE DE CV (OPCIONAL)">
+                <input
+                  type="url"
+                  value={profileCvUrl}
+                  onChange={(e) => setProfileCvUrl(e.target.value)}
+                  className={CX.input}
+                  placeholder="https://..."
                 />
               </Field>
 
