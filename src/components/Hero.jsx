@@ -169,6 +169,7 @@ export default function Hero({ profile, onContactClick }) {
   const name = profile.name || 'Daniela Cabrera';
   const title = profile.title || 'Técnica en programación & Desarrolladora de software';
   const imgUrl = profile.url_foto || '';
+  const cvUrl = profile.cv_url || '';
 
   const shouldReduceMotion = useReducedMotion();
 
@@ -279,7 +280,7 @@ export default function Hero({ profile, onContactClick }) {
               {name}
             </h1>
 
-             {/* Línea divisoria */}
+            {/* Línea divisoria */}
             <div
               className="flex items-center gap-3 w-full max-w-xs md:max-w-none"
               aria-hidden="true"
@@ -287,7 +288,7 @@ export default function Hero({ profile, onContactClick }) {
               <span className="text-amber-200/90 text-xs drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">◊</span>
               <div className="flex-1 h-px relative overflow-hidden rounded-full">
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-transparent" />
-                <motion.div 
+                <motion.div
                   className="absolute top-0 bottom-0 w-1/2"
                   style={{
                     background: 'linear-gradient(90deg, transparent, rgba(251,191,36,0.6), transparent)',
@@ -298,7 +299,7 @@ export default function Hero({ profile, onContactClick }) {
                 />
               </div>
             </div>
-          
+
             {/* Título profesional con fallback defensivo */}
             <p className="uppercase text-[13px] tracking-[0.22em] text-indigo-200 leading-relaxed">
               {title?.trim() ? title : 'Técnica en Programación & Desarrolladora de Software'}
@@ -306,26 +307,57 @@ export default function Hero({ profile, onContactClick }) {
           </motion.div>
 
           {/* Bloque de Contacto / Redes */}
-          <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-6 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-            {/* Botón Iniciar Contacto */}
-            <button 
+          {/* Bloque de Contacto / Redes */}
+          <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-8 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 flex-wrap">
+            {/* Botón Principal Iniciar Contacto (CTA Elevado) */}
+            <button
               onClick={onContactClick}
               className={[
-                'group flex items-center gap-3',
-                'font-sans-body text-[11px] font-medium tracking-[0.25em] uppercase text-indigo-200/80',
-                'transition-all duration-500 ease-out cursor-pointer',
-                'hover:text-indigo-50',
+                'group relative flex items-center gap-3 px-6 py-3 rounded-xl',
+                'bg-gradient-to-r from-violet-900/40 via-indigo-900/30 to-violet-900/40',
+                'backdrop-blur-md border border-violet-400/35',
+                'font-sans-body text-[11px] font-medium tracking-[0.25em] uppercase text-indigo-100',
+                'shadow-[0_0_20px_rgba(139,92,246,0.15)]',
+                'hover:border-amber-300/60 hover:text-amber-100 hover:shadow-[0_0_30px_rgba(251,191,36,0.25)]',
+                'hover:scale-[1.03] active:scale-[0.98]',
+                'transition-all duration-400 ease-out cursor-pointer',
               ].join(' ')}
+              aria-label="Abrir formulario para iniciar contacto"
             >
-              <span className="text-amber-200/60 text-[9px] group-hover:text-amber-200 group-hover:drop-shadow-[0_0_8px_rgba(251,191,36,0.6)] transition-all duration-500">
+              <span className="text-amber-300/80 text-[10px] group-hover:text-amber-200 group-hover:scale-125 group-hover:drop-shadow-[0_0_8px_rgba(251,191,36,0.8)] transition-all duration-400">
                 ◊
               </span>
-              <span className="relative">
+              <span className="relative font-semibold">
                 INICIAR CONTACTO
-                <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-indigo-300/80 to-transparent group-hover:w-full transition-all duration-500 ease-out" />
               </span>
             </button>
+
+            {/* Botón Secundario de CV (si está configurado) */}
+            {cvUrl && (
+              <a
+                href={cvUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={[
+                  'px-5 py-3 rounded-xl',
+                  'bg-white/4 backdrop-blur-sm border border-white/10',
+                  'font-sans-body text-[10px] font-medium tracking-[0.20em] uppercase text-indigo-200/80',
+                  'hover:text-white hover:border-indigo-400/30 hover:bg-white/8 hover:shadow-[0_0_15px_rgba(99,102,241,0.15)]',
+                  'hover:scale-[1.02] active:scale-[0.98]',
+                  'transition-all duration-400 ease-out',
+                ].join(' ')}
+                title="Abrir Currículum Vitae en nueva pestaña"
+              >
+                Ver CV ↗
+              </a>
+            )}
+
+            {/* Redes Sociales directas (GitHub, LinkedIn) */}
+            <div className="flex items-center gap-2 pl-1 sm:pl-2">
+              <SocialLinks size="sm" onContactClick={onContactClick} />
+            </div>
           </motion.div>
+
 
         </div>
       </div>
