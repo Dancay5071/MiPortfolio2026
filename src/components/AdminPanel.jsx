@@ -43,20 +43,8 @@ const CX = {
     'rounded-xl',
     'text-sm text-mystic-star font-sans-body',
     'outline-none cursor-pointer',
-    'focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300/80 focus:bg-white/10 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)]',
-    'transition-all duration-400 ease-out',
-  ].join(' '),
-
-  //Select
-  select: [
-    'w-full px-4 py-3',
-    'bg-white/4 backdrop-blur-sm',
-    'border border-white/8',
-    'rounded-xl',
-    'text-sm text-mystic-star font-sans-body',
-    'outline-none cursor-pointer',
-    'focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-300/50 focus:bg-white/10 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)]',
-    'transition-all duration-400 ease-out',
+    'focus:ring-2 focus:ring-indigo-400/60 focus:border-indigo-300/70 focus:bg-white/10 focus:shadow-[0_0_15px_rgba(99,102,241,0.20)]',
+    'transition-all duration-300 ease-out',
   ].join(' '),
 
   //Heading de sección
@@ -85,7 +73,8 @@ const CX = {
     'hover:from-violet-800/60 hover:to-indigo-800/50',
     'hover:border-violet-300/50',
     'hover:shadow-[0_0_24px_rgba(139,92,246,0.22),0_0_50px_rgba(139,92,246,0.08)]',
-    'transition-all duration-500 ease-out',
+    'active:scale-[0.97] cursor-pointer',
+    'transition-all duration-200 ease-out',
     'disabled:opacity-40 disabled:cursor-not-allowed',
     'inline-flex items-center justify-center gap-2',
   ].join(' '),
@@ -99,13 +88,14 @@ const CX = {
     'bg-emerald-900/30',
     'hover:bg-emerald-800/40 hover:border-emerald-400/45',
     'hover:shadow-[0_0_20px_rgba(52,211,153,0.18)]',
-    'transition-all duration-500 ease-out',
+    'active:scale-[0.97] cursor-pointer',
+    'transition-all duration-200 ease-out',
     'disabled:opacity-40 disabled:cursor-not-allowed',
     'inline-flex items-center justify-center gap-2',
   ].join(' '),
 
   //Botón cancelar
-  btnCancel: 'px-3 py-1.5 text-[10px] font-sans-body tracking-[0.15em] uppercase text-indigo-200/75 hover:text-indigo-100 transition-colors duration-300',
+  btnCancel: 'px-3 py-1.5 text-[10px] font-sans-body tracking-[0.15em] uppercase text-indigo-200/75 hover:text-indigo-100 active:scale-[0.96] cursor-pointer transition-all duration-150',
 
   //Botón agregar
   btnAdd: [
@@ -113,10 +103,11 @@ const CX = {
     'px-5 py-2 rounded-none',
     'border border-indigo-400/25',
     'text-indigo-200/75',
-    'bg-transparent',
+    'bg-transparent cursor-pointer',
     'hover:bg-indigo-900/20 hover:border-indigo-300/40 hover:text-indigo-100',
     'hover:shadow-[0_0_16px_rgba(99,102,241,0.15)]',
-    'transition-all duration-500 ease-out',
+    'active:scale-[0.97]',
+    'transition-all duration-150 ease-out',
   ].join(' '),
 
   //Input de archivo
@@ -131,12 +122,12 @@ const CX = {
   ].join(' '),
 
   //Nav activa
-  navInactive: [
+  navActive: [
     'flex items-center justify-center md:justify-start gap-2',
     'px-4 py-2 text-[10px] font-sans-body font-medium tracking-[0.15em] uppercase',
-    'rounded-none border border-transparent',
-    'text-indigo-200/70 hover:text-indigo-100 hover:bg-white/6 hover:border-indigo-400/25',
-    'whitespace-nowrap transition-all duration-300',
+    'rounded-none border border-violet-400/40 bg-violet-900/25',
+    'text-violet-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]',
+    'whitespace-nowrap cursor-pointer transition-all duration-200',
   ].join(' '),
 
   //Nav inactiva
@@ -144,8 +135,8 @@ const CX = {
     'flex items-center justify-center md:justify-start gap-2',
     'px-4 py-2 text-[10px] font-sans-body font-medium tracking-[0.15em] uppercase',
     'rounded-none border border-transparent',
-    'text-indigo-300/45 hover:text-indigo-200/80 hover:bg-white/4 hover:border-indigo-400/15',
-    'whitespace-nowrap transition-all duration-300',
+    'text-indigo-300/55 hover:text-indigo-200/90 hover:bg-white/5 hover:border-indigo-400/20',
+    'whitespace-nowrap cursor-pointer active:scale-[0.98] transition-all duration-150',
   ].join(' '),
 };
 
@@ -584,8 +575,8 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     setExpRole(exp.cargo);
     setExpDate(exp.fecha_inicio);
     setExpFechaFin(exp.fecha_fin || '');
-    setExpTech(exp.raw_tech);
-    setExpDesc(exp.descripcion);
+    setExpTech(exp.tecnologias || '');
+    setExpDesc(exp.descripcion || '');
     setIsExpFormOpen(true);
   };
   const handleDeleteExperience = async (id) => {
@@ -594,10 +585,9 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       if (demoIntercept()) return;
 
       try {
-        const { error } = await deleteExperience(id, token);
-        if (error) throw error;
+        await deleteExperience(id, token);
         addToast('Experiencia eliminada', 'success');
-      } catch { addToast('Error al eliminar', 'error'); }
+      } catch (err) { addToast(err.message || 'Error al eliminar', 'error'); }
     }
   };
   const handleExpSubmit = async (e) => {
@@ -617,11 +607,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         descripcion: expDesc,
       };
       if (expId) {
-        const { error } = await updateExperience(expId, data, token);
+        await updateExperience(expId, data, token);
         addToast('Experiencia actualizada correctamente', 'success');
       } else {
-        const { error } = await createExperience(data, token);
-        if (error) throw error;
+        await createExperience(data, token);
         addToast('Experiencia guardada exitosamente', 'success');
       }
       setIsExpFormOpen(false); resetExpForm();
@@ -649,10 +638,9 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       if (demoIntercept()) return;
 
       try {
-        const { error } = await deleteEducation(id, token);
-        if (error) throw error;
+        await deleteEducation(id, token);
         addToast('Título eliminado', 'success');
-      } catch { addToast('Error al eliminar', 'error'); }
+      } catch (err) { addToast(err.message || 'Error al eliminar', 'error'); }
     }
   };
   const handleEduSubmit = async (e) => {
@@ -673,12 +661,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         descripcion: eduDesc.trim() || null,
       };
       if (eduId) {
-        const { error } = await updateEducation(eduId, data, token);
-        if (error) throw error;
+        await updateEducation(eduId, data, token);
         addToast('Educación actualizada correctamente', 'success');
       } else {
-        const { error } = await createEducation(data, token);
-        if (error) throw error;
+        await createEducation(data, token);
         addToast('Educación guardada exitosamente', 'success');
       }
       setIsEduFormOpen(false); resetEduForm();
@@ -700,10 +686,9 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       if (demoIntercept()) return;
 
       try {
-        const { error } = await deleteProject(id, token);
-        if (error) throw error;
+        await deleteProject(id, token);
         addToast('Proyecto eliminado', 'success');
-      } catch { addToast('Error al eliminar proyecto', 'error'); }
+      } catch (err) { addToast(err.message || 'Error al eliminar proyecto', 'error'); }
     }
   };
   const handleProjFileChange = (e) => {
@@ -738,11 +723,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         image_url: finalImgUrl || ''
       };
       if (projId) {
-        const { error } = await updateProject(projId, data, token);
+        await updateProject(projId, data, token);
         addToast('Proyecto actualizado', 'success');
       } else {
-        const { error } = await createProject(data, token);
-        if (error) throw error;
+        await createProject(data, token);
         addToast('Proyecto creado con éxito', 'success');
       }
       setIsProjFormOpen(false); resetProjForm();
