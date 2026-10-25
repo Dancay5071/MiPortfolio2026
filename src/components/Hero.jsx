@@ -332,7 +332,7 @@ export default function Hero({ profile, onContactClick }) {
               </span>
             </button>
 
-            {/* Botón Secundario de CV (si está configurado) */}
+            {/* Botón Secundario de CV */}
             {cvUrl && (
               <a
                 href={cvUrl}
@@ -352,10 +352,6 @@ export default function Hero({ profile, onContactClick }) {
               </a>
             )}
 
-            {/* Redes Sociales directas (GitHub, LinkedIn) */}
-            <div className="flex items-center gap-2 pl-1 sm:pl-2">
-              <SocialLinks size="sm" onContactClick={onContactClick} />
-            </div>
           </motion.div>
 
 

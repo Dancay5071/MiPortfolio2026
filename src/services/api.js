@@ -64,18 +64,31 @@ export const getVisitStats = async () => {
         return null;
     }
 };
-// Helper genérico para peticiones protegidas
+// Helper genérico para peticiones protegidas (Defensivo contra respuestas HTML/404)
 const authFetch = async (endpoint, options = {}, token) => {
-  const res = await fetch(`${API_URL}${endpoint}`, {
-    ...options,
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.message || 'Error en la petición al servidor');
+  let res;
+  try {
+    res = await fetch(`${API_URL}${endpoint}`, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+    });
+  } catch (netErr) {
+    throw new Error(`No se pudo conectar con el backend (${API_URL}). Asegúrate de que esté iniciado.`);
+  }
+
+  const text = await res.text();
+  let json;
+  try {
+    json = JSON.parse(text);
+  } catch {
+    throw new Error(`El servidor devolvió un error (HTTP ${res.status}): ${text.slice(0, 100)}`);
+  }
+
+  if (!res.ok) throw new Error(json.message || `Error del servidor (${res.status})`);
   return json.data;
 };
 // Proyectos
