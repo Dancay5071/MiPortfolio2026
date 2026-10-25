@@ -50,8 +50,8 @@ function ProjectPortal({ src, alt, isActive }) {
   }
 
   const hasSrc = Boolean(src);
-  const imgActiveClass = 'grayscale-0 opacity-100 contrast-100 scale-[1.04]';
-  const imgDormantClass = 'grayscale opacity-55 contrast-125 scale-100';
+  const imgActiveClass = 'opacity-100 scale-[1.03] filter-none';
+  const imgDormantClass = 'opacity-90 contrast-105 md:opacity-85 md:hover:opacity-100 transition-all duration-500';
 
   return (
     <div

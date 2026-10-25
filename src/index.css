@@ -1,5 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600;700;900&family=Inter:wght@300;400;500;600;700;800&family=Share+Tech+Mono&display=swap');
 @import "tailwindcss";
+@config "../tailwind.config.js";
 
 @layer base {
   :root {
@@ -382,6 +382,7 @@
   filter: blur(0.5px) drop-shadow(0 0 4px rgba(196, 181, 253, 0.5));
   display: none;
 }
+
 @media (min-width: 768px) {
   .neon-orbit-line {
     display: block;
@@ -395,6 +396,7 @@
   0% {
     offset-distance: 0%;
   }
+
   100% {
     offset-distance: 100%;
   }
