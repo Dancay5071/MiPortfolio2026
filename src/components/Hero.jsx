@@ -299,18 +299,7 @@ export default function Hero({ profile, onContactClick }) {
                 />
               </div>
             </div>
-
-            {/* Subtítulo */}
-            <p className="uppercase text-[13px] tracking-[0.22em] text-indigo-200 leading-relaxed">
-              {title}
-            </p>
-
-            <div className="md:hidden mt-3 w-full flex justify-center md:justify-start">
-              <span className="text-[10px] font-medium tracking-[0.15em] text-indigo-300/60 uppercase flex items-center gap-2">
-                [ Experiencia recomendada en PC ]
-                <span className="text-amber-200/50">◊</span>
-              </span>
-            </div>
+          
           </motion.div>
 
           <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-6 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">

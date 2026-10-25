@@ -1,106 +1,121 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, useSpring } from 'framer-motion';
 
 export default function MysticalCursor() {
-  const [mousePos, setMousePos] = useState({ x: -100, y: -100 });
+  const dotRef = useRef(null);
   const [isHovering, setIsHovering] = useState(false);
-  const [isTouch, setIsTouch] = useState(false);
-  const [isDesktop, setIsDesktop] = useState(true);
-  const [reducedMotion, setReducedMotion] = useState(false);
+  const [isTextElement, setIsTextElement] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+  const [isEnabled, setIsEnabled] = useState(false);
 
-  // Física de resorte para el Aura
-  const springConfig = { stiffness: 100, damping: 25, mass: 0.1 };
+  // Física de resorte para el aura
+  const springConfig = { stiffness: 180, damping: 22, mass: 0.1 };
   const auraX = useSpring(-100, springConfig);
   const auraY = useSpring(-100, springConfig);
 
   useEffect(() => {
-    // Detectar soporte táctil o pantallas pequeñas
-    const checkEnvironment = () => {
-      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-      setIsTouch(isTouchDevice);
-      setIsDesktop(window.innerWidth >= 768);
-      
-      const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-      setReducedMotion(mediaQuery.matches);
-    };
-    
-    checkEnvironment();
-    window.addEventListener('resize', checkEnvironment);
-    window.addEventListener('touchstart', () => setIsTouch(true), { passive: true });
+  
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasFinePointer = window.matchMedia('(pointer: fine) and (hover: hover)').matches;
+
+    if (prefersReducedMotion || !hasFinePointer) {
+      setIsEnabled(false);
+      return;
+    }
+
+    setIsEnabled(true);
 
     const handleMouseMove = (e) => {
-      if (isTouch) return;
-      setMousePos({ x: e.clientX, y: e.clientY });
-      auraX.set(e.clientX);
-      auraY.set(e.clientY);
+      const { clientX, clientY } = e;
+
+      // Actualización directa del punto por GPU
+      if (dotRef.current) {
+        dotRef.current.style.transform = `translate3d(${clientX}px, ${clientY}px, 0) translate(-50%, -50%)`;
+      }
+
+      auraX.set(clientX);
+      auraY.set(clientY);
+
+      if (!isVisible) setIsVisible(true);
     };
 
     const handleMouseOver = (e) => {
-      if (isTouch) return;
       const target = e.target;
-      const isInteractive = target.closest('a, button, input, textarea, select, details, summary, .group-hover, [role="button"], [tabindex]:not([tabindex="-1"])');
-      setIsHovering(!!isInteractive);
+      
+      // Detectar si el usuario está sobre un campo de texto o editable
+      const isInput = !!target.closest('input, textarea, select, [contenteditable="true"], .cursor-text');
+      setIsTextElement(isInput);
+
+      // Detectar elementos interactivos para expandir el aura
+      const isInteractive = !!target.closest('a, button, [role="button"], input[type="submit"], input[type="button"], label.cursor-pointer');
+      setIsHovering(isInteractive);
     };
 
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseover', handleMouseOver);
+    const handleMouseLeave = () => setIsVisible(false);
+    const handleMouseEnter = () => setIsVisible(true);
+
+    window.addEventListener('mousemove', handleMouseMove, { passive: true });
+    window.addEventListener('mouseover', handleMouseOver, { passive: true });
+    document.addEventListener('mouseleave', handleMouseLeave);
+    document.addEventListener('mouseenter', handleMouseEnter);
 
     return () => {
-      window.removeEventListener('resize', checkEnvironment);
       window.removeEventListener('mousemove', handleMouseMove);
       window.removeEventListener('mouseover', handleMouseOver);
+      document.removeEventListener('mouseleave', handleMouseLeave);
+      document.removeEventListener('mouseenter', handleMouseEnter);
     };
-  }, [auraX, auraY, isTouch]);
+  }, [auraX, auraY, isVisible]);
 
-  if (isTouch || !isDesktop || reducedMotion) return null;
-
-  const isVisible = mousePos.x !== -100;
+  if (!isEnabled) return null;
 
   return (
     <>
       <style>{`
-        /* Ocultar el cursor por defecto globalmente en escritorio */
-        @media (min-width: 768px) {
-          *, *::before, *::after {
+        /*  Oculta el cursor del sistema SOLO en dispositivos con mouse real */
+        @media (pointer: fine) and (hover: hover) {
+          body, a, button, [role="button"] {
             cursor: none !important;
+          }
+          /* Libera SIEMPRE los campos de texto para permitir seleccionar y editar normalmente */
+          input, textarea, select, [contenteditable="true"], .cursor-text {
+            cursor: text !important;
           }
         }
       `}</style>
-      
-      <div className="fixed top-0 left-0 z-[9999] pointer-events-none hidden md:block" aria-hidden="true">
-        
-        {/* El núcleo */}
-        <div 
-          className="fixed w-1.5 h-1.5 rounded-full bg-indigo-100 shadow-[0_0_10px_rgba(224,231,255,0.8)]"
-          style={{
-            left: mousePos.x,
-            top: mousePos.y,
-            transform: 'translate(-50%, -50%)',
-            transition: 'opacity 0.15s ease',
-            opacity: isVisible ? 1 : 0
-          }}
+
+      <div 
+        className="fixed inset-0 pointer-events-none z-[9999] overflow-hidden transition-opacity duration-200"
+        style={{ opacity: isVisible && !isTextElement ? 1 : 0 }}
+        aria-hidden="true"
+      >
+        {/* Punto central con alta visibilidad y contraste */}
+        <div
+          ref={dotRef}
+          className="fixed top-0 left-0 w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_rgba(255,255,255,0.9),0_0_15px_rgba(167,139,250,0.8)] will-change-transform"
         />
 
-        {/* El Aura */}
+        {/* Aura magnética exterior */}
         <motion.div
-          className="fixed rounded-full backdrop-blur-[1px]"
+          className="fixed top-0 left-0 rounded-full pointer-events-none will-change-transform"
           style={{
-            left: auraX,
-            top: auraY,
+            x: auraX,
+            y: auraY,
             translateX: '-50%',
             translateY: '-50%',
-            width: '2rem', 
-            height: '2rem', 
-            border: '1px solid rgba(217, 70, 239, 0.4)',
-            backgroundColor: isHovering ? 'rgba(112, 26, 117, 0.05)' : 'rgba(112, 26, 117, 0.1)', // bg-fuchsia-900/10 vs bg-fuchsia-900/5
-            opacity: isVisible ? 1 : 0
+            width: '2.2rem',
+            height: '2.2rem',
+            border: '1px solid rgba(192, 132, 252, 0.45)',
+            backgroundColor: isHovering ? 'rgba(168, 85, 247, 0.12)' : 'rgba(168, 85, 247, 0.04)',
+            backdropFilter: 'blur(1px)',
           }}
           animate={{
-            scale: isHovering ? 1.8 : 1,
-            borderColor: isHovering ? 'rgba(217, 70, 239, 0.9)' : 'rgba(217, 70, 239, 0.4)',
+            scale: isHovering ? 1.7 : 1,
+            borderColor: isHovering ? 'rgba(216, 180, 254, 0.85)' : 'rgba(192, 132, 252, 0.45)',
+            boxShadow: isHovering ? '0 0 20px rgba(168, 85, 247, 0.25)' : 'none',
           }}
           transition={{
-            scale: { type: 'spring', stiffness: 300, damping: 20 },
+            scale: { type: 'spring', stiffness: 260, damping: 20 },
             borderColor: { duration: 0.2 }
           }}
         />
@@ -108,3 +123,4 @@ export default function MysticalCursor() {
     </>
   );
 }
+

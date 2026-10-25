@@ -79,8 +79,9 @@ function TabPanel({ children, maxWidth = 'max-w-4xl', className = '', glow = nul
 
 
 //App 
-const SECTIONS = ['inicio', 'experiencia', 'educacion', 'proyectos', 'admin'];
+const PUBLIC_SECTIONS = ['inicio', 'experiencia', 'educacion', 'proyectos'];
 
+const SECTIONS = [...PUBLIC_SECTIONS, 'admin'];
 const swipeVariants = {
   enter: (direction) => ({
     x: direction > 0 ? 40 : -40,
@@ -175,23 +176,28 @@ function App() {
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const currentIndex = SECTIONS.indexOf(activeTab);
+    // Si el usuario está en el panel de admin, no permitimos cambiar de pestaña por swipe
+    if (activeTab === 'admin') return;
 
-    if (distance > minSwipeDistance && currentIndex < SECTIONS.length - 1) {
+    const distance = touchStart - touchEnd;
+    const currentIndex = PUBLIC_SECTIONS.indexOf(activeTab);
+    if (currentIndex === -1) return;
+
+    if (distance > minSwipeDistance && currentIndex < PUBLIC_SECTIONS.length - 1) {
       setHasSwiped(true);
-      const newTab = SECTIONS[currentIndex + 1];
+      const newTab = PUBLIC_SECTIONS[currentIndex + 1];
       setDirection(1);
       setActiveTab(newTab);
       window.history.replaceState(null, null, `#${newTab}`);
     } else if (distance < -minSwipeDistance && currentIndex > 0) {
       setHasSwiped(true);
-      const newTab = SECTIONS[currentIndex - 1];
+      const newTab = PUBLIC_SECTIONS[currentIndex - 1];
       setDirection(-1);
       setActiveTab(newTab);
       window.history.replaceState(null, null, `#${newTab}`);
     }
   };
+
 
   const [totalVisits, setTotalVisits] = useState(null);
 
