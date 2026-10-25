@@ -795,10 +795,9 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
 
   const validTabs = ['profile', 'experience', 'education', 'projects'];
-  const currentTab = validTabs.includes(activeSubTab) ? activeSubTab : 'profile';
-  if (isDemoUser && currentTab === 'overview') {
-    currentTab = 'profile';
-  }
+  const currentTab = (isDemoUser && activeSubTab === 'overview') || !validTabs.includes(activeSubTab)
+    ? 'profile'
+    : activeSubTab;
 
   return (
     <div className="w-full flex flex-col md:flex-row min-h-[60vh] gap-6 animate-[fadeInTab_0.4s_ease-out_forwards]">

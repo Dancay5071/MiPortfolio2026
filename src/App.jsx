@@ -121,6 +121,8 @@ function App() {
     name: 'Daniela Cabrera',
     title: 'Técnica en programación & Desarrolladora de software',
     url_foto: '',
+    description: '',
+    cv_url: '',
   });
 
   const addToast = useCallback((message, type = 'info') => {
