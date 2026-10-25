@@ -19,7 +19,7 @@ import {
 //HUD class constants
 const CX = {
 
-  label: 'block text-[10px] font-medium tracking-[0.18em] uppercase text-indigo-300/55 mb-1.5 font-mono-hud flex items-center gap-1.5 before:content-["◊"] before:text-violet-400/35 before:text-[8px]',
+  label: 'block text-[10px] font-medium tracking-[0.18em] uppercase text-indigo-200/90 mb-1.5 font-mono-hud flex items-center gap-1.5 before:content-["◊"] before:text-violet-400/70 before:text-[8px]',
 
   //Inputs
   input: [
@@ -28,11 +28,23 @@ const CX = {
     'border border-white/8',
     'rounded-xl',
     'text-sm text-mystic-star font-sans-body',
-    'placeholder:text-indigo-300/35 placeholder:font-light',
+    'placeholder:text-indigo-300/65 placeholder:font-light',
     'outline-none',
-    'focus:ring-2 focus:ring-indigo-400/40 focus:border-indigo-300/50 focus:bg-white/10 focus:shadow-[0_0_15px_rgba(99,102,241,0.15)]',
+    'focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300/80 focus:bg-white/10 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)]',
     'transition-all duration-400 ease-out',
     'disabled:opacity-40 disabled:cursor-not-allowed',
+  ].join(' '),
+
+  //Select
+  select: [
+    'w-full px-4 py-3',
+    'bg-white/4 backdrop-blur-sm',
+    'border border-white/8',
+    'rounded-xl',
+    'text-sm text-mystic-star font-sans-body',
+    'outline-none cursor-pointer',
+    'focus:ring-2 focus:ring-indigo-400/70 focus:border-indigo-300/80 focus:bg-white/10 focus:shadow-[0_0_15px_rgba(99,102,241,0.25)]',
+    'transition-all duration-400 ease-out',
   ].join(' '),
 
   //Select
@@ -93,7 +105,7 @@ const CX = {
   ].join(' '),
 
   //Botón cancelar
-  btnCancel: 'px-3 py-1.5 text-[10px] font-sans-body tracking-[0.15em] uppercase text-indigo-300/45 hover:text-indigo-200/70 transition-colors duration-300',
+  btnCancel: 'px-3 py-1.5 text-[10px] font-sans-body tracking-[0.15em] uppercase text-indigo-200/75 hover:text-indigo-100 transition-colors duration-300',
 
   //Botón agregar
   btnAdd: [
@@ -119,13 +131,11 @@ const CX = {
   ].join(' '),
 
   //Nav activa
-  navActive: [
+  navInactive: [
     'flex items-center justify-center md:justify-start gap-2',
     'px-4 py-2 text-[10px] font-sans-body font-medium tracking-[0.15em] uppercase',
-    'rounded-none',
-    'bg-white/5 backdrop-blur-md border border-indigo-500/20',
-    'shadow-[0_0_15px_rgba(99,102,241,0.10)]',
-    'text-indigo-200',
+    'rounded-none border border-transparent',
+    'text-indigo-200/70 hover:text-indigo-100 hover:bg-white/6 hover:border-indigo-400/25',
     'whitespace-nowrap transition-all duration-300',
   ].join(' '),
 
@@ -608,7 +618,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       };
       if (expId) {
         const { error } = await updateExperience(expId, data, token);
-         addToast('Experiencia actualizada correctamente', 'success');
+        addToast('Experiencia actualizada correctamente', 'success');
       } else {
         const { error } = await createExperience(data, token);
         if (error) throw error;
@@ -728,9 +738,9 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         image_url: finalImgUrl || ''
       };
       if (projId) {
-        const { error } =  await updateProject(projId, data, token);
+        const { error } = await updateProject(projId, data, token);
         addToast('Proyecto actualizado', 'success');
-    } else {
+      } else {
         const { error } = await createProject(data, token);
         if (error) throw error;
         addToast('Proyecto creado con éxito', 'success');
@@ -965,79 +975,79 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         )}
 
         {/* SUB-TAB: MENSAJES DE CONTACTO */}
-{currentTab === 'messages' && (
-  <div>
-    <div className="flex justify-between items-center mb-6 border-b border-indigo-400/8 pb-3">
-      <h2 className={CX.sectionHead}>
-        <span className="text-indigo-400/60">✉</span> Bandeja de Mensajes ({messages.length})
-      </h2>
-      <button
-        onClick={fetchMessages}
-        className="text-[10px] uppercase tracking-widest text-indigo-300/60 hover:text-indigo-100 flex items-center gap-1.5 cursor-pointer"
-      >
-        Actualizar ◊
-      </button>
-    </div>
-
-    {messagesLoading ? (
-      <div className="py-12 flex justify-center">
-        <CatHeadLoader size="md" />
-      </div>
-    ) : messages.length === 0 ? (
-      <div className="text-center py-12 text-xs font-mono-hud text-indigo-300/40 tracking-widest">
-        ◊ No hay mensajes recibidos aún ◊
-      </div>
-    ) : (
-      <div className="space-y-4">
-        {messages.map(msg => (
-          <div
-            key={msg.id}
-            className="bg-white/4 border border-white/8 rounded-xl p-5 hover:border-violet-400/25 transition-all duration-300"
-          >
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3 mb-3">
-              <div>
-                <h3 className="font-semibold text-mystic-star text-sm">{msg.nombre}</h3>
-                <a
-                  href={`mailto:${msg.email}`}
-                  className="text-xs text-indigo-300/70 hover:text-amber-200 transition-colors"
-                >
-                  {msg.email}
-                </a>
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="text-[10px] font-mono-hud text-indigo-300/40">
-                  {new Date(msg.created_at).toLocaleDateString('es-AR', {
-                    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
-                  })}
-                </span>
-                <button
-                  onClick={() => handleDeleteMsg(msg.id)}
-                  className="text-rose-400/60 hover:text-rose-300 text-xs px-2 py-1 rounded transition-colors"
-                  title="Eliminar mensaje"
-                >
-                  ✕
-                </button>
-              </div>
-            </div>
-
-            <p className="text-sm text-indigo-100/90 leading-relaxed font-sans-body whitespace-pre-line bg-black/20 p-3 rounded-lg border border-white/5">
-              {msg.mensaje}
-            </p>
-
-            <div className="mt-3 flex justify-end">
-              <a
-                href={`mailto:${msg.email}?subject=Respuesta a tu mensaje en mi Portfolio`}
-                className="text-[10px] uppercase tracking-widest font-mono-hud text-violet-300 hover:text-white flex items-center gap-1.5 transition-colors"
+        {currentTab === 'messages' && (
+          <div>
+            <div className="flex justify-between items-center mb-6 border-b border-indigo-400/8 pb-3">
+              <h2 className={CX.sectionHead}>
+                <span className="text-indigo-400/60">✉</span> Bandeja de Mensajes ({messages.length})
+              </h2>
+              <button
+                onClick={fetchMessages}
+                className="text-[10px] uppercase tracking-widest text-indigo-300/60 hover:text-indigo-100 flex items-center gap-1.5 cursor-pointer"
               >
-                Responder por mail →
-              </a>
+                Actualizar ◊
+              </button>
             </div>
+
+            {messagesLoading ? (
+              <div className="py-12 flex justify-center">
+                <CatHeadLoader size="md" />
+              </div>
+            ) : messages.length === 0 ? (
+              <div className="text-center py-12 text-xs font-mono-hud text-indigo-300/40 tracking-widest">
+                ◊ No hay mensajes recibidos aún ◊
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {messages.map(msg => (
+                  <div
+                    key={msg.id}
+                    className="bg-white/4 border border-white/8 rounded-xl p-5 hover:border-violet-400/25 transition-all duration-300"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3 mb-3">
+                      <div>
+                        <h3 className="font-semibold text-mystic-star text-sm">{msg.nombre}</h3>
+                        <a
+                          href={`mailto:${msg.email}`}
+                          className="text-xs text-indigo-300/70 hover:text-amber-200 transition-colors"
+                        >
+                          {msg.email}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-mono-hud text-indigo-300/40">
+                          {new Date(msg.created_at).toLocaleDateString('es-AR', {
+                            day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                          })}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteMsg(msg.id)}
+                          className="text-rose-400/60 hover:text-rose-300 text-xs px-2 py-1 rounded transition-colors"
+                          title="Eliminar mensaje"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="text-sm text-indigo-100/90 leading-relaxed font-sans-body whitespace-pre-line bg-black/20 p-3 rounded-lg border border-white/5">
+                      {msg.mensaje}
+                    </p>
+
+                    <div className="mt-3 flex justify-end">
+                      <a
+                        href={`mailto:${msg.email}?subject=Respuesta a tu mensaje en mi Portfolio`}
+                        className="text-[10px] uppercase tracking-widest font-mono-hud text-violet-300 hover:text-white flex items-center gap-1.5 transition-colors"
+                      >
+                        Responder por mail →
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
-        ))}
-      </div>
-    )}
-  </div>
-)}
+        )}
 
 
         {/* SUB-TAB: EXPERIENCIAS */}

@@ -1,26 +1,26 @@
 import { useId } from 'react';
 
 export function MysticInput({
-  type         = 'text',
+  type = 'text',
   value,
   onChange,
-  placeholder  = '',
+  placeholder = '',
   label,
   hint,
   icon,
-  required     = false,
-  disabled     = false,
-  className    = '',
+  required = false,
+  disabled = false,
+  className = '',
   inputClassName = '',
   id: propId,
   error,
-  as           = 'input',
-  rows         = 3,
+  as = 'input',
+  rows = 3,
   ...rest
 }) {
-  const autoId  = useId();
+  const autoId = useId();
   const fieldId = propId ?? autoId;
-  const Tag     = as;
+  const Tag = as;
 
   //Clases dinámicas según estado 
   const borderClass = error
@@ -28,13 +28,13 @@ export function MysticInput({
     : 'border-white/8 focus:border-violet-400/30 focus:ring-indigo-500/20';
 
   const baseInput = [
-    
+
     'w-full rounded-xl',
     icon ? 'pl-10 pr-4 py-3' : 'px-4 py-3',
     'bg-white/4 backdrop-blur-sm',
     `border ${borderClass}`,
     'text-sm text-mystic-star font-sans-body',
-    'placeholder:text-indigo-300/35 placeholder:font-light',
+    'placeholder:text-indigo-300/65 placeholder:font-light',
     'outline-none',
     'focus:ring-2',
     'focus:bg-white/6',
@@ -50,7 +50,7 @@ export function MysticInput({
       {label && (
         <label
           htmlFor={fieldId}
-          className="flex items-center gap-1.5 text-[10px] font-medium tracking-[0.18em] uppercase text-indigo-300/60 font-mono-hud"
+          className="flex items-center gap-1.5 text-[10px] font-medium tracking-[0.18em] uppercase text-indigo-200/60 font-mono-hud"
         >
           <span className="text-violet-400/40 text-[8px]">◊</span>
           {label}
@@ -96,9 +96,8 @@ export function MysticInput({
       {(hint || error) && (
         <p
           id={`${fieldId}-desc`}
-          className={`text-[10px] font-mono-hud tracking-wide pl-1 ${
-            error ? 'text-rose-400/70' : 'text-indigo-300/40'
-          }`}
+          className={`text-[10px] font-mono-hud tracking-wide pl-1 ${error ? 'text-rose-400/70' : 'text-indigo-300/40'
+            }`}
         >
           {error ?? hint}
         </p>
@@ -110,31 +109,31 @@ export function MysticInput({
 
 export function MysticButton({
   children,
-  variant      = 'ghost',
-  size         = 'md',
-  type         = 'button',
-  disabled     = false,
-  isLoading    = false,
-  loadingText  = 'Procesando',
+  variant = 'ghost',
+  size = 'md',
+  type = 'button',
+  disabled = false,
+  isLoading = false,
+  loadingText = 'Procesando',
   onClick,
-  className    = '',
+  className = '',
   icon,
   iconRight,
-  fullWidth    = false,
-  as           = 'button',
+  fullWidth = false,
+  as = 'button',
   href,
   ...rest
 }) {
- 
+
   const sizes = {
     sm: 'px-4 py-1.5 text-[10px] tracking-[0.22em]',
     md: 'px-6 py-2.5 text-xs   tracking-[0.20em]',
     lg: 'px-8 py-3   text-xs   tracking-[0.22em]',
   };
 
-  
+
   const variants = {
-  
+
     ghost: [
       'border border-indigo-400/28',
       'text-indigo-200/80',
@@ -174,7 +173,7 @@ export function MysticButton({
   };
 
   const base = [
-    
+
     'rounded-full',
     'uppercase font-medium font-sans-body',
     'inline-flex items-center justify-center gap-2',
@@ -213,7 +212,7 @@ export function MysticButton({
         </>
       ) : (
         <>
-          {icon    && <span className="flex-shrink-0 opacity-70" aria-hidden="true">{icon}</span>}
+          {icon && <span className="flex-shrink-0 opacity-70" aria-hidden="true">{icon}</span>}
           {children}
           {iconRight && <span className="flex-shrink-0 opacity-70" aria-hidden="true">{iconRight}</span>}
         </>
@@ -241,10 +240,10 @@ export function MysticFormPanel({ title, children, className = '' }) {
     <div
       className={`relative overflow-hidden rounded-xl border border-white/6 p-5 space-y-4 ${className}`}
       style={{
-        background:         'linear-gradient(135deg, rgba(11,9,20,0.65) 0%, rgba(8,5,18,0.55) 100%)',
-        backdropFilter:     'blur(14px)',
-        WebkitBackdropFilter:'blur(14px)',
-        boxShadow:          '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(196,181,253,0.06)',
+        background: 'linear-gradient(135deg, rgba(11,9,20,0.65) 0%, rgba(8,5,18,0.55) 100%)',
+        backdropFilter: 'blur(14px)',
+        WebkitBackdropFilter: 'blur(14px)',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.40), inset 0 1px 0 rgba(196,181,253,0.06)',
       }}
     >
       <div
@@ -271,7 +270,7 @@ export function MysticFormPanel({ title, children, className = '' }) {
 }
 
 export function MysticSelect({ label, children, className = '', id: propId, ...rest }) {
-  const autoId  = useId();
+  const autoId = useId();
   const fieldId = propId ?? autoId;
 
   return (
