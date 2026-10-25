@@ -6,6 +6,13 @@ import ProjectList from './ProjectList';
 import { useDemoGuard } from '../hooks/useDemoGuard';
 import CatHeadLoader from './CatHeadLoader';
 import { MysticInput, MysticButton, MysticDivider, MysticFormPanel } from './MysticUI';
+import {
+  createProject, updateProject, deleteProject,
+  createExperience, updateExperience, deleteExperience,
+  createEducation, updateEducation, deleteEducation
+} from '../services/api';
+
+const token = session?.access_token;
 
 //HUD class constants
 const CX = {
@@ -538,7 +545,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       if (demoIntercept()) return;
 
       try {
-        const { error } = await supabase.from('experiencia').delete().eq('id', id);
+        const { error } = await deleteExperience(id, token);
         if (error) throw error;
         addToast('Experiencia eliminada', 'success');
       } catch { addToast('Error al eliminar', 'error'); }
@@ -561,11 +568,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         descripcion: expDesc,
       };
       if (expId) {
-        const { error } = await supabase.from('experiencia').update(data).eq('id', expId);
-        if (error) throw error;
-        addToast('Experiencia actualizada correctamente', 'success');
+        const { error } = await updateExperience(expId, data, token);
+         addToast('Experiencia actualizada correctamente', 'success');
       } else {
-        const { error } = await supabase.from('experiencia').insert([data]);
+        const { error } = await createExperience(data, token);
         if (error) throw error;
         addToast('Experiencia guardada exitosamente', 'success');
       }
@@ -594,7 +600,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       if (demoIntercept()) return;
 
       try {
-        const { error } = await supabase.from('educacion').delete().eq('id', id);
+        const { error } = await deleteEducation(id, token);
         if (error) throw error;
         addToast('Título eliminado', 'success');
       } catch { addToast('Error al eliminar', 'error'); }
@@ -618,11 +624,11 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         descripcion: eduDesc.trim() || null,
       };
       if (eduId) {
-        const { error } = await supabase.from('educacion').update(data).eq('id', eduId);
+        const { error } = await updateEducation(eduId, data, token);
         if (error) throw error;
         addToast('Educación actualizada correctamente', 'success');
       } else {
-        const { error } = await supabase.from('educacion').insert([data]);
+        const { error } = await createEducation(data, token);
         if (error) throw error;
         addToast('Educación guardada exitosamente', 'success');
       }
@@ -645,7 +651,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       if (demoIntercept()) return;
 
       try {
-        const { error } = await supabase.from('proyectos').delete().eq('id', id);
+        const { error } = await deleteProject(id, token);
         if (error) throw error;
         addToast('Proyecto eliminado', 'success');
       } catch { addToast('Error al eliminar proyecto', 'error'); }
@@ -683,11 +689,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         image_url: finalImgUrl || ''
       };
       if (projId) {
-        const { error } = await supabase.from('proyectos').update(data).eq('id', projId);
-        if (error) throw error;
+        const { error } =  await updateProject(projId, data, token);
         addToast('Proyecto actualizado', 'success');
-      } else {
-        const { error } = await supabase.from('proyectos').insert([data]);
+    } else {
+        const { error } = await createProject(data, token);
         if (error) throw error;
         addToast('Proyecto creado con éxito', 'success');
       }

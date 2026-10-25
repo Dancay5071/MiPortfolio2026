@@ -64,3 +64,29 @@ export const getVisitStats = async () => {
         return null;
     }
 };
+// Helper genérico para peticiones protegidas
+const authFetch = async (endpoint, options = {}, token) => {
+  const res = await fetch(`${API_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+      ...options.headers,
+    },
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.message || 'Error en la petición al servidor');
+  return json.data;
+};
+// Proyectos
+export const createProject = (data, token) => authFetch('/projects', { method: 'POST', body: JSON.stringify(data) }, token);
+export const updateProject = (id, data, token) => authFetch(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(data) }, token);
+export const deleteProject = (id, token) => authFetch(`/projects/${id}`, { method: 'DELETE' }, token);
+// Experiencia
+export const createExperience = (data, token) => authFetch('/experience', { method: 'POST', body: JSON.stringify(data) }, token);
+export const updateExperience = (id, data, token) => authFetch(`/experience/${id}`, { method: 'PUT', body: JSON.stringify(data) }, token);
+export const deleteExperience = (id, token) => authFetch(`/experience/${id}`, { method: 'DELETE' }, token);
+// Educación
+export const createEducation = (data, token) => authFetch('/education', { method: 'POST', body: JSON.stringify(data) }, token);
+export const updateEducation = (id, data, token) => authFetch(`/education/${id}`, { method: 'PUT', body: JSON.stringify(data) }, token);
+export const deleteEducation = (id, token) => authFetch(`/education/${id}`, { method: 'DELETE' }, token);
