@@ -6,7 +6,7 @@ export default function ContactModal({ isOpen, onClose }) {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [status, setStatus] = useState('idle');
 
-  // Cerrar el modal con la tecla 'Escape' (Estándar de Accesibilidad UX)
+  // Cerrar el modal con la tecla 'Escape'
   useEffect(() => {
     if (!isOpen) return;
     const handleKeyDown = (e) => {

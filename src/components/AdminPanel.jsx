@@ -9,8 +9,10 @@ import { MysticInput, MysticButton, MysticDivider, MysticFormPanel } from './Mys
 import {
   createProject, updateProject, deleteProject,
   createExperience, updateExperience, deleteExperience,
-  createEducation, updateEducation, deleteEducation
+  createEducation, updateEducation, deleteEducation,
+  getMessages, deleteMessage
 } from '../services/api';
+
 
 
 
@@ -794,6 +796,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   //Sidebar nav items
   const navItems = [
     { id: 'profile', label: 'Perfil', icon: '◊' },
+    { id: 'messages', label: 'Mensajes', icon: '✉' },
     { id: 'experience', label: 'Experiencia', icon: '◊' },
     { id: 'education', label: 'Educación', icon: '◊' },
     { id: 'projects', label: 'Proyectos', icon: '◊' },
@@ -924,6 +927,82 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
             </form>
           </div>
         )}
+
+        {/* SUB-TAB: MENSAJES DE CONTACTO */}
+{currentTab === 'messages' && (
+  <div>
+    <div className="flex justify-between items-center mb-6 border-b border-indigo-400/8 pb-3">
+      <h2 className={CX.sectionHead}>
+        <span className="text-indigo-400/60">✉</span> Bandeja de Mensajes ({messages.length})
+      </h2>
+      <button
+        onClick={fetchMessages}
+        className="text-[10px] uppercase tracking-widest text-indigo-300/60 hover:text-indigo-100 flex items-center gap-1.5 cursor-pointer"
+      >
+        Actualizar ◊
+      </button>
+    </div>
+
+    {messagesLoading ? (
+      <div className="py-12 flex justify-center">
+        <CatHeadLoader size="md" />
+      </div>
+    ) : messages.length === 0 ? (
+      <div className="text-center py-12 text-xs font-mono-hud text-indigo-300/40 tracking-widest">
+        ◊ No hay mensajes recibidos aún ◊
+      </div>
+    ) : (
+      <div className="space-y-4">
+        {messages.map(msg => (
+          <div
+            key={msg.id}
+            className="bg-white/4 border border-white/8 rounded-xl p-5 hover:border-violet-400/25 transition-all duration-300"
+          >
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3 mb-3">
+              <div>
+                <h3 className="font-semibold text-mystic-star text-sm">{msg.nombre}</h3>
+                <a
+                  href={`mailto:${msg.email}`}
+                  className="text-xs text-indigo-300/70 hover:text-amber-200 transition-colors"
+                >
+                  {msg.email}
+                </a>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-[10px] font-mono-hud text-indigo-300/40">
+                  {new Date(msg.created_at).toLocaleDateString('es-AR', {
+                    day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                  })}
+                </span>
+                <button
+                  onClick={() => handleDeleteMsg(msg.id)}
+                  className="text-rose-400/60 hover:text-rose-300 text-xs px-2 py-1 rounded transition-colors"
+                  title="Eliminar mensaje"
+                >
+                  ✕
+                </button>
+              </div>
+            </div>
+
+            <p className="text-sm text-indigo-100/90 leading-relaxed font-sans-body whitespace-pre-line bg-black/20 p-3 rounded-lg border border-white/5">
+              {msg.mensaje}
+            </p>
+
+            <div className="mt-3 flex justify-end">
+              <a
+                href={`mailto:${msg.email}?subject=Respuesta a tu mensaje en mi Portfolio`}
+                className="text-[10px] uppercase tracking-widest font-mono-hud text-violet-300 hover:text-white flex items-center gap-1.5 transition-colors"
+              >
+                Responder por mail →
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+    )}
+  </div>
+)}
+
 
         {/* SUB-TAB: EXPERIENCIAS */}
         {currentTab === 'experience' && (
@@ -1127,3 +1206,39 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     </div>
   );
 }
+const [messages, setMessages] = useState([]);
+const [messagesLoading, setMessagesLoading] = useState(false);
+
+const fetchMessages = async () => {
+  if (!token) return;
+  setMessagesLoading(true);
+  try {
+    const data = await getMessages(token);
+    setMessages(data || []);
+  } catch (err) {
+    console.error('Error al cargar mensajes:', err);
+  } finally {
+    setMessagesLoading(false);
+  }
+};
+
+// Cargar mensajes cuando el admin selecciona la pestaña 'messages'
+useEffect(() => {
+  if (activeSubTab === 'messages' && session) {
+    fetchMessages();
+  }
+}, [activeSubTab, session]);
+
+const handleDeleteMsg = async (id) => {
+  if (window.confirm('¿Eliminar este mensaje?')) {
+    if (demoIntercept()) return;
+    try {
+      await deleteMessage(id, token);
+      setMessages(prev => prev.filter(m => m.id !== id));
+      addToast('Mensaje eliminado', 'success');
+    } catch {
+      addToast('Error al eliminar mensaje', 'error');
+    }
+  }
+};
+
