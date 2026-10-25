@@ -30,30 +30,42 @@ const cardVariants = {
 };
 
 const MESES = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
-// Convierte 'Mar 2026', '2024' o 'Actualidad' a una fecha comparable
 
-const parseFechaEducacion = (fechaStr, esFin = false) => {
-  if (!fechaStr) return esFin ? new Date(9999, 0, 1) : new Date(0);
+// Parser robusto
+const parseFechaEducacion = (fechaStr) => {
+  if (!fechaStr) return new Date(0);
   const s = String(fechaStr).toLowerCase().trim();
 
   if (s.includes('actual') || s.includes('presente') || s.includes('curso')) {
     return new Date(9999, 0, 1);
   }
-  // Formato "Mes AAAA"
+
+  // Formato "Mes AAAA" 
   const matchMesAno = s.match(/([a-z]{3})[a-z]*[\s\/\-]+(\d{4})/i);
   if (matchMesAno) {
     const mes = MESES[matchMesAno[1].slice(0, 3)] ?? 0;
     const ano = parseInt(matchMesAno[2], 10);
     return new Date(ano, mes, 1);
   }
-  // Formato solo año
+
+  // Formato solo año 
   const matchAno = s.match(/(\d{4})/);
   if (matchAno) {
     const ano = parseInt(matchAno[1], 10);
-    return new Date(ano, esFin ? 11 : 0, 1);
+    return new Date(ano, 0, 1);
   }
+
   return new Date(0);
 };
+
+// Obtiene la fecha representativa
+const getFechaRelevante = (item) => {
+  if (item.fecha_fin && item.fecha_fin.trim() !== '') {
+    return parseFechaEducacion(item.fecha_fin);
+  }
+  return parseFechaEducacion(item.fecha_inicio);
+};
+
 const formatRango = (fechaInicio, fechaFin) => {
   const inicio = fechaInicio ? String(fechaInicio).trim() : '';
   const fin = fechaFin ? String(fechaFin).trim() : '';
@@ -268,12 +280,12 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
 
       // Orden cronológico: lo más reciente / en curso primero
       const sorted = mapped.sort((a, b) => {
-        const finA = parseFechaEducacion(a.fecha_fin, true).getTime();
-        const finB = parseFechaEducacion(b.fecha_fin, true).getTime();
-        if (finB !== finA) return finB - finA;
-
-        const inicioA = parseFechaEducacion(a.fecha_inicio).getTime();
+        const fechaB = getFechaRelevante(b).getTime();
+        const fechaA = getFechaRelevante(a).getTime();
+        if (fechaB !== fechaA) return fechaB - fechaA;
+        // Si empatan, desempata por fecha de inicio
         const inicioB = parseFechaEducacion(b.fecha_inicio).getTime();
+        const inicioA = parseFechaEducacion(a.fecha_inicio).getTime();
         return inicioB - inicioA;
       });
 

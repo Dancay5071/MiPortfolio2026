@@ -4,62 +4,62 @@ import NeonCatLoader from './NeonCatLoader';
 import SocialLinks from './SocialLinks';
 
 const STAGE = {
-  hidden:  { opacity: 0 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
       staggerChildren: 0.3,
-      delayChildren:   0.05,
+      delayChildren: 0.05,
       when: 'beforeChildren',
     },
   },
 };
 
 const PHASE_AURA = {
-  hidden:  { opacity: 0 },
+  hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
       duration: 2.5,
-      ease:     [0.25, 0.1, 0.25, 1],
+      ease: [0.25, 0.1, 0.25, 1],
     },
   },
 };
 
 
 const PHASE_AVATAR = {
-  hidden:  { opacity: 0, y: 20, scale: 0.95 },
+  hidden: { opacity: 0, y: 20, scale: 0.95 },
   visible: {
     opacity: 1,
-    y:       0,
-    scale:   1,
+    y: 0,
+    scale: 1,
     transition: {
       duration: 2.2,
-      ease:     [0.25, 0.1, 0.25, 1],
+      ease: [0.25, 0.1, 0.25, 1],
     },
   },
 };
 
 const PHASE_TEXT = {
-  hidden:  { opacity: 0, y: 30 },
+  hidden: { opacity: 0, y: 30 },
   visible: {
     opacity: 1,
-    y:       0,
+    y: 0,
     transition: {
       duration: 2.0,
-      ease:     [0.25, 0.1, 0.25, 1],
+      ease: [0.25, 0.1, 0.25, 1],
     },
   },
 };
 
 const PHASE_SOCIAL = {
-  hidden:  { opacity: 0, y: 12 },
+  hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
-    y:       0,
+    y: 0,
     transition: {
       duration: 1.8,
-      ease:     [0.25, 0.1, 0.25, 1],
+      ease: [0.25, 0.1, 0.25, 1],
     },
   },
 };
@@ -81,7 +81,7 @@ function AvatarFrame({ imgUrl, name }) {
   useEffect(() => { setLoaded(false); }, [imgUrl]);
 
   return (
-    
+
     <div className="group relative flex items-center justify-center cursor-default">
 
       <div
@@ -166,38 +166,38 @@ function AvatarFrame({ imgUrl, name }) {
 
 
 export default function Hero({ profile, onContactClick }) {
-  const name   = profile.name     || 'Daniela Cabrera';
-  const title  = profile.title    || 'Técnica en programación & Desarrolladora de software';
+  const name = profile.name || 'Daniela Cabrera';
+  const title = profile.title || 'Técnica en programación & Desarrolladora de software';
   const imgUrl = profile.url_foto || '';
-  
+
   const shouldReduceMotion = useReducedMotion();
 
   const DYNAMIC_PHASE_AURA = {
-    hidden:  { opacity: 0 },
+    hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: { duration: shouldReduceMotion ? 0 : 2.5, ease: [0.25, 0.1, 0.25, 1] },
     },
   };
-  
+
   const DYNAMIC_PHASE_AVATAR = {
-    hidden:  { opacity: 0, y: shouldReduceMotion ? 0 : 20, scale: shouldReduceMotion ? 1 : 0.95 },
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20, scale: shouldReduceMotion ? 1 : 0.95 },
     visible: {
       opacity: 1, y: 0, scale: 1,
       transition: { duration: shouldReduceMotion ? 0 : 2.2, ease: [0.25, 0.1, 0.25, 1] },
     },
   };
-  
+
   const DYNAMIC_PHASE_TEXT = {
-    hidden:  { opacity: 0, y: shouldReduceMotion ? 0 : 30 },
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 30 },
     visible: {
       opacity: 1, y: 0,
       transition: { duration: shouldReduceMotion ? 0 : 2.0, ease: [0.25, 0.1, 0.25, 1] },
     },
   };
-  
+
   const DYNAMIC_PHASE_SOCIAL = {
-    hidden:  { opacity: 0, y: shouldReduceMotion ? 0 : 12 },
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 12 },
     visible: {
       opacity: 1, y: 0,
       transition: { duration: shouldReduceMotion ? 0 : 1.8, ease: [0.25, 0.1, 0.25, 1] },
@@ -215,7 +215,7 @@ export default function Hero({ profile, onContactClick }) {
 
       <motion.div
         variants={DYNAMIC_PHASE_AURA}
-        className="contents"  
+        className="contents"
         aria-hidden="true"
       >
         {/* Esquina superior izquierda */}
@@ -279,15 +279,14 @@ export default function Hero({ profile, onContactClick }) {
               {name}
             </h1>
 
+             {/* Línea divisoria */}
             <div
               className="flex items-center gap-3 w-full max-w-xs md:max-w-none"
               aria-hidden="true"
             >
               <span className="text-amber-200/90 text-xs drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">◊</span>
               <div className="flex-1 h-px relative overflow-hidden rounded-full">
-
                 <div className="absolute inset-0 bg-gradient-to-r from-indigo-400/20 to-transparent" />
-
                 <motion.div 
                   className="absolute top-0 bottom-0 w-1/2"
                   style={{
@@ -300,14 +299,14 @@ export default function Hero({ profile, onContactClick }) {
               </div>
             </div>
           
-          <p className="uppercase text-[13px] tracking-[0.22em] text-indigo-200 leading-relaxed">
-              {title}
+            {/* Título profesional con fallback defensivo */}
+            <p className="uppercase text-[13px] tracking-[0.22em] text-indigo-200 leading-relaxed">
+              {title?.trim() ? title : 'Técnica en Programación & Desarrolladora de Software'}
             </p>
           </motion.div>
 
-
+          {/* Bloque de Contacto / Redes */}
           <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-6 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
-            
             {/* Botón Iniciar Contacto */}
             <button 
               onClick={onContactClick}
@@ -326,8 +325,6 @@ export default function Hero({ profile, onContactClick }) {
                 <span className="absolute -bottom-1 left-0 w-0 h-px bg-gradient-to-r from-indigo-300/80 to-transparent group-hover:w-full transition-all duration-500 ease-out" />
               </span>
             </button>
-            
-            
           </motion.div>
 
         </div>
@@ -336,3 +333,4 @@ export default function Hero({ profile, onContactClick }) {
     </motion.div>
   );
 }
+
