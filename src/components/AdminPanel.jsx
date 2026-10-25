@@ -12,7 +12,7 @@ import {
   createEducation, updateEducation, deleteEducation
 } from '../services/api';
 
-const token = session?.access_token;
+
 
 //HUD class constants
 const CX = {
@@ -343,6 +343,7 @@ function CatSaveButton({ isLoading, label, variant = 'violet', className = '' })
 }
 
 export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogout }) {
+  const token = session?.access_token;
   const [activeSubTab, setActiveSubTab] = useState('profile');
 
   //Login
