@@ -90,3 +90,7 @@ export const deleteExperience = (id, token) => authFetch(`/experience/${id}`, { 
 export const createEducation = (data, token) => authFetch('/education', { method: 'POST', body: JSON.stringify(data) }, token);
 export const updateEducation = (id, data, token) => authFetch(`/education/${id}`, { method: 'PUT', body: JSON.stringify(data) }, token);
 export const deleteEducation = (id, token) => authFetch(`/education/${id}`, { method: 'DELETE' }, token);
+// Mensajes de contacto
+export const getMessages = (token) => authFetch('/contact', { method: 'GET' }, token);
+export const deleteMessage = (id, token) => authFetch(`/contact/${id}`, { method: 'DELETE' }, token);
+

@@ -401,6 +401,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const [projPreview, setProjPreview] = useState('');
   const [projSaving, setProjSaving] = useState(false);
 
+  // Mensajes de contacto
+  const [messages, setMessages] = useState([]);
+  const [messagesLoading, setMessagesLoading] = useState(false);
+
   useEffect(() => {
     if (session) fetchProfile();
   }, [session]);
@@ -474,6 +478,38 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       }
     } catch (err) {
       console.error('Error al cargar perfil en Admin:', err);
+    }
+  };
+
+  const fetchMessages = async () => {
+    if (!token) return;
+    setMessagesLoading(true);
+    try {
+      const data = await getMessages(token);
+      setMessages(data || []);
+    } catch (err) {
+      console.error('Error al cargar mensajes:', err);
+    } finally {
+      setMessagesLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (activeSubTab === 'messages' && session) {
+      fetchMessages();
+    }
+  }, [activeSubTab, session]);
+
+  const handleDeleteMsg = async (id) => {
+    if (window.confirm('¿Eliminar este mensaje?')) {
+      if (demoIntercept()) return;
+      try {
+        await deleteMessage(id, token);
+        setMessages(prev => prev.filter(m => m.id !== id));
+        addToast('Mensaje eliminado', 'success');
+      } catch {
+        addToast('Error al eliminar mensaje', 'error');
+      }
     }
   };
 
@@ -803,7 +839,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   ];
 
 
-  const validTabs = ['profile', 'experience', 'education', 'projects'];
+  const validTabs = ['profile', 'messages', 'experience', 'education', 'projects'];
   const currentTab = (isDemoUser && activeSubTab === 'overview') || !validTabs.includes(activeSubTab)
     ? 'profile'
     : activeSubTab;
@@ -1206,39 +1242,4 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     </div>
   );
 }
-const [messages, setMessages] = useState([]);
-const [messagesLoading, setMessagesLoading] = useState(false);
-
-const fetchMessages = async () => {
-  if (!token) return;
-  setMessagesLoading(true);
-  try {
-    const data = await getMessages(token);
-    setMessages(data || []);
-  } catch (err) {
-    console.error('Error al cargar mensajes:', err);
-  } finally {
-    setMessagesLoading(false);
-  }
-};
-
-// Cargar mensajes cuando el admin selecciona la pestaña 'messages'
-useEffect(() => {
-  if (activeSubTab === 'messages' && session) {
-    fetchMessages();
-  }
-}, [activeSubTab, session]);
-
-const handleDeleteMsg = async (id) => {
-  if (window.confirm('¿Eliminar este mensaje?')) {
-    if (demoIntercept()) return;
-    try {
-      await deleteMessage(id, token);
-      setMessages(prev => prev.filter(m => m.id !== id));
-      addToast('Mensaje eliminado', 'success');
-    } catch {
-      addToast('Error al eliminar mensaje', 'error');
-    }
-  }
-};
 
