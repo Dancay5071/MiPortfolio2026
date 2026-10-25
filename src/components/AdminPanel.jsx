@@ -5,7 +5,6 @@ import EducacionList from './EducacionList';
 import ProjectList from './ProjectList';
 import { useDemoGuard } from '../hooks/useDemoGuard';
 import CatHeadLoader from './CatHeadLoader';
-import MetricsCard from './MetricsCard';
 import { MysticInput, MysticButton, MysticDivider, MysticFormPanel } from './MysticUI';
 
 //HUD class constants
@@ -758,16 +757,15 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
   //Sidebar nav items
   const navItems = [
-    !isDemoUser && { id: 'overview', label: 'Overview', icon: '◊' },
     { id: 'profile', label: 'Perfil', icon: '◊' },
     { id: 'experience', label: 'Experiencia', icon: '◊' },
     { id: 'education', label: 'Educación', icon: '◊' },
     { id: 'projects', label: 'Proyectos', icon: '◊' },
-  ].filter(Boolean);
+  ];
 
 
-  const validTabs = ['overview', 'profile', 'experience', 'education', 'projects'];
-  let currentTab = validTabs.includes(activeSubTab) ? activeSubTab : 'profile';
+  const validTabs = ['profile', 'experience', 'education', 'projects'];
+  const currentTab = validTabs.includes(activeSubTab) ? activeSubTab : 'profile';
   if (isDemoUser && currentTab === 'overview') {
     currentTab = 'profile';
   }
@@ -818,87 +816,6 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       {/* Content area */}
       <div className="flex-1 min-h-[50vh] overflow-y-auto custom-scrollbar px-1">
 
-        {/* SUB-TAB: OVERVIEW */}
-        {currentTab === 'overview' && (
-          <div className="animate-[fadeInTab_0.4s_ease-out_forwards]">
-            <h2 className={CX.sectionHead}>
-              <span className="text-indigo-400/60">◊</span> Overview
-            </h2>
-
-            {/* Grid de métricas */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-              <MetricsCard isDemo={isDemoUser} />
-
-              {/* Tarjeta Estado del Sistema */}
-              <div className="bg-[#0B0914]/40 backdrop-blur-xl border border-indigo-300/10 rounded-2xl p-6 relative overflow-hidden transition-[border-color,box-shadow] duration-400 hover:border-indigo-300/20 hover:shadow-[0_0_20px_rgba(99,102,241,0.08)]">
-
-                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-emerald-400/6 blur-2xl pointer-events-none" aria-hidden="true" />
-
-                {/* Título */}
-                <p className="font-serif uppercase tracking-[0.2em] text-xs text-indigo-300 mb-4">
-                  Estado del Sistema
-                </p>
-
-                <div className="space-y-2.5">
-                  {[
-                    { label: 'Base de Datos' },
-                    { label: 'Autenticación' },
-                    { label: 'Almacenamiento' },
-                  ].map(({ label }) => (
-                    <div key={label} className="flex items-center justify-between">
-                      <span className="text-[10px] tracking-wider text-indigo-300/45">{label}</span>
-                      <div className="flex items-center gap-1.5">
-                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-300/70 animate-pulse" />
-                        <span className="text-[10px] uppercase tracking-widest text-emerald-100/60">Sincronizado</span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <div className="my-3 h-px" style={{ background: 'linear-gradient(90deg,transparent,rgba(165,180,252,0.12),transparent)' }} />
-
-                <p className="text-[10px] tracking-wider text-indigo-300/30">
-                  {new Date().toLocaleDateString('es-AR', { day: '2-digit', month: 'short', year: 'numeric' })}
-                </p>
-              </div>
-
-              {/* Tarjeta Operador */}
-              <div className="bg-[#0B0914]/40 backdrop-blur-xl border border-indigo-300/10 rounded-2xl p-6 relative overflow-hidden transition-[border-color,box-shadow] duration-400 hover:border-indigo-300/20 hover:shadow-[0_0_20px_rgba(99,102,241,0.08)]">
-                <div className="absolute -top-6 -right-6 w-20 h-20 rounded-full bg-violet-400/6 blur-2xl pointer-events-none" aria-hidden="true" />
-
-                {/* Título */}
-                <p className="font-serif uppercase tracking-[0.2em] text-xs text-indigo-300 mb-4">
-                  Operador
-                </p>
-
-                <p
-                  className="text-[11px] text-indigo-100/70 tracking-wide truncate mb-2"
-                  title={session.user.email}
-                >
-                  {session.user.email}
-                </p>
-
-                {isDemoUser && (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-none border border-indigo-500/25 bg-indigo-900/20 text-[9px] text-indigo-300/70 tracking-widest uppercase">
-                    <span className="inline-block w-1 h-1 rounded-none bg-indigo-400 animate-pulse" />
-                    Demo
-                  </span>
-                )}
-
-                <div className="my-3 h-px" style={{ background: 'linear-gradient(90deg,transparent,rgba(165,180,252,0.12),transparent)' }} />
-
-                <p className="text-[10px] tracking-wider text-indigo-300/30">Acceso · Nivel 1</p>
-              </div>
-            </div>
-
-            {/* Nota del sistema */}
-            <div className="rounded-none bg-white/5 border border-white/5 text-center py-2 px-6">
-              <p className="italic text-xs text-indigo-200/45">
-                Las visitas únicas se contabilizan por navegador
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* SUB-TAB: PERFIL */}
         {currentTab === 'profile' && (
