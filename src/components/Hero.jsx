@@ -300,7 +300,11 @@ export default function Hero({ profile, onContactClick }) {
               </div>
             </div>
           
+          <p className="uppercase text-[13px] tracking-[0.22em] text-indigo-200 leading-relaxed">
+              {title}
+            </p>
           </motion.div>
+
 
           <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-6 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4">
             
