@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000/api';
+const rawApiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim();
+const API_URL = rawApiUrl.replace(/\/+$/, '');
 
 // Obtener Perfil
 export const getProfile = async () => {
@@ -67,8 +68,9 @@ export const getVisitStats = async () => {
 // Helper genérico para peticiones protegidas (Defensivo contra respuestas HTML/404)
 const authFetch = async (endpoint, options = {}, token) => {
   let res;
+  const path = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   try {
-    res = await fetch(`${API_URL}${endpoint}`, {
+    res = await fetch(`${API_URL}${path}`, {
       ...options,
       headers: {
         'Content-Type': 'application/json',
@@ -85,7 +87,11 @@ const authFetch = async (endpoint, options = {}, token) => {
   try {
     json = JSON.parse(text);
   } catch {
-    throw new Error(`El servidor devolvió un error (HTTP ${res.status}): ${text.slice(0, 100)}`);
+    const stripped = text.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+    if (res.status === 404) {
+      throw new Error(`Ruta ${path} no encontrada (HTTP 404). Verifica que el backend en Render esté actualizado con el último despliegue.`);
+    }
+    throw new Error(`El servidor devolvió un error (HTTP ${res.status}): ${stripped.slice(0, 100)}`);
   }
 
   if (!res.ok) throw new Error(json.message || `Error del servidor (${res.status})`);

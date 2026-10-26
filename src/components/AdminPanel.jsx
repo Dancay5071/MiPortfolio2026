@@ -100,14 +100,15 @@ const CX = {
   //Botón agregar
   btnAdd: [
     'font-sans-body text-[10px] font-medium tracking-[0.20em] uppercase',
-    'px-5 py-2 rounded-none',
-    'border border-indigo-400/25',
-    'text-indigo-200/75',
-    'bg-transparent cursor-pointer',
-    'hover:bg-indigo-900/20 hover:border-indigo-300/40 hover:text-indigo-100',
-    'hover:shadow-[0_0_16px_rgba(99,102,241,0.15)]',
+    'px-5 py-2 rounded-lg',
+    'border border-indigo-400/30',
+    'text-indigo-200',
+    'bg-indigo-950/40 backdrop-blur-sm cursor-pointer',
+    'hover:bg-indigo-900/40 hover:border-indigo-300/60 hover:text-white',
+    'hover:shadow-[0_0_20px_rgba(99,102,241,0.25)] hover:scale-[1.02]',
     'active:scale-[0.97]',
     'transition-all duration-150 ease-out',
+    'inline-flex items-center gap-1.5',
   ].join(' '),
 
   //Input de archivo
@@ -123,19 +124,19 @@ const CX = {
 
   //Nav activa
   navActive: [
-    'flex items-center justify-center md:justify-start gap-2',
-    'px-4 py-2 text-[10px] font-sans-body font-medium tracking-[0.15em] uppercase',
-    'rounded-none border border-violet-400/40 bg-violet-900/25',
-    'text-violet-100 shadow-[0_0_12px_rgba(139,92,246,0.15)]',
+    'flex items-center justify-center md:justify-start gap-2.5',
+    'px-4 py-2.5 text-[10px] font-sans-body font-medium tracking-[0.18em] uppercase',
+    'rounded-xl border border-violet-400/40 bg-gradient-to-r from-violet-900/40 to-indigo-900/30 backdrop-blur-md',
+    'text-violet-100 shadow-[0_0_16px_rgba(139,92,246,0.25)]',
     'whitespace-nowrap cursor-pointer transition-all duration-200',
   ].join(' '),
 
   //Nav inactiva
   navInactive: [
-    'flex items-center justify-center md:justify-start gap-2',
-    'px-4 py-2 text-[10px] font-sans-body font-medium tracking-[0.15em] uppercase',
-    'rounded-none border border-transparent',
-    'text-indigo-300/55 hover:text-indigo-200/90 hover:bg-white/5 hover:border-indigo-400/20',
+    'flex items-center justify-center md:justify-start gap-2.5',
+    'px-4 py-2.5 text-[10px] font-sans-body font-medium tracking-[0.18em] uppercase',
+    'rounded-xl border border-transparent',
+    'text-indigo-300/60 hover:text-indigo-100 hover:bg-white/5 hover:border-indigo-400/20',
     'whitespace-nowrap cursor-pointer active:scale-[0.98] transition-all duration-150',
   ].join(' '),
 };
@@ -288,27 +289,28 @@ function CatSaveButton({ isLoading, label, variant = 'violet', className = '' })
         type="submit"
         disabled={isLoading}
         className={[
-          'bg-gradient-to-br from-indigo-900/40 to-violet-900/40 backdrop-blur-sm border border-indigo-400/50',
+          'bg-gradient-to-br from-indigo-900/60 to-violet-900/60 backdrop-blur-md border border-indigo-400/40',
           'font-serif text-xs uppercase tracking-[0.2em] text-indigo-100 shadow-[0_0_15px_rgba(99,102,241,0.2)]',
-          'rounded-lg px-8 py-3 w-auto md:w-fit',
-          'transition-all duration-500 ease-in-out hover:scale-[1.02]',
-          'hover:bg-gradient-to-br hover:from-indigo-800/50 hover:to-violet-800/50 hover:border-amber-300/60 hover:text-amber-100 hover:shadow-[0_0_25px_rgba(251,191,36,0.3)]',
-          'disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:border-indigo-400/50 disabled:hover:shadow-none disabled:hover:text-indigo-100',
+          'rounded-xl px-7 py-2.5 w-auto md:w-fit cursor-pointer',
+          'transition-all duration-200 ease-out hover:scale-[1.02] active:scale-[0.98]',
+          'hover:bg-gradient-to-br hover:from-indigo-800/70 hover:to-violet-800/70 hover:border-amber-300/60 hover:text-amber-100 hover:shadow-[0_0_25px_rgba(251,191,36,0.25)]',
+          'disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 disabled:hover:border-indigo-400/40 disabled:hover:shadow-none disabled:hover:text-indigo-100',
           'flex items-center justify-center gap-2',
           className
         ].join(' ')}
       >
         {isLoading ? (
           <>
-            <span>Guardando...</span>
-            <svg className="animate-spin w-4 h-4 text-amber-200/80 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <span className="font-sans-body text-xs font-medium tracking-wider">Guardando...</span>
+            <svg className="animate-spin w-4 h-4 text-amber-200 ml-1" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
           </>
         ) : (
           <>
-            {label} <span className="text-amber-200/90 text-[10px] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">◊</span>
+            <span>{label}</span>
+            <span className="text-amber-200/90 text-[10px] drop-shadow-[0_0_8px_rgba(251,191,36,0.4)]">◊</span>
           </>
         )}
       </button>
@@ -405,6 +407,11 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   // Mensajes de contacto
   const [messages, setMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
+
+  // Claves de refresco dinámico para listas
+  const [expRefreshKey, setExpRefreshKey] = useState(0);
+  const [eduRefreshKey, setEduRefreshKey] = useState(0);
+  const [projRefreshKey, setProjRefreshKey] = useState(0);
 
   useEffect(() => {
     if (session) fetchProfile();
@@ -586,6 +593,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
       try {
         await deleteExperience(id, token);
+        setExpRefreshKey(k => k + 1);
         addToast('Experiencia eliminada', 'success');
       } catch (err) { addToast(err.message || 'Error al eliminar', 'error'); }
     }
@@ -613,6 +621,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         await createExperience(data, token);
         addToast('Experiencia guardada exitosamente', 'success');
       }
+      setExpRefreshKey(k => k + 1);
       setIsExpFormOpen(false); resetExpForm();
     } catch (err) { addToast(err.message || 'Error al guardar experiencia.', 'error'); }
     finally { setExpSaving(false); }
@@ -639,6 +648,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
       try {
         await deleteEducation(id, token);
+        setEduRefreshKey(k => k + 1);
         addToast('Título eliminado', 'success');
       } catch (err) { addToast(err.message || 'Error al eliminar', 'error'); }
     }
@@ -667,6 +677,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         await createEducation(data, token);
         addToast('Educación guardada exitosamente', 'success');
       }
+      setEduRefreshKey(k => k + 1);
       setIsEduFormOpen(false); resetEduForm();
     } catch (err) { addToast(err.message || 'Error al guardar educación.', 'error'); }
     finally { setEduSaving(false); }
@@ -687,6 +698,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
 
       try {
         await deleteProject(id, token);
+        setProjRefreshKey(k => k + 1);
         addToast('Proyecto eliminado', 'success');
       } catch (err) { addToast(err.message || 'Error al eliminar proyecto', 'error'); }
     }
@@ -729,6 +741,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         await createProject(data, token);
         addToast('Proyecto creado con éxito', 'success');
       }
+      setProjRefreshKey(k => k + 1);
       setIsProjFormOpen(false); resetProjForm();
     } catch (err) { addToast(err.message || 'Error al guardar el proyecto.', 'error'); }
     finally { setProjSaving(false); }
@@ -1084,7 +1097,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
               </div>
             )}
 
-            <ExperienciaList isAdmin={true} onEdit={handleEditExperience} onDelete={handleDeleteExperience} />
+            <ExperienciaList key={expRefreshKey} isAdmin={true} onEdit={handleEditExperience} onDelete={handleDeleteExperience} />
           </div>
         )}
 
@@ -1149,7 +1162,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
               </div>
             )}
 
-            <EducacionList isAdmin={true} onEdit={handleEditEducation} onDelete={handleDeleteEducation} />
+            <EducacionList key={eduRefreshKey} isAdmin={true} onEdit={handleEditEducation} onDelete={handleDeleteEducation} />
           </div>
         )}
 
@@ -1228,7 +1241,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
               </div>
             )}
 
-            <ProjectList isAdmin={true} onEdit={handleEditProject} onDelete={handleDeleteProject} />
+            <ProjectList key={projRefreshKey} isAdmin={true} onEdit={handleEditProject} onDelete={handleDeleteProject} />
           </div>
         )}
 

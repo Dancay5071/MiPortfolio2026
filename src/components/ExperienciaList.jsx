@@ -355,16 +355,16 @@ export default function ExperienciaList({ isAdmin = false, onEdit, onDelete }) {
             </p>
           </div>
 
-          <div className="flex items-center gap-4 shrink-0">
+          <div className="flex items-center gap-2.5 shrink-0">
             <button
-              className="text-[11px] tracking-widest text-indigo-400 hover:text-indigo-200 hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0914] rounded-sm px-1"
+              className="px-3 py-1.5 text-[10px] font-sans-body tracking-[0.15em] uppercase text-indigo-200/90 bg-indigo-950/40 hover:bg-indigo-900/50 border border-indigo-400/25 hover:border-indigo-300/60 rounded-lg transition-all duration-150 active:scale-95 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(99,102,241,0.2)]"
               onClick={() => onEdit(exp)}
               type="button"
             >
-              Editar
+              Editar ◊
             </button>
             <button
-              className="text-[11px] tracking-widest text-fuchsia-400/60 hover:text-fuchsia-300 hover:underline transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0914] rounded-sm px-1"
+              className="px-3 py-1.5 text-[10px] font-sans-body tracking-[0.15em] uppercase text-rose-300/80 bg-rose-950/20 hover:bg-rose-900/40 border border-rose-500/20 hover:border-rose-400/50 rounded-lg transition-all duration-150 active:scale-95 cursor-pointer shadow-sm hover:shadow-[0_0_12px_rgba(244,63,94,0.15)]"
               onClick={() => onDelete(exp.id)}
               type="button"
             >
