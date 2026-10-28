@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { motion, useInView, useAnimation, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { getExperience } from '../services/api';
 
 const pathVariants = {
@@ -35,7 +35,7 @@ const parseFechaExperiencia = (fechaStr, esFin = false) => {
   }
 
   // Formato "Mes AAAA"
-  const matchMesAno = s.match(/([a-z]{3})[a-z]*[\s\/\-]+(\d{4})/i);
+  const matchMesAno = s.match(/([a-z]{3})[a-z]*[\s/-]+(\d{4})/i);
   if (matchMesAno) {
     const mes = MESES[matchMesAno[1].slice(0, 3)] ?? 0;
     const ano = parseInt(matchMesAno[2], 10);
@@ -288,8 +288,10 @@ export default function ExperienciaList({ isAdmin = false, onEdit, onDelete }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchExperiencia = async () => {
-    setLoading(true);
+  const fetchExperiencia = async (isBackground = false) => {
+    if (!isBackground) {
+      setLoading(true);
+    }
     try {
       const resData = await getExperience();
       const mapped = (resData || []).map(mapExperiencia);
@@ -314,7 +316,7 @@ export default function ExperienciaList({ isAdmin = false, onEdit, onDelete }) {
   };
 
   useEffect(() => {
-    fetchExperiencia();
+    fetchExperiencia(true);
   }, []);
 
   if (loading) return <SkeletonTimeline />;

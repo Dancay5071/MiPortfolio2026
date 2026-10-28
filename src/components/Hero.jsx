@@ -1,7 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import NeonCatLoader from './NeonCatLoader';
-import SocialLinks from './SocialLinks';
 
 const STAGE = {
   hidden: { opacity: 0 },
@@ -11,55 +10,6 @@ const STAGE = {
       staggerChildren: 0.3,
       delayChildren: 0.05,
       when: 'beforeChildren',
-    },
-  },
-};
-
-const PHASE_AURA = {
-  hidden: { opacity: 0 },
-  visible: {
-    opacity: 1,
-    transition: {
-      duration: 2.5,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-};
-
-
-const PHASE_AVATAR = {
-  hidden: { opacity: 0, y: 20, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    scale: 1,
-    transition: {
-      duration: 2.2,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-};
-
-const PHASE_TEXT = {
-  hidden: { opacity: 0, y: 30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 2.0,
-      ease: [0.25, 0.1, 0.25, 1],
-    },
-  },
-};
-
-const PHASE_SOCIAL = {
-  hidden: { opacity: 0, y: 12 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: {
-      duration: 1.8,
-      ease: [0.25, 0.1, 0.25, 1],
     },
   },
 };
@@ -76,9 +26,14 @@ function PolarStarIcon({ className = "" }) {
 // Marco de Avatar
 function AvatarFrame({ imgUrl, name }) {
   const [loaded, setLoaded] = useState(false);
-  const hasImage = Boolean(imgUrl);
+  const [prevUrl, setPrevUrl] = useState(imgUrl);
 
-  useEffect(() => { setLoaded(false); }, [imgUrl]);
+  if (imgUrl !== prevUrl) {
+    setPrevUrl(imgUrl);
+    setLoaded(false);
+  }
+
+  const hasImage = Boolean(imgUrl);
 
   return (
 
@@ -137,6 +92,8 @@ function AvatarFrame({ imgUrl, name }) {
           <img
             src={imgUrl}
             alt={`Foto de perfil de ${name}`}
+            crossOrigin="anonymous"
+            loading="eager"
             onLoad={() => setLoaded(true)}
             onError={() => setLoaded(true)}
             ref={(img) => {
@@ -306,7 +263,6 @@ export default function Hero({ profile, onContactClick }) {
             </p>
           </motion.div>
 
-          {/* Bloque de Contacto / Redes */}
           {/* Bloque de Contacto / Redes */}
           <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-8 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 flex-wrap">
             {/* Botón Principal Iniciar Contacto (CTA Elevado) */}

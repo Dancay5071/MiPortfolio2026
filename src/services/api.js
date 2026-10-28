@@ -79,7 +79,7 @@ const authFetch = async (endpoint, options = {}, token) => {
       },
     });
   } catch (netErr) {
-    throw new Error(`No se pudo conectar con el backend (${API_URL}). Asegúrate de que esté iniciado.`);
+    throw new Error(`No se pudo conectar con el backend (${API_URL}). Asegúrate de que esté iniciado.`, { cause: netErr });
   }
 
   const text = await res.text();

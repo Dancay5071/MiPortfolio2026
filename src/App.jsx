@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
+import { useState, useEffect, useCallback, useRef, lazy, Suspense } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from './supabaseClient';
 import Navbar from './components/Navbar';
@@ -204,15 +204,21 @@ function App() {
 
   // Auth
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession()
+      .then(({ data: { session } = {} }) => {
+        setSession(session);
+      })
+      .catch((err) => {
+        console.warn('[Supabase] Error al recuperar sesión:', err);
+      });
+
+    const { data: { subscription } = {} } = supabase.auth.onAuthStateChange((_event, session) => {
       setSession(session);
     });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-    });
-
-    return () => subscription.unsubscribe();
+    return () => {
+      subscription?.unsubscribe?.();
+    };
   }, []);
 
   useEffect(() => {

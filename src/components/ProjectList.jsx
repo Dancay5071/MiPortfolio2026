@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useInView } from 'framer-motion';
 import TiltedScroll from './TiltedScroll';
 import CatHeadLoader from './CatHeadLoader';
@@ -367,7 +367,7 @@ export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
 
   const fetchProyectos = async (isBackground = false) => {
     if (!isBackground) {
-      setTimeout(() => setLoading(true), 0);
+      setLoading(true);
     }
     try {
       // Ahora consume tu Backend Node.js
@@ -384,9 +384,8 @@ export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
     }
   };
 
-
   useEffect(() => {
-    fetchProyectos();
+    fetchProyectos(true);
   }, []);
 
   const filteredData = activeFilter === 'all' ? data : data.filter(p => p.category === activeFilter);

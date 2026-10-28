@@ -1,4 +1,3 @@
-import React from 'react';
 import CatHeadLoader from './CatHeadLoader';
 
 export default function LoaderGlobal() {

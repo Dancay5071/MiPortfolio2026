@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { motion, useSpring } from 'framer-motion';
 
 export default function MysticalCursor() {
@@ -6,7 +6,12 @@ export default function MysticalCursor() {
   const [isHovering, setIsHovering] = useState(false);
   const [isTextElement, setIsTextElement] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  const [isEnabled, setIsEnabled] = useState(false);
+  const [isEnabled] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasFinePointer = window.matchMedia('(pointer: fine) and (hover: hover)').matches;
+    return !prefersReducedMotion && hasFinePointer;
+  });
 
   // Física de resorte para el aura
   const springConfig = { stiffness: 180, damping: 22, mass: 0.1 };
@@ -14,16 +19,7 @@ export default function MysticalCursor() {
   const auraY = useSpring(-100, springConfig);
 
   useEffect(() => {
-  
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const hasFinePointer = window.matchMedia('(pointer: fine) and (hover: hover)').matches;
-
-    if (prefersReducedMotion || !hasFinePointer) {
-      setIsEnabled(false);
-      return;
-    }
-
-    setIsEnabled(true);
+    if (!isEnabled) return;
 
     const handleMouseMove = (e) => {
       const { clientX, clientY } = e;
@@ -65,7 +61,7 @@ export default function MysticalCursor() {
       document.removeEventListener('mouseleave', handleMouseLeave);
       document.removeEventListener('mouseenter', handleMouseEnter);
     };
-  }, [auraX, auraY, isVisible]);
+  }, [auraX, auraY, isVisible, isEnabled]);
 
   if (!isEnabled) return null;
 

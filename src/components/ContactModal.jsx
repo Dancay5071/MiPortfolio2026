@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { sendContactMessage } from '../services/api';
 
@@ -179,7 +179,7 @@ export default function ContactModal({ isOpen, onClose }) {
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        placeholder="Contame sobre tu proyecto o propuesta..."
+                        placeholder="Escribe aquí tu mensaje..."
                         required
                         rows="4"
                         className="bg-white/5 border border-white/10 rounded-lg px-4 py-3 text-indigo-100 placeholder:text-indigo-300/30 outline-none transition-all duration-300 focus:border-amber-200/50 focus:shadow-[0_0_10px_rgba(251,191,36,0.1)] resize-none text-sm"

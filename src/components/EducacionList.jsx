@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { getEducation } from '../services/api';
 
@@ -41,7 +41,7 @@ const parseFechaEducacion = (fechaStr) => {
   }
 
   // Formato "Mes AAAA" 
-  const matchMesAno = s.match(/([a-z]{3})[a-z]*[\s\/\-]+(\d{4})/i);
+  const matchMesAno = s.match(/([a-z]{3})[a-z]*[\s/-]+(\d{4})/i);
   if (matchMesAno) {
     const mes = MESES[matchMesAno[1].slice(0, 3)] ?? 0;
     const ano = parseInt(matchMesAno[2], 10);
@@ -272,8 +272,10 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-    const fetchEducacion = async () => {
-    setLoading(true);
+  const fetchEducacion = async (isBackground = false) => {
+    if (!isBackground) {
+      setLoading(true);
+    }
     try {
       const resData = await getEducation();
       const mapped = (resData || []).map(mapEducacion);
@@ -299,9 +301,8 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
     }
   };
 
-
   useEffect(() => {
-    fetchEducacion();
+    fetchEducacion(true);
   }, []);
 
   if (loading) {

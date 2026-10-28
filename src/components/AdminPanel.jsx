@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../supabaseClient';
 import ExperienciaList from './ExperienciaList';
 import EducacionList from './EducacionList';
@@ -141,33 +141,6 @@ const CX = {
   ].join(' '),
 };
 
-function PanelCorners() {
-  return (
-    <>
-      <span className="tech-corner tl" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
-          <path d="M1 10 L1 1 L10 1" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
-        </svg>
-      </span>
-      <span className="tech-corner tr" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
-          <path d="M8 1 L17 1 L17 10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
-        </svg>
-      </span>
-      <span className="tech-corner bl" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
-          <path d="M1 8 L1 17 L10 17" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
-        </svg>
-      </span>
-      <span className="tech-corner br" aria-hidden="true">
-        <svg width="14" height="14" viewBox="0 0 18 18" fill="none">
-          <path d="M8 17 L17 17 L17 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="square" />
-        </svg>
-      </span>
-    </>
-  );
-}
-
 function Field({ label, children }) {
   return (
     <div>
@@ -181,7 +154,7 @@ function DatePickerFields({ fechaInicio, onChangeInicio, fechaFin, onChangeFin, 
   const parseParts = (str) => {
     if (!str) return { mes: '', anio: '' };
     const s = String(str).trim();
-    const match = s.match(/([a-zA-Z]{3})[\s\/\-]+(\d{4})/);
+    const match = s.match(/([a-zA-Z]{3})[\s/-]+(\d{4})/);
     if (match) {
       const mesCap = match[1].charAt(0).toUpperCase() + match[1].slice(1).toLowerCase();
       return { mes: mesCap, anio: match[2] };
@@ -413,9 +386,52 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const [eduRefreshKey, setEduRefreshKey] = useState(0);
   const [projRefreshKey, setProjRefreshKey] = useState(0);
 
+  // CRUD Perfil
+  const fetchProfile = useCallback(async () => {
+    try {
+      const { data, error } = await supabase
+        .from('perfil')
+        .select('*')
+        .limit(1)
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setProfileId(data.id);
+        setProfileName(data.nombre || '');
+        setProfileTitle(data.titulo || '');
+        setProfileDesc(data.descripcion || '');
+        setProfileImageUrl(data.avatar_url || '');
+        setProfilePreview(data.avatar_url || '');
+        setProfileCvUrl(data.cv_url || '');
+      }
+    } catch (err) {
+      console.error('Error al cargar perfil en Admin:', err);
+    }
+  }, []);
+
+  const fetchMessages = useCallback(async () => {
+    if (!token) return;
+    setMessagesLoading(true);
+    try {
+      const data = await getMessages(token);
+      setMessages(data || []);
+    } catch (err) {
+      console.error('Error al cargar mensajes:', err);
+    } finally {
+      setMessagesLoading(false);
+    }
+  }, [token]);
+
   useEffect(() => {
     if (session) fetchProfile();
-  }, [session]);
+  }, [session, fetchProfile]);
+
+  useEffect(() => {
+    if (activeSubTab === 'messages' && session) {
+      fetchMessages();
+    }
+  }, [activeSubTab, session, fetchMessages]);
 
   //Demo
   const { isDemoUser, demoIntercept } = useDemoGuard(session, addToast);
@@ -443,8 +459,13 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     if (isDemoUser) {
       onDemoLogout?.();
     } else {
-      await supabase.auth.signOut();
-      addToast('Sesión cerrada correctamente', 'success');
+      try {
+        await supabase.auth.signOut();
+        addToast('Sesión cerrada correctamente', 'success');
+      } catch (err) {
+        console.error('Error al cerrar sesión:', err);
+        addToast('Error al cerrar sesión', 'error');
+      }
     }
   };
 
@@ -464,49 +485,6 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       throw err;
     }
   };
-
-  //CRUD Perfil
-  const fetchProfile = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('perfil')
-        .select('*')
-        .limit(1)
-        .maybeSingle();
-
-      if (error) throw error;
-      if (data) {
-        setProfileId(data.id);
-        setProfileName(data.nombre || '');
-        setProfileTitle(data.titulo || '');
-        setProfileDesc(data.descripcion || '');
-        setProfileImageUrl(data.avatar_url || '');
-        setProfilePreview(data.avatar_url || '');
-        setProfileCvUrl(data.cv_url || '');
-      }
-    } catch (err) {
-      console.error('Error al cargar perfil en Admin:', err);
-    }
-  };
-
-  const fetchMessages = async () => {
-    if (!token) return;
-    setMessagesLoading(true);
-    try {
-      const data = await getMessages(token);
-      setMessages(data || []);
-    } catch (err) {
-      console.error('Error al cargar mensajes:', err);
-    } finally {
-      setMessagesLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (activeSubTab === 'messages' && session) {
-      fetchMessages();
-    }
-  }, [activeSubTab, session]);
 
   const handleDeleteMsg = async (id) => {
     if (window.confirm('¿Eliminar este mensaje?')) {
