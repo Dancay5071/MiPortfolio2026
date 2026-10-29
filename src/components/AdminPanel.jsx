@@ -11,7 +11,8 @@ import {
   createExperience, updateExperience, deleteExperience,
   createEducation, updateEducation, deleteEducation,
   getMessages, deleteMessage,
-  getCvRequests, deleteCvRequest
+  getCvRequests, deleteCvRequest,
+  updateProfile
 } from '../services/api';
 
 
@@ -570,46 +571,54 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       setProfileCvUrl(url);
       setProfileCvFile(file);
 
-      // 3. Guardado PERMANENTE inmediato en la tabla 'perfil' de Supabase
-      let saveError = null;
-      if (profileId) {
-        const { error } = await supabase
-          .from('perfil')
-          .update({ cv_url: url, updated_at: new Date().toISOString() })
-          .eq('id', profileId);
-        saveError = error;
-      } else {
-        const { data: existing } = await supabase.from('perfil').select('id').limit(1).maybeSingle();
-        if (existing?.id) {
-          setProfileId(existing.id);
-          const { error } = await supabase
-            .from('perfil')
-            .update({ cv_url: url, updated_at: new Date().toISOString() })
-            .eq('id', existing.id);
-          saveError = error;
-        } else {
-          const { data: newRow, error } = await supabase
-            .from('perfil')
-            .insert([{
-              cv_url: url,
-              nombre: profileName.trim() || 'Daniela Cabrera',
-              titulo: profileTitle.trim() || 'Técnica en Programación & Desarrolladora',
-              descripcion: profileDesc.trim() || '',
-              updated_at: new Date().toISOString()
-            }])
-            .select()
-            .single();
-          if (newRow?.id) setProfileId(newRow.id);
-          saveError = error;
+      // 3. Guardado PERMANENTE inmediato
+      let saved = false;
+      if (token) {
+        try {
+          await updateProfile({
+            name: profileName.trim() || 'Daniela Cabrera',
+            title: profileTitle.trim() || '',
+            description: profileDesc.trim() || '',
+            url_foto: profileImageUrl || '',
+            cv_url: url
+          }, token);
+          saved = true;
+        } catch (apiErr) {
+          console.warn('Fallo guardado de CV vía backend, usando Supabase cliente:', apiErr.message);
         }
       }
 
-      if (saveError) throw saveError;
+      if (!saved) {
+        let idToUpdate = profileId;
+        if (!idToUpdate) {
+          const { data: existing } = await supabase.from('perfil').select('id').limit(1).maybeSingle();
+          if (existing?.id) {
+            idToUpdate = existing.id;
+            setProfileId(existing.id);
+          }
+        }
+
+        if (idToUpdate) {
+          const res = await supabase.from('perfil').update({ cv_url: url }).eq('id', idToUpdate);
+          if (res.error) throw res.error;
+        } else {
+          const res = await supabase.from('perfil').insert([{
+            cv_url: url,
+            nombre: profileName.trim() || 'Daniela Cabrera',
+            titulo: profileTitle.trim() || 'Técnica en Programación'
+          }]).select().single();
+          if (res.data?.id) setProfileId(res.data.id);
+          if (res.error) throw res.error;
+        }
+      }
 
       addToast('¡CV en PDF subido y guardado de forma permanente en tu perfil!', 'success');
     } catch (err) {
       console.error('Error al subir y guardar CV:', err);
-      addToast(err.message || 'Error al guardar el CV en la base de datos', 'error');
+      const msg = err.message?.includes('cv_url')
+        ? 'Falta la columna "cv_url" en la tabla perfil de Supabase.'
+        : (err.message || 'Error al guardar el CV en la base de datos');
+      addToast(msg, 'error');
     } finally {
       setProfileCvUploading(false);
       e.target.value = '';
@@ -624,7 +633,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       if (profileId) {
         const { error } = await supabase
           .from('perfil')
-          .update({ cv_url: '', updated_at: new Date().toISOString() })
+          .update({ cv_url: '' })
           .eq('id', profileId);
         if (error) throw error;
       }
@@ -688,29 +697,64 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       }
 
       const payload = {
-        nombre: profileName.trim(),
-        titulo: profileTitle.trim(),
-        descripcion: profileDesc.trim(),
-        avatar_url: finalImgUrl,
+        name: profileName.trim(),
+        title: profileTitle.trim(),
+        description: profileDesc.trim(),
+        url_foto: finalImgUrl,
         cv_url: profileCvUrl.trim(),
-        updated_at: new Date().toISOString()
       };
 
-      let error;
-      if (profileId) {
-        const res = await supabase.from('perfil').update(payload).eq('id', profileId);
-        error = res.error;
-      } else {
-        const res = await supabase.from('perfil').insert([payload]).select().single();
-        if (res.data) setProfileId(res.data.id);
-        error = res.error;
+      // 1. Intentar guardar primero a través del backend API (usa Service Role Key y salta cualquier traba de RLS)
+      let saved = false;
+      if (token) {
+        try {
+          await updateProfile(payload, token);
+          saved = true;
+        } catch (apiErr) {
+          console.warn('Backend API no disponible para perfil, intentando directo con Supabase:', apiErr.message);
+        }
       }
 
-      if (error) throw error;
+      // 2. Si la API no respondió, guardar directo en Supabase
+      if (!saved) {
+        let idToUpdate = profileId;
+        if (!idToUpdate) {
+          const { data: existingRow } = await supabase.from('perfil').select('id').limit(1).maybeSingle();
+          if (existingRow?.id) {
+            idToUpdate = existingRow.id;
+            setProfileId(existingRow.id);
+          }
+        }
+
+        const dbPayload = {
+          nombre: payload.name,
+          titulo: payload.title,
+          descripcion: payload.description,
+          avatar_url: payload.url_foto,
+          cv_url: payload.cv_url,
+        };
+
+        let res;
+        if (idToUpdate) {
+          res = await supabase.from('perfil').update(dbPayload).eq('id', idToUpdate);
+        } else {
+          res = await supabase.from('perfil').insert([dbPayload]).select().single();
+          if (res.data?.id) setProfileId(res.data.id);
+        }
+
+        if (res.error) {
+          console.error('Error detallado de Supabase:', res.error);
+          if (res.error.message?.includes('cv_url') || res.error.code === '42703') {
+            throw new Error('La columna "cv_url" no existe en la tabla perfil de Supabase.');
+          }
+          throw new Error(res.error.message || 'Error al guardar el perfil en la base de datos');
+        }
+      }
+
       addToast('Perfil guardado exitosamente.', 'success');
     } catch (err) {
       console.error('Error al guardar perfil:', err);
-      addToast('Error al guardar el perfil.', 'error');
+      addToast(err.message || 'Error al guardar el perfil.', 'error');
     } finally {
       setProfileSaving(false);
     }

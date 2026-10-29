@@ -187,3 +187,7 @@ export const deleteMessage = (id, token) => authFetch(`/contact/${id}`, { method
 // Solicitudes de CV (Admin)
 export const getCvRequests = (token) => authFetch('/cv/requests', { method: 'GET' }, token);
 export const deleteCvRequest = (id, token) => authFetch(`/cv/requests/${id}`, { method: 'DELETE' }, token);
+
+// Perfil (Admin vía Backend con Service Role)
+export const updateProfile = (data, token) => authFetch('/profile', { method: 'PUT', body: JSON.stringify(data) }, token);
+
