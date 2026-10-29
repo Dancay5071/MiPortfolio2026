@@ -337,6 +337,8 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const [profileImageUrl, setProfileImageUrl] = useState('');
   const [profileDesc, setProfileDesc] = useState('');
   const [profileCvUrl, setProfileCvUrl] = useState('');
+  const [profileCvFile, setProfileCvFile] = useState(null);
+  const [profileCvUploading, setProfileCvUploading] = useState(false);
   const [profileFile, setProfileFile] = useState(null);
   const [profilePreview, setProfilePreview] = useState('');
   const [profileSaving, setProfileSaving] = useState(false);
@@ -504,6 +506,68 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     } catch (err) {
       addToast('No se pudo subir la imagen', 'error');
       throw err;
+    }
+  };
+
+  // Subir PDF del Currículum a Supabase Storage
+  const uploadCvPdf = async (file) => {
+    try {
+      const fileExt = file.name.split('.').pop().toLowerCase();
+      if (fileExt !== 'pdf') {
+        throw new Error('El archivo debe ser un documento en formato PDF (.pdf)');
+      }
+
+      const fileName = `cv_${Date.now()}_${Math.floor(Math.random() * 1000)}.pdf`;
+
+      // Intentamos subir a 'documentos', y si no existe el bucket o falla, a 'imagenes-portfolio'
+      let uploadResult = await supabase.storage
+        .from('documentos')
+        .upload(fileName, file, { contentType: 'application/pdf', upsert: true });
+
+      let bucketUsed = 'documentos';
+
+      if (uploadResult.error) {
+        const fallbackResult = await supabase.storage
+          .from('imagenes-portfolio')
+          .upload(fileName, file, { contentType: 'application/pdf', upsert: true });
+
+        if (fallbackResult.error) {
+          throw new Error(fallbackResult.error.message || uploadResult.error.message || 'Error al subir el archivo');
+        }
+        bucketUsed = 'imagenes-portfolio';
+      }
+
+      const { data } = supabase.storage.from(bucketUsed).getPublicUrl(fileName);
+      return data.publicUrl;
+    } catch (err) {
+      console.error('Error al subir PDF de CV:', err);
+      addToast(err.message || 'No se pudo subir el archivo PDF', 'error');
+      throw err;
+    }
+  };
+
+  const handleCvFileChange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      addToast('Por favor selecciona un archivo PDF (.pdf)', 'error');
+      return;
+    }
+
+    if (demoIntercept()) return;
+
+    setProfileCvUploading(true);
+    try {
+      addToast('Subiendo archivo PDF...', 'info');
+      const url = await uploadCvPdf(file);
+      setProfileCvUrl(url);
+      setProfileCvFile(file);
+      addToast('¡Archivo PDF de CV subido con éxito! Recuerda guardar el perfil.', 'success');
+    } catch (err) {
+      console.error('Error al subir PDF:', err);
+    } finally {
+      setProfileCvUploading(false);
     }
   };
 
@@ -948,14 +1012,76 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                 />
               </Field>
 
-              <Field label="ENLACE DE CV (OPCIONAL)">
-                <input
-                  type="url"
-                  value={profileCvUrl}
-                  onChange={(e) => setProfileCvUrl(e.target.value)}
-                  className={CX.input}
-                  placeholder="https://..."
-                />
+              <Field label="DOCUMENTO DE CV (PDF)">
+                <div className="space-y-3">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <label className={[
+                      'cursor-pointer px-4 py-2.5 text-[10px] font-sans-body tracking-[0.18em] uppercase rounded-none',
+                      'border border-amber-300/35 text-amber-100 bg-gradient-to-r from-amber-900/30 via-violet-900/20 to-amber-900/30',
+                      'hover:border-amber-300/60 hover:text-white hover:shadow-[0_0_15px_rgba(251,191,36,0.2)]',
+                      'transition-all duration-300 inline-flex items-center gap-2',
+                      profileCvUploading ? 'opacity-60 pointer-events-none' : ''
+                    ].join(' ')}>
+                      {profileCvUploading ? (
+                        <>
+                          <svg className="animate-spin w-3.5 h-3.5 text-amber-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                          </svg>
+                          <span>Subiendo PDF...</span>
+                        </>
+                      ) : (
+                        <>
+                          <span>📄 Cargar archivo PDF</span>
+                          <span className="text-amber-300/80 text-xs">◊</span>
+                        </>
+                      )}
+                      <input
+                        type="file"
+                        accept="application/pdf,.pdf"
+                        onChange={handleCvFileChange}
+                        disabled={profileCvUploading}
+                        className="hidden"
+                      />
+                    </label>
+
+                    {profileCvUrl && (
+                      <div className="flex items-center gap-3 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
+                        <span className="text-amber-300 text-xs">✓</span>
+                        <a
+                          href={profileCvUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-[10px] uppercase font-mono tracking-wider text-amber-200/90 hover:text-white underline transition-colors"
+                        >
+                          Ver PDF cargado ↗
+                        </a>
+                        <button
+                          type="button"
+                          onClick={() => { setProfileCvUrl(''); setProfileCvFile(null); }}
+                          className="text-[10px] uppercase font-mono tracking-wider text-rose-400/80 hover:text-rose-300 ml-2 transition-colors cursor-pointer"
+                          title="Quitar archivo actual"
+                        >
+                          Quitar
+                        </button>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Campo opcional para pegar link externo si se prefiere */}
+                  <div className="space-y-1">
+                    <label className="text-[9px] font-mono tracking-wider text-indigo-300/40 uppercase block">
+                      O pegar enlace directo a un PDF externo (Google Drive, Dropbox, etc.):
+                    </label>
+                    <input
+                      type="url"
+                      value={profileCvUrl}
+                      onChange={(e) => setProfileCvUrl(e.target.value)}
+                      className={CX.input}
+                      placeholder="https://..."
+                    />
+                  </div>
+                </div>
               </Field>
 
               <Field label="IMAGEN DE PERFIL">
@@ -979,7 +1105,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                 </div>
               </Field>
 
-              <CatSaveButton isLoading={profileSaving} label="Guardar Perfil" variant="mystic" className="mt-4" />
+              <CatSaveButton isLoading={profileSaving || profileCvUploading} label="Guardar Perfil" variant="mystic" className="mt-4" />
             </form>
           </div>
         )}
