@@ -73,7 +73,7 @@ function AvatarFrame({ imgUrl, name }) {
       <div
         className={[
           'relative rounded-full border border-indigo-300/30 overflow-hidden bg-[#0B0914]',
-          'w-36 h-36 sm:w-44 sm:h-44 md:w-52 md:h-52',
+          'w-32 h-32 sm:w-40 sm:h-40 md:w-44 md:h-44 lg:w-48 lg:h-48',
           'shadow-[0_0_30px_rgba(165,180,252,0.10)]',
           'transition-all duration-[1500ms] ease-in-out motion-reduce:transition-none motion-reduce:transform-none',
           'group-hover:-translate-y-2',
@@ -197,7 +197,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
       </motion.div>
 
       {/*Contenedor Principal*/}
-      <div className="flex flex-col md:flex-row items-center justify-center gap-12 md:gap-24 lg:gap-32 p-8 md:p-12 w-full">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 lg:gap-20 py-2 md:py-4 px-4 md:px-8 w-full">
 
         <motion.div variants={DYNAMIC_PHASE_AVATAR}>
           <AvatarFrame imgUrl={imgUrl} name={name} />
@@ -206,7 +206,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
         <div
           className={[
             'group',
-            'flex flex-col gap-4 items-center md:items-start text-center md:text-left',
+            'flex flex-col gap-3 md:gap-3.5 items-center md:items-start text-center md:text-left',
             'transition-all duration-[1500ms] ease-in-out',
             'hover:-translate-y-1',
           ].join(' ')}
@@ -214,7 +214,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
 
           <motion.div
             variants={DYNAMIC_PHASE_TEXT}
-            className="flex flex-col gap-4 items-center md:items-start w-full"
+            className="flex flex-col gap-3 md:gap-3.5 items-center md:items-start w-full"
           >
             <p
               className="flex items-center gap-2 text-[11px] tracking-[0.25em] text-indigo-300/80 uppercase select-none"
@@ -263,7 +263,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
           </motion.div>
 
           {/* Bloque de Contacto / Redes */}
-          <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-8 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 flex-wrap">
+          <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-5 md:mt-6 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-3.5 flex-wrap">
             {/* Botón Principal Iniciar Contacto */}
             <button
               onClick={onContactClick}

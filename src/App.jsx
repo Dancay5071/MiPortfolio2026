@@ -57,13 +57,13 @@ function AmbientGlow({ variant = 'proyectos' }) {
   );
 }
 
-function TabPanel({ children, maxWidth = 'max-w-4xl', className = '', glow = null }) {
+function TabPanel({ children, maxWidth = 'max-w-4xl', className = '', glow = null, padding = 'p-6 md:p-10' }) {
   return (
     <div
       className={[
         'relative overflow-hidden w-full mx-auto',
         'rounded-2xl',
-        'p-6 md:p-10',
+        padding,
         maxWidth,
         className,
       ].join(' ')}
@@ -293,14 +293,14 @@ function App() {
   if (isLoading) return <LoaderGlobal />;
 
   return (
-    <MouseGlowLayout className="w-full min-h-screen">
+    <MouseGlowLayout className={`w-full ${activeTab === 'inicio' ? 'h-screen max-h-screen md:overflow-hidden' : 'min-h-screen'}`}>
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
       <CvRequestModal isOpen={isCvModalOpen} onClose={() => setIsCvModalOpen(false)} />
       <MysticalCursor />
-      <div className="relative w-full min-h-screen flex flex-col font-sans overflow-x-hidden bg-[var(--color-light)] text-[var(--color-dark)]">
+      <div className={`relative w-full flex flex-col font-sans bg-[var(--color-light)] text-[var(--color-dark)] ${activeTab === 'inicio' ? 'h-screen max-h-screen md:overflow-hidden' : 'min-h-screen overflow-x-hidden'}`}>
 
         <MysticalBackground />
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-2 md:px-8 flex flex-col min-h-screen bg-transparent">
+        <div className={`relative z-10 w-full max-w-6xl mx-auto px-2 md:px-8 flex flex-col bg-transparent ${activeTab === 'inicio' ? 'h-full justify-between' : 'min-h-screen'}`}>
 
           <Navbar
             activeTab={activeTab}
@@ -309,7 +309,7 @@ function App() {
             onContactClick={() => setIsContactOpen(true)}
           />
 
-          <main className="flex-1 flex flex-col items-center justify-center pt-4 md:pt-6 pb-10">
+          <main className={`flex-1 flex flex-col items-center justify-center w-full ${activeTab === 'inicio' ? 'py-1 md:py-2 my-auto' : 'pt-4 md:pt-6 pb-10'}`}>
             <div className="w-full">
               <AnimatePresence mode="wait" custom={direction}>
                 <motion.div
@@ -329,7 +329,7 @@ function App() {
                     onTouchEnd={onTouchEnd}
                   >
                     {activeTab === 'inicio' && (
-                      <TabPanel key="inicio" maxWidth="max-w-6xl" className="py-12 md:py-16 px-4 md:px-8" glow="inicio">
+                      <TabPanel key="inicio" maxWidth="max-w-6xl" padding="py-2 md:py-4 px-3 md:px-6" glow="inicio">
                         <Hero
                           profile={profile}
                           onContactClick={() => setIsContactOpen(true)}
@@ -412,17 +412,13 @@ function App() {
           </AnimatePresence>
 
           <footer
-            className="mt-auto px-6 md:px-10 py-5 border-t border-indigo-400/8 glass-panel-blur"
+            className={`mt-auto px-6 md:px-10 border-t border-indigo-400/8 glass-panel-blur ${activeTab === 'inicio' ? 'py-2.5 md:py-3.5' : 'py-5'}`}
             style={{ background: 'rgba(11,9,20,0.85)' }}
             role="contentinfo"
           >
             <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
 
               <div className="flex items-center gap-3 text-indigo-300 text-xs tracking-widest">
-                <div className="flex items-center gap-2">
-                  <span className="text-indigo-400/70" aria-hidden="true">◊</span>
-                  <span>Frecuencia Estable</span>
-                </div>
 
                 {totalVisits !== null && (
                   <div className="flex items-center gap-1.5 px-2.5 py-0.5 rounded-full border border-indigo-500/20 bg-indigo-950/40 text-[10px] text-indigo-200/70 font-mono-hud shadow-[0_0_10px_rgba(99,102,241,0.15)]">
