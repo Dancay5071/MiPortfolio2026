@@ -175,25 +175,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
         className="contents"
         aria-hidden="true"
       >
-        {/* Esquina superior izquierda */}
-        <div className="absolute top-0 left-0 text-white/40 select-none pointer-events-none">
-          <PolarStarIcon />
-        </div>
-
-        {/* Esquina superior derecha */}
-        <div className="absolute top-0 right-0 text-white/50 select-none pointer-events-none">
-          <PolarStarIcon className="scale-90" />
-        </div>
-
-        {/* Esquina inferior izquierda */}
-        <div className="absolute bottom-0 left-0 text-white/40 select-none pointer-events-none">
-          <PolarStarIcon className="scale-75" />
-        </div>
-
-        {/* Esquina inferior derecha */}
-        <div className="absolute bottom-0 right-0 text-white/70 select-none pointer-events-none drop-shadow-[0_0_8px_rgba(255,255,255,0.4)]">
-          <PolarStarIcon className="scale-110" />
-        </div>
+       
       </motion.div>
 
       {/*Contenedor Principal*/}
