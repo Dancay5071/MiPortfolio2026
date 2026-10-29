@@ -9,7 +9,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
     company: '',
     b_website: '' // Campo trampa honeypot para bots
   });
-  const [status, setStatus] = useState('idle'); // 'idle' | 'submitting' | 'success' | 'error'
+  const [status, setStatus] = useState('idle');
   const [errorMessage, setErrorMessage] = useState('');
   const [cvUrl, setCvUrl] = useState('');
 
@@ -25,7 +25,6 @@ export default function CvRequestModal({ isOpen, onClose }) {
 
   const handleClose = () => {
     onClose();
-    // Reiniciar estados luego de cerrar la animación
     setTimeout(() => {
       setStatus('idle');
       setErrorMessage('');
@@ -62,7 +61,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
             console.info('Apertura automática bloqueada por el navegador. El botón manual está disponible.');
           }
         } catch {
-          // Ignorar bloqueo y mostrar botón manual
+        
         }
       } else {
         throw new Error('No se pudo recuperar el enlace del currículum.');

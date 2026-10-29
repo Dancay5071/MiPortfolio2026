@@ -265,7 +265,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
 
           {/* Bloque de Contacto / Redes */}
           <motion.div variants={DYNAMIC_PHASE_SOCIAL} className="mt-8 w-full flex flex-col sm:flex-row items-center justify-center md:justify-start gap-4 flex-wrap">
-            {/* Botón Principal Iniciar Contacto (CTA Elevado) */}
+            {/* Botón Principal Iniciar Contacto */}
             <button
               onClick={onContactClick}
               className={[
@@ -288,7 +288,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
               </span>
             </button>
 
-            {/* Botón Secundario de CV con Filtro Seguro */}
+            {/* Botón Secundario de CV */}
             {hasCv && (
               <button
                 type="button"
