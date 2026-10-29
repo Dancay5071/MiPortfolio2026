@@ -61,7 +61,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
             console.info('Apertura automática bloqueada por el navegador. El botón manual está disponible.');
           }
         } catch {
-        
+
         }
       } else {
         throw new Error('No se pudo recuperar el enlace del currículum.');
@@ -225,7 +225,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="ej. Laura Gómez"
+                        placeholder="Nombre Apellido"
                         required
                         className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-indigo-100 placeholder:text-indigo-300/30 outline-none transition-all duration-300 focus:border-amber-200/50 focus:shadow-[0_0_10px_rgba(251,191,36,0.1)] text-sm"
                       />
@@ -243,13 +243,13 @@ export default function CvRequestModal({ isOpen, onClose }) {
                         name="email"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="ej. laura@empresa.com"
+                        placeholder="correo@empresa.com"
                         required
                         className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-indigo-100 placeholder:text-indigo-300/30 outline-none transition-all duration-300 focus:border-amber-200/50 focus:shadow-[0_0_10px_rgba(251,191,36,0.1)] text-sm"
                       />
                     </div>
 
-                    {/* Empresa / Organización (Opcional) */}
+                    {/* Empresa  */}
                     <div className="flex flex-col gap-1">
                       <label htmlFor="cv-company" className="text-[10px] font-mono tracking-[0.18em] uppercase text-indigo-300/70 flex items-center gap-1.5">
                         <span className="text-violet-400/70 text-[8px]">◊</span>
@@ -261,7 +261,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
                         name="company"
                         value={formData.company}
                         onChange={handleChange}
-                        placeholder="ej. Tech Corp / Particular"
+                        placeholder="Empresa / Particular"
                         className="bg-white/5 border border-white/10 rounded-lg px-4 py-2.5 text-indigo-100 placeholder:text-indigo-300/30 outline-none transition-all duration-300 focus:border-amber-200/50 focus:shadow-[0_0_10px_rgba(251,191,36,0.1)] text-sm"
                       />
                     </div>
