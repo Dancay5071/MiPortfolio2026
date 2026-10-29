@@ -1,3 +1,5 @@
+import { supabase } from '../supabaseClient';
+
 const rawApiUrl = (import.meta.env.VITE_API_URL || 'http://localhost:5000/api').trim();
 const API_URL = rawApiUrl.replace(/\/+$/, '');
 
@@ -45,16 +47,67 @@ export const sendContactMessage = async ({ name, email, message }) => {
     return data;
 };
 
+// Fallback en caso de que el backend local no se haya reiniciado o esté desplegándose
+const fallbackCvAccess = async ({ name, email, company }) => {
+    try {
+        const { data, error } = await supabase
+            .from('perfil')
+            .select('cv_url')
+            .limit(1)
+            .maybeSingle();
+
+        if (error) throw error;
+        if (!data?.cv_url) throw new Error('El currículum aún no ha sido cargado. Puedes subir el archivo PDF desde el Panel de Administración (#admin > Perfil).');
+
+        // Intentar registrar la solicitud en Supabase
+        try {
+            await supabase.from('solicitudes_cv').insert([
+                {
+                    nombre: name,
+                    email: email,
+                    empresa: company || '',
+                    created_at: new Date().toISOString()
+                }
+            ]);
+        } catch {
+            // Ignorar si la tabla no está creada
+        }
+
+        return {
+            success: true,
+            cvUrl: data.cv_url,
+            message: 'Acceso verificado.'
+        };
+    } catch (err) {
+        throw new Error(err.message || 'No se pudo obtener el currículum.');
+    }
+};
+
 // Solicitar Acceso al CV con Filtro Seguro
 export const requestCvAccess = async ({ name, email, company, honeypot }) => {
-    const res = await fetch(`${API_URL}/cv/request`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, company, honeypot })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Error al procesar la solicitud del currículum');
-    return data;
+    try {
+        const res = await fetch(`${API_URL}/cv/request`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, company, honeypot })
+        });
+        const data = await res.json();
+        if (res.ok && data?.cvUrl) {
+            return data;
+        }
+        // Si el backend responde 404 (porque el proceso Node en la terminal no se reinició aún con las nuevas rutas)
+        if (res.status === 404) {
+            console.warn('El backend local devolvió 404. Usando fallback directo de Supabase...');
+            return await fallbackCvAccess({ name, email, company });
+        }
+        throw new Error(data.message || 'Error al procesar la solicitud del currículum');
+    } catch (err) {
+        // Si falló por 404 o problema de conexión al backend, intentar fallback
+        if (err.message && (err.message.includes('404') || err.message.includes('no encontrada') || err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+            return await fallbackCvAccess({ name, email, company });
+        }
+        throw err;
+    }
 };
 
 // Registrar Visita

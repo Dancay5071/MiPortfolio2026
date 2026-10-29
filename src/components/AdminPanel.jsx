@@ -550,24 +550,90 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     const file = e.target.files[0];
     if (!file) return;
 
-    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
-      addToast('Por favor selecciona un archivo PDF (.pdf)', 'error');
+    // 1. Bloquear estrictamente en modo invitado
+    if (demoIntercept()) {
+      e.target.value = '';
       return;
     }
 
-    if (demoIntercept()) return;
+    // 2. Validar que sea PDF
+    if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
+      addToast('Por favor selecciona un archivo PDF (.pdf)', 'error');
+      e.target.value = '';
+      return;
+    }
 
     setProfileCvUploading(true);
     try {
-      addToast('Subiendo archivo PDF...', 'info');
+      addToast('Subiendo archivo PDF a Supabase Storage...', 'info');
       const url = await uploadCvPdf(file);
       setProfileCvUrl(url);
       setProfileCvFile(file);
-      addToast('¡Archivo PDF de CV subido con éxito! Recuerda guardar el perfil.', 'success');
+
+      // 3. Guardado PERMANENTE inmediato en la tabla 'perfil' de Supabase
+      let saveError = null;
+      if (profileId) {
+        const { error } = await supabase
+          .from('perfil')
+          .update({ cv_url: url, updated_at: new Date().toISOString() })
+          .eq('id', profileId);
+        saveError = error;
+      } else {
+        const { data: existing } = await supabase.from('perfil').select('id').limit(1).maybeSingle();
+        if (existing?.id) {
+          setProfileId(existing.id);
+          const { error } = await supabase
+            .from('perfil')
+            .update({ cv_url: url, updated_at: new Date().toISOString() })
+            .eq('id', existing.id);
+          saveError = error;
+        } else {
+          const { data: newRow, error } = await supabase
+            .from('perfil')
+            .insert([{
+              cv_url: url,
+              nombre: profileName.trim() || 'Daniela Cabrera',
+              titulo: profileTitle.trim() || 'Técnica en Programación & Desarrolladora',
+              descripcion: profileDesc.trim() || '',
+              updated_at: new Date().toISOString()
+            }])
+            .select()
+            .single();
+          if (newRow?.id) setProfileId(newRow.id);
+          saveError = error;
+        }
+      }
+
+      if (saveError) throw saveError;
+
+      addToast('¡CV en PDF subido y guardado de forma permanente en tu perfil!', 'success');
     } catch (err) {
-      console.error('Error al subir PDF:', err);
+      console.error('Error al subir y guardar CV:', err);
+      addToast(err.message || 'Error al guardar el CV en la base de datos', 'error');
     } finally {
       setProfileCvUploading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleCvRemove = async () => {
+    if (demoIntercept()) return;
+    if (!window.confirm('¿Estás segura de que deseas quitar el CV del perfil?')) return;
+
+    try {
+      if (profileId) {
+        const { error } = await supabase
+          .from('perfil')
+          .update({ cv_url: '', updated_at: new Date().toISOString() })
+          .eq('id', profileId);
+        if (error) throw error;
+      }
+      setProfileCvUrl('');
+      setProfileCvFile(null);
+      addToast('El CV ha sido quitado permanentemente del perfil', 'info');
+    } catch (err) {
+      console.error('Error al quitar CV:', err);
+      addToast('Error al quitar el CV de la base de datos', 'error');
     }
   };
 
@@ -1015,13 +1081,22 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
               <Field label="DOCUMENTO DE CV (PDF)">
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-3">
-                    <label className={[
-                      'cursor-pointer px-4 py-2.5 text-[10px] font-sans-body tracking-[0.18em] uppercase rounded-none',
-                      'border border-amber-300/35 text-amber-100 bg-gradient-to-r from-amber-900/30 via-violet-900/20 to-amber-900/30',
-                      'hover:border-amber-300/60 hover:text-white hover:shadow-[0_0_15px_rgba(251,191,36,0.2)]',
-                      'transition-all duration-300 inline-flex items-center gap-2',
-                      profileCvUploading ? 'opacity-60 pointer-events-none' : ''
-                    ].join(' ')}>
+                    <label
+                      onClick={(e) => {
+                        if (isDemoUser) {
+                          e.preventDefault();
+                          demoIntercept();
+                        }
+                      }}
+                      className={[
+                        isDemoUser
+                          ? 'opacity-40 cursor-not-allowed border-white/10 text-indigo-300/40 bg-white/5'
+                          : 'cursor-pointer border-amber-300/35 text-amber-100 bg-gradient-to-r from-amber-900/30 via-violet-900/20 to-amber-900/30 hover:border-amber-300/60 hover:text-white hover:shadow-[0_0_15px_rgba(251,191,36,0.2)]',
+                        'px-4 py-2.5 text-[10px] font-sans-body tracking-[0.18em] uppercase rounded-none',
+                        'transition-all duration-300 inline-flex items-center gap-2',
+                        profileCvUploading ? 'opacity-60 pointer-events-none' : ''
+                      ].join(' ')}
+                    >
                       {profileCvUploading ? (
                         <>
                           <svg className="animate-spin w-3.5 h-3.5 text-amber-200" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -1032,7 +1107,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                         </>
                       ) : (
                         <>
-                          <span>📄 Cargar archivo PDF</span>
+                          <span>📄 {isDemoUser ? 'Cargar PDF (Solo lectura)' : 'Cargar archivo PDF'}</span>
                           <span className="text-amber-300/80 text-xs">◊</span>
                         </>
                       )}
@@ -1040,7 +1115,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                         type="file"
                         accept="application/pdf,.pdf"
                         onChange={handleCvFileChange}
-                        disabled={profileCvUploading}
+                        disabled={isDemoUser || profileCvUploading}
                         className="hidden"
                       />
                     </label>
@@ -1056,17 +1131,26 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                         >
                           Ver PDF cargado ↗
                         </a>
-                        <button
-                          type="button"
-                          onClick={() => { setProfileCvUrl(''); setProfileCvFile(null); }}
-                          className="text-[10px] uppercase font-mono tracking-wider text-rose-400/80 hover:text-rose-300 ml-2 transition-colors cursor-pointer"
-                          title="Quitar archivo actual"
-                        >
-                          Quitar
-                        </button>
+                        {!isDemoUser && (
+                          <button
+                            type="button"
+                            onClick={handleCvRemove}
+                            className="text-[10px] uppercase font-mono tracking-wider text-rose-400/80 hover:text-rose-300 ml-2 transition-colors cursor-pointer"
+                            title="Quitar archivo actual"
+                          >
+                            Quitar
+                          </button>
+                        )}
                       </div>
                     )}
                   </div>
+
+                  {isDemoUser && (
+                    <p className="text-[10px] text-amber-300/60 font-mono tracking-wider flex items-center gap-1.5">
+                      <span>◊</span>
+                      <span>Modo Invitado: La carga y edición del CV se encuentra en modo solo lectura.</span>
+                    </p>
+                  )}
 
                   {/* Campo opcional para pegar link externo si se prefiere */}
                   <div className="space-y-1">
@@ -1076,9 +1160,13 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                     <input
                       type="url"
                       value={profileCvUrl}
-                      onChange={(e) => setProfileCvUrl(e.target.value)}
-                      className={CX.input}
-                      placeholder="https://..."
+                      onChange={(e) => {
+                        if (isDemoUser) return;
+                        setProfileCvUrl(e.target.value);
+                      }}
+                      disabled={isDemoUser}
+                      className={`${CX.input} ${isDemoUser ? 'opacity-40 cursor-not-allowed' : ''}`}
+                      placeholder={isDemoUser ? 'Modo invitado (Solo lectura)' : 'https://...'}
                     />
                   </div>
                 </div>
