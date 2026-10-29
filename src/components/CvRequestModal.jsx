@@ -52,17 +52,6 @@ export default function CvRequestModal({ isOpen, onClose }) {
       if (response?.cvUrl) {
         setCvUrl(response.cvUrl);
         setStatus('success');
-
-        // Intentar abrir automáticamente en una pestaña nueva
-        try {
-          const newTab = window.open(response.cvUrl, '_blank', 'noopener,noreferrer');
-          if (!newTab || newTab.closed || typeof newTab.closed === 'undefined') {
-            // El navegador bloqueó la ventana emergente automática
-            console.info('Apertura automática bloqueada por el navegador. El botón manual está disponible.');
-          }
-        } catch {
-
-        }
       } else {
         throw new Error('No se pudo recuperar el enlace del currículum.');
       }
