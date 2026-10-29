@@ -126,7 +126,6 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
   const name = profile?.name || 'Daniela Cabrera';
   const title = profile?.title || 'Técnica en programación & Desarrolladora de software';
   const imgUrl = profile?.url_foto || '';
-  const hasCv = Boolean(profile?.has_cv || profile?.cv_url);
 
   const shouldReduceMotion = useReducedMotion();
 
@@ -288,24 +287,29 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
               </span>
             </button>
 
-            {/* Botón Secundario de CV */}
-            {hasCv && (
-              <button
-                type="button"
-                onClick={onCvClick}
-                className={[
-                  'px-5 py-3 rounded-xl cursor-pointer',
-                  'bg-white/4 backdrop-blur-sm border border-white/10',
-                  'font-sans-body text-[10px] font-medium tracking-[0.20em] uppercase text-indigo-200/80',
-                  'hover:text-white hover:border-indigo-400/30 hover:bg-white/8 hover:shadow-[0_0_15px_rgba(99,102,241,0.15)]',
-                  'hover:scale-[1.02] active:scale-[0.98]',
-                  'transition-all duration-400 ease-out',
-                ].join(' ')}
-                title="Solicitar acceso al Currículum Vitae"
-              >
-                Ver CV ↗
-              </button>
-            )}
+            {/* Botón ver CV */}
+            <button
+              type="button"
+              onClick={onCvClick}
+              className={[
+                'group relative flex items-center gap-2.5 px-6 py-3 rounded-xl cursor-pointer',
+                'bg-white/5 hover:bg-white/10 backdrop-blur-md',
+                'border border-white/15 hover:border-indigo-400/50',
+                'font-sans-body text-[11px] font-medium tracking-[0.22em] uppercase text-indigo-100',
+                'shadow-[0_0_20px_rgba(99,102,241,0.12)] hover:shadow-[0_0_25px_rgba(165,180,252,0.20)]',
+                'hover:scale-[1.03] active:scale-[0.98]',
+                'transition-all duration-400 ease-out',
+              ].join(' ')}
+              title="Solicitar acceso al Currículum Vitae"
+              aria-label="Abrir formulario para descargar el Currículum Vitae"
+            >
+              <span className="relative font-semibold">
+                Ver CV
+              </span>
+              <span className="text-amber-300/80 text-[11px] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform duration-300">
+                ↗
+              </span>
+            </button>
 
           </motion.div>
 
