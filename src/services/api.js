@@ -45,6 +45,18 @@ export const sendContactMessage = async ({ name, email, message }) => {
     return data;
 };
 
+// Solicitar Acceso al CV con Filtro Seguro
+export const requestCvAccess = async ({ name, email, company, honeypot }) => {
+    const res = await fetch(`${API_URL}/cv/request`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, company, honeypot })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || 'Error al procesar la solicitud del currículum');
+    return data;
+};
+
 // Registrar Visita
 export const recordVisit = async () => {
     try {
@@ -53,6 +65,7 @@ export const recordVisit = async () => {
         console.warn('No se pudo registrar la visita:', error.message);
     }
 };
+
 // Obtener Total de Visitas
 export const getVisitStats = async () => {
     try {
@@ -65,6 +78,7 @@ export const getVisitStats = async () => {
         return null;
     }
 };
+
 // Helper genérico para peticiones protegidas (Defensivo contra respuestas HTML/404)
 const authFetch = async (endpoint, options = {}, token) => {
   let res;
@@ -97,19 +111,26 @@ const authFetch = async (endpoint, options = {}, token) => {
   if (!res.ok) throw new Error(json.message || `Error del servidor (${res.status})`);
   return json.data;
 };
+
 // Proyectos
 export const createProject = (data, token) => authFetch('/projects', { method: 'POST', body: JSON.stringify(data) }, token);
 export const updateProject = (id, data, token) => authFetch(`/projects/${id}`, { method: 'PUT', body: JSON.stringify(data) }, token);
 export const deleteProject = (id, token) => authFetch(`/projects/${id}`, { method: 'DELETE' }, token);
+
 // Experiencia
 export const createExperience = (data, token) => authFetch('/experience', { method: 'POST', body: JSON.stringify(data) }, token);
 export const updateExperience = (id, data, token) => authFetch(`/experience/${id}`, { method: 'PUT', body: JSON.stringify(data) }, token);
 export const deleteExperience = (id, token) => authFetch(`/experience/${id}`, { method: 'DELETE' }, token);
+
 // Educación
 export const createEducation = (data, token) => authFetch('/education', { method: 'POST', body: JSON.stringify(data) }, token);
 export const updateEducation = (id, data, token) => authFetch(`/education/${id}`, { method: 'PUT', body: JSON.stringify(data) }, token);
 export const deleteEducation = (id, token) => authFetch(`/education/${id}`, { method: 'DELETE' }, token);
+
 // Mensajes de contacto
 export const getMessages = (token) => authFetch('/contact', { method: 'GET' }, token);
 export const deleteMessage = (id, token) => authFetch(`/contact/${id}`, { method: 'DELETE' }, token);
 
+// Solicitudes de CV (Admin)
+export const getCvRequests = (token) => authFetch('/cv/requests', { method: 'GET' }, token);
+export const deleteCvRequest = (id, token) => authFetch(`/cv/requests/${id}`, { method: 'DELETE' }, token);

@@ -12,6 +12,7 @@ import LoaderGlobal from './components/LoaderGlobal';
 import MouseGlowLayout from './components/MouseGlowLayout';
 import MysticalCursor from './components/MysticalCursor';
 import ContactModal from './components/ContactModal';
+import CvRequestModal from './components/CvRequestModal';
 import { DEMO_EMAIL } from './hooks/useDemoGuard';
 import { getProfile, recordVisit, getVisitStats } from './services/api';
 
@@ -110,6 +111,7 @@ function App() {
   const [activeTab, setActiveTab] = useState(initialTab);
   const [direction, setDirection] = useState(0);
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [isCvModalOpen, setIsCvModalOpen] = useState(false);
   const [session, setSession] = useState(null);
   const [fakeSession, setFakeSession] = useState(null);
   const [toast, setToast] = useState(null);
@@ -125,6 +127,7 @@ function App() {
     url_foto: '',
     description: '',
     cv_url: '',
+    has_cv: false,
   });
 
   const addToast = useCallback((message, type = 'info') => {
@@ -256,6 +259,7 @@ function App() {
             url_foto: data.url_foto || '',
             description: data.description || '',
             cv_url: data.cv_url || '',
+            has_cv: data.has_cv !== undefined ? Boolean(data.has_cv) : Boolean(data.cv_url),
           });
         }
       } catch (err) {
@@ -291,6 +295,7 @@ function App() {
   return (
     <MouseGlowLayout className="w-full min-h-screen">
       <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
+      <CvRequestModal isOpen={isCvModalOpen} onClose={() => setIsCvModalOpen(false)} />
       <MysticalCursor />
       <div className="relative w-full min-h-screen flex flex-col font-sans overflow-x-hidden bg-[var(--color-light)] text-[var(--color-dark)]">
 
@@ -328,6 +333,7 @@ function App() {
                         <Hero
                           profile={profile}
                           onContactClick={() => setIsContactOpen(true)}
+                          onCvClick={() => setIsCvModalOpen(true)}
                         />
                       </TabPanel>
                     )}

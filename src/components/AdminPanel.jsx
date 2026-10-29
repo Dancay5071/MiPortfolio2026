@@ -10,7 +10,8 @@ import {
   createProject, updateProject, deleteProject,
   createExperience, updateExperience, deleteExperience,
   createEducation, updateEducation, deleteEducation,
-  getMessages, deleteMessage
+  getMessages, deleteMessage,
+  getCvRequests, deleteCvRequest
 } from '../services/api';
 
 
@@ -381,6 +382,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const [messages, setMessages] = useState([]);
   const [messagesLoading, setMessagesLoading] = useState(false);
 
+  // Solicitudes de CV
+  const [cvRequests, setCvRequests] = useState([]);
+  const [cvRequestsLoading, setCvRequestsLoading] = useState(false);
+
   // Claves de refresco dinámico para listas
   const [expRefreshKey, setExpRefreshKey] = useState(0);
   const [eduRefreshKey, setEduRefreshKey] = useState(0);
@@ -423,6 +428,19 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     }
   }, [token]);
 
+  const fetchCvRequests = useCallback(async () => {
+    if (!token) return;
+    setCvRequestsLoading(true);
+    try {
+      const data = await getCvRequests(token);
+      setCvRequests(data || []);
+    } catch (err) {
+      console.warn('Error al cargar solicitudes de CV en Admin:', err);
+    } finally {
+      setCvRequestsLoading(false);
+    }
+  }, [token]);
+
   useEffect(() => {
     if (session) fetchProfile();
   }, [session, fetchProfile]);
@@ -431,7 +449,10 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     if (activeSubTab === 'messages' && session) {
       fetchMessages();
     }
-  }, [activeSubTab, session, fetchMessages]);
+    if (activeSubTab === 'cv_requests' && session) {
+      fetchCvRequests();
+    }
+  }, [activeSubTab, session, fetchMessages, fetchCvRequests]);
 
   //Demo
   const { isDemoUser, demoIntercept } = useDemoGuard(session, addToast);
@@ -495,6 +516,19 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         addToast('Mensaje eliminado', 'success');
       } catch {
         addToast('Error al eliminar mensaje', 'error');
+      }
+    }
+  };
+
+  const handleDeleteCvRequest = async (id) => {
+    if (window.confirm('¿Eliminar este registro de solicitud de CV?')) {
+      if (demoIntercept()) return;
+      try {
+        await deleteCvRequest(id, token);
+        setCvRequests(prev => prev.filter(r => r.id !== id));
+        addToast('Registro de CV eliminado', 'success');
+      } catch {
+        addToast('Error al eliminar registro', 'error');
       }
     }
   };
@@ -818,13 +852,14 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const navItems = [
     { id: 'profile', label: 'Perfil', icon: '◊' },
     { id: 'messages', label: 'Mensajes', icon: '✉' },
+    { id: 'cv_requests', label: 'Descargas CV', icon: '📄' },
     { id: 'experience', label: 'Experiencia', icon: '◊' },
     { id: 'education', label: 'Educación', icon: '◊' },
     { id: 'projects', label: 'Proyectos', icon: '◊' },
   ];
 
 
-  const validTabs = ['profile', 'messages', 'experience', 'education', 'projects'];
+  const validTabs = ['profile', 'messages', 'cv_requests', 'experience', 'education', 'projects'];
   const currentTab = (isDemoUser && activeSubTab === 'overview') || !validTabs.includes(activeSubTab)
     ? 'profile'
     : activeSubTab;
@@ -1015,6 +1050,85 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                         className="text-[10px] uppercase tracking-widest font-mono-hud text-violet-300 hover:text-white flex items-center gap-1.5 transition-colors"
                       >
                         Responder por mail →
+                      </a>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* SUB-TAB: SOLICITUDES DE CV */}
+        {currentTab === 'cv_requests' && (
+          <div>
+            <div className="flex justify-between items-center mb-6 border-b border-indigo-400/8 pb-3">
+              <h2 className={CX.sectionHead}>
+                <span className="text-amber-300/80">📄</span> Descargas de CV ({cvRequests.length})
+              </h2>
+              <button
+                onClick={fetchCvRequests}
+                className="text-[10px] uppercase tracking-widest text-indigo-300/60 hover:text-indigo-100 flex items-center gap-1.5 cursor-pointer"
+              >
+                Actualizar ◊
+              </button>
+            </div>
+
+            {cvRequestsLoading ? (
+              <div className="py-12 flex justify-center">
+                <CatHeadLoader size="md" />
+              </div>
+            ) : cvRequests.length === 0 ? (
+              <div className="text-center py-12 text-xs font-mono-hud text-indigo-300/40 tracking-widest">
+                ◊ Aún no hay solicitudes de CV registradas ◊
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {cvRequests.map(req => (
+                  <div
+                    key={req.id}
+                    className="bg-white/4 border border-white/8 rounded-xl p-5 hover:border-amber-400/25 transition-all duration-300"
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-white/5 pb-3 mb-3">
+                      <div>
+                        <h3 className="font-semibold text-mystic-star text-sm flex items-center gap-2">
+                          <span>{req.nombre}</span>
+                          {req.empresa && (
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-violet-900/40 border border-violet-400/30 text-violet-200">
+                              {req.empresa}
+                            </span>
+                          )}
+                        </h3>
+                        <a
+                          href={`mailto:${req.email}`}
+                          className="text-xs text-indigo-300/70 hover:text-amber-200 transition-colors"
+                        >
+                          {req.email}
+                        </a>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <span className="text-[10px] font-mono-hud text-indigo-300/40">
+                          {req.created_at ? new Date(req.created_at).toLocaleDateString('es-AR', {
+                            day: '2-digit', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'
+                          }) : ''}
+                        </span>
+                        <button
+                          onClick={() => handleDeleteCvRequest(req.id)}
+                          className="text-rose-400/60 hover:text-rose-300 text-xs px-2 py-1 rounded transition-colors"
+                          title="Eliminar registro"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-[10px] text-indigo-300/50 font-mono-hud">
+                      {req.ip_origen && <span>IP: {req.ip_origen}</span>}
+                      <a
+                        href={`mailto:${req.email}?subject=Contacto por tu interés en mi CV - Daniela Cabrera`}
+                        className="text-[10px] uppercase tracking-widest text-violet-300 hover:text-white flex items-center gap-1.5 transition-colors ml-auto"
+                      >
+                        Enviar correo →
                       </a>
                     </div>
                   </div>
