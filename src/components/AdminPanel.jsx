@@ -1501,8 +1501,14 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                     />
 
                   </div>
-                  <Field label="DESCRIPCIÓN (Opcional)">
-                    <textarea value={eduDesc} onChange={(e) => setEduDesc(e.target.value)} rows="3" className={CX.input} placeholder="Descripción de los estudios..." />
+                  <Field label="DESCRIPCIÓN / MATERIAS CLAVE (Opcional)">
+                    <textarea
+                      value={eduDesc}
+                      onChange={(e) => setEduDesc(e.target.value)}
+                      rows="3"
+                      className={CX.input}
+                      placeholder="Para materias o núcleos temáticos separa con guiones: Estructuras de Datos - Algoritmos - Bases de Datos - Arquitectura Web..."
+                    />
                   </Field>
                   <div className="flex justify-end gap-3 pt-2 border-t border-white/5">
                     <button type="button" onClick={() => { setIsEduFormOpen(false); resetEduForm(); }} className={CX.btnCancel}>Cancelar</button>
