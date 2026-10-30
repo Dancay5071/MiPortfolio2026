@@ -125,7 +125,6 @@ function App() {
     name: 'Daniela Cabrera',
     title: 'Técnica en programación & Desarrolladora de software',
     url_foto: '',
-    description: '',
     cv_url: '',
     has_cv: false,
   });
@@ -180,7 +179,7 @@ function App() {
 
   const onTouchEnd = () => {
     if (!touchStart || !touchEnd) return;
-    // Si el usuario está en el panel de admin, no permitimos cambiar de pestaña por swipe
+
     if (activeTab === 'admin') return;
 
     const distance = touchStart - touchEnd;
@@ -257,7 +256,6 @@ function App() {
             name: data.name || 'Daniela Cabrera',
             title: data.title || 'Técnica en Programación & Desarrolladora de Software',
             url_foto: data.url_foto || '',
-            description: data.description || '',
             cv_url: data.cv_url || '',
             has_cv: data.has_cv !== undefined ? Boolean(data.has_cv) : Boolean(data.cv_url),
           });

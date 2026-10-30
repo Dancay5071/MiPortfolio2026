@@ -17,7 +17,6 @@ import {
 
 
 
-
 //HUD class constants
 const CX = {
 
@@ -551,13 +550,13 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
     const file = e.target.files[0];
     if (!file) return;
 
-    // 1. Bloquear estrictamente en modo invitado
+    // Bloquear estrictamente en modo invitado
     if (demoIntercept()) {
       e.target.value = '';
       return;
     }
 
-    // 2. Validar que sea PDF
+    // Validar que sea PDF
     if (file.type !== 'application/pdf' && !file.name.toLowerCase().endsWith('.pdf')) {
       addToast('Por favor selecciona un archivo PDF (.pdf)', 'error');
       e.target.value = '';
@@ -571,7 +570,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       setProfileCvUrl(url);
       setProfileCvFile(file);
 
-      // 3. Guardado PERMANENTE inmediato
+      // Guardado PERMANENTE inmediato
       let saved = false;
       if (token) {
         try {
@@ -1323,7 +1322,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
           <div>
             <div className="flex justify-between items-center mb-6 border-b border-indigo-400/8 pb-3">
               <h2 className={CX.sectionHead}>
-                <span className="text-amber-300/80">📄</span> Descargas de CV ({cvRequests.length})
+                <span className="text-amber-300/80">◊</span> Descargas de CV ({cvRequests.length})
               </h2>
               <button
                 onClick={fetchCvRequests}
