@@ -703,7 +703,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         cv_url: profileCvUrl.trim(),
       };
 
-      // 1. Intentar guardar primero a través del backend API (usa Service Role Key y salta cualquier traba de RLS)
+      //  Intentar guardar primero a través del backend API (usa Service Role Key y salta cualquier traba de RLS)
       let saved = false;
       if (token) {
         try {
@@ -714,7 +714,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         }
       }
 
-      // 2. Si la API no respondió, guardar directo en Supabase
+      // Si la API no respondió, guardar directo en Supabase
       if (!saved) {
         let idToUpdate = profileId;
         if (!idToUpdate) {
@@ -1025,7 +1025,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const navItems = [
     { id: 'profile', label: 'Perfil', icon: '◊' },
     { id: 'messages', label: 'Mensajes', icon: '✉' },
-    { id: 'cv_requests', label: 'Descargas CV', icon: '📄' },
+    { id: 'cv_requests', label: 'Descargas CV', icon: '◊' },
     { id: 'experience', label: 'Experiencia', icon: '◊' },
     { id: 'education', label: 'Educación', icon: '◊' },
     { id: 'projects', label: 'Proyectos', icon: '◊' },

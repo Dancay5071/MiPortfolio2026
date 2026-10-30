@@ -37,17 +37,71 @@ export const getEducation = async () => {
 
 // Enviar Mensaje de Contacto
 export const sendContactMessage = async ({ name, email, message }) => {
-    const res = await fetch(`${API_URL}/contact`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, message })
-    });
-    const data = await res.json();
-    if (!res.ok) throw new Error(data.message || 'Error al enviar el mensaje');
-    return data;
+    try {
+        const res = await fetch(`${API_URL}/contact`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, message })
+        });
+        const data = await res.json();
+        if (res.ok) return data;
+        throw new Error(data.message || 'Error del backend');
+    } catch (err) {
+        console.warn('Backend de contacto no disponible. Usando canal directo de Supabase y Formspree...', err.message);
+
+        // 1. Guardar en Supabase directamente
+        try {
+            await supabase.from('mensajes_contacto').insert([
+                {
+                    nombre: name.trim(),
+                    email: email.trim(),
+                    mensaje: message.trim(),
+                    created_at: new Date().toISOString()
+                }
+            ]);
+        } catch (dbErr) {
+            console.warn('No se pudo guardar mensaje en Supabase:', dbErr);
+        }
+
+        // 2. Enviar email por Formspree directamente a Daniela
+        const formspreeRes = await fetch('https://formspree.io/f/xgojrjpb', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: `✨ Nuevo mensaje de ${name} en tu Portfolio`,
+                name,
+                email,
+                message
+            })
+        });
+        if (!formspreeRes.ok) {
+            throw new Error('No se pudo enviar el mensaje. Por favor intenta nuevamente.');
+        }
+        return { success: true, message: '¡Mensaje enviado con éxito!' };
+    }
 };
 
-// Fallback en caso de que el backend local no se haya reiniciado o esté desplegándose
+// Notificación directa de Solicitud de CV a Daniela (Vía Formspree)
+export const notifyOwnerCvRequest = async ({ name, email, company }) => {
+    try {
+        await fetch('https://formspree.io/f/xgojrjpb', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({
+                _subject: `📄 ¡Alguien solicitó tu CV! (${name})`,
+                nombre: name,
+                email: email,
+                empresa: company || 'No especificada',
+                tipo: 'Solicitud de CV en Portfolio',
+                fecha: new Date().toLocaleString('es-AR')
+            })
+        });
+    } catch (err) {
+        console.warn('Aviso de CV vía Formspree omitido:', err);
+    }
+};
+
+// Fallback en caso de que el backend local no se haya iniciado o esté offline
 const fallbackCvAccess = async ({ name, email, company }) => {
     try {
         const { data, error } = await supabase
@@ -59,19 +113,25 @@ const fallbackCvAccess = async ({ name, email, company }) => {
         if (error) throw error;
         if (!data?.cv_url) throw new Error('El currículum aún no ha sido cargado. Puedes subir el archivo PDF desde el Panel de Administración (#admin > Perfil).');
 
-        // Intentar registrar la solicitud en Supabase
+        // 1. Registrar la solicitud en Supabase (tabla 'solicitudes_cv')
         try {
-            await supabase.from('solicitudes_cv').insert([
+            const { error: insertErr } = await supabase.from('solicitudes_cv').insert([
                 {
-                    nombre: name,
-                    email: email,
-                    empresa: company || '',
+                    nombre: name.trim(),
+                    email: email.trim(),
+                    empresa: company ? company.trim() : '',
                     created_at: new Date().toISOString()
                 }
             ]);
-        } catch {
-            // Ignorar si la tabla no está creada
+            if (insertErr) {
+                console.warn('Nota Supabase solicitudes_cv:', insertErr.message);
+            }
+        } catch (dbErr) {
+            console.warn('Error en supabase insert solicitudes_cv:', dbErr);
         }
+
+        // 2. Enviar aviso por correo a Daniela
+        await notifyOwnerCvRequest({ name, email, company });
 
         return {
             success: true,
@@ -85,6 +145,10 @@ const fallbackCvAccess = async ({ name, email, company }) => {
 
 // Solicitar Acceso al CV con Filtro Seguro
 export const requestCvAccess = async ({ name, email, company, honeypot }) => {
+    if (honeypot) {
+        return { success: true, cvUrl: '', message: 'Acceso verificado.' };
+    }
+
     try {
         const res = await fetch(`${API_URL}/cv/request`, {
             method: 'POST',
@@ -93,17 +157,17 @@ export const requestCvAccess = async ({ name, email, company, honeypot }) => {
         });
         const data = await res.json();
         if (res.ok && data?.cvUrl) {
+            // Enviar aviso también para asegurar recepción inmediata en bandeja
+            notifyOwnerCvRequest({ name, email, company });
             return data;
         }
-        // Si el backend responde 404 (porque el proceso Node en la terminal no se reinició aún con las nuevas rutas)
         if (res.status === 404) {
-            console.warn('El backend local devolvió 404. Usando fallback directo de Supabase...');
+            console.warn('El backend local devolvió 404. Usando canal directo de Supabase...');
             return await fallbackCvAccess({ name, email, company });
         }
         throw new Error(data.message || 'Error al procesar la solicitud del currículum');
     } catch (err) {
-
-        if (err.message && (err.message.includes('404') || err.message.includes('no encontrada') || err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+        if (err.message && (err.message.includes('404') || err.message.includes('no encontrada') || err.message.includes('Failed to fetch') || err.message.includes('NetworkError') || err.message.includes('conectar con el servidor'))) {
             return await fallbackCvAccess({ name, email, company });
         }
         throw err;
@@ -181,12 +245,52 @@ export const updateEducation = (id, data, token) => authFetch(`/education/${id}`
 export const deleteEducation = (id, token) => authFetch(`/education/${id}`, { method: 'DELETE' }, token);
 
 // Mensajes de contacto
-export const getMessages = (token) => authFetch('/contact', { method: 'GET' }, token);
-export const deleteMessage = (id, token) => authFetch(`/contact/${id}`, { method: 'DELETE' }, token);
+export const getMessages = async (token) => {
+    try {
+        return await authFetch('/contact', { method: 'GET' }, token);
+    } catch {
+        const { data, error } = await supabase
+            .from('mensajes_contacto')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
+    }
+};
+
+export const deleteMessage = async (id, token) => {
+    try {
+        return await authFetch(`/contact/${id}`, { method: 'DELETE' }, token);
+    } catch {
+        const { error } = await supabase.from('mensajes_contacto').delete().eq('id', id);
+        if (error) throw error;
+        return { success: true };
+    }
+};
 
 // Solicitudes de CV (Admin)
-export const getCvRequests = (token) => authFetch('/cv/requests', { method: 'GET' }, token);
-export const deleteCvRequest = (id, token) => authFetch(`/cv/requests/${id}`, { method: 'DELETE' }, token);
+export const getCvRequests = async (token) => {
+    try {
+        return await authFetch('/cv/requests', { method: 'GET' }, token);
+    } catch {
+        const { data, error } = await supabase
+            .from('solicitudes_cv')
+            .select('*')
+            .order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
+    }
+};
+
+export const deleteCvRequest = async (id, token) => {
+    try {
+        return await authFetch(`/cv/requests/${id}`, { method: 'DELETE' }, token);
+    } catch {
+        const { error } = await supabase.from('solicitudes_cv').delete().eq('id', id);
+        if (error) throw error;
+        return { success: true };
+    }
+};
 
 // Perfil (Admin vía Backend con Service Role)
 export const updateProfile = (data, token) => authFetch('/profile', { method: 'PUT', body: JSON.stringify(data) }, token);
