@@ -161,11 +161,10 @@ function CarreraHeroCard({ edu }) {
             {/* Estado / Rango de Fechas */}
             {edu.rango && edu.rango !== 'S/F' && (
               <span
-                className={`inline-flex items-center gap-1.5 text-xs font-mono-hud tracking-wider px-2.5 py-0.5 border ${
-                  isEnCurso
+                className={`inline-flex items-center gap-1.5 text-xs font-mono-hud tracking-wider px-2.5 py-0.5 border ${isEnCurso
                     ? 'text-amber-200 bg-amber-500/10 border-amber-500/30 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]'
                     : 'text-violet-200/80 bg-violet-950/30 border-violet-500/20'
-                }`}
+                  }`}
               >
                 {isEnCurso && (
                   <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse" aria-hidden="true" />
@@ -197,9 +196,8 @@ function CarreraHeroCard({ edu }) {
                 aria-expanded={isExpanded}
               >
                 <span
-                  className={`text-amber-300 text-xs drop-shadow-[0_0_8px_rgba(251,191,36,0.5)] transition-transform duration-300 ${
-                    isExpanded ? 'rotate-90' : 'group-hover/btn:rotate-45'
-                  }`}
+                  className={`text-amber-300 text-xs drop-shadow-[0_0_8px_rgba(251,191,36,0.5)] transition-transform duration-300 ${isExpanded ? 'rotate-90' : 'group-hover/btn:rotate-45'
+                    }`}
                   aria-hidden="true"
                 >
                   ◊
@@ -370,7 +368,7 @@ function FormacionCard({ edu }) {
   );
 }
 
-// ─── COMPONENTE: NIVEL 3 · CURSO COMPACTO (ALTA DENSIDAD / ESCANEABLE) ───
+// ─── COMPONENTE: NIVEL 3 ───
 function CursoCompactCard({ edu }) {
   const theme = getTheme(edu.tipo);
 
@@ -503,7 +501,7 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
     );
   }
 
-  // ─── MODO ADMINISTRADOR (CRUD RÁPIDO) ───
+  // ─── MODO ADMINISTRADOR ───
   if (isAdmin) {
     return (
       <div className="divide-y divide-indigo-500/10">
@@ -553,46 +551,11 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
     );
   }
 
-  // ─── MODO PÚBLICO (JERARQUÍA GRÁFICA & FILTROS UX) ───
+  // ─── MODO PÚBLICO───
   return (
     <div className="w-full space-y-10">
-      {/* Barra de Filtros Rápidos (Pills) */}
-      <nav
-        aria-label="Filtro de categorías de educación"
-        className="flex items-center justify-start sm:justify-center gap-2 overflow-x-auto scrollbar-none pb-2 pt-1 px-1"
-      >
-        {[
-          { key: 'todos', label: 'Todos', count: data.length },
-          { key: 'carreras', label: 'Carreras', count: carreras.length },
-          { key: 'formacion', label: 'Formación Prof.', count: formacion.length },
-          { key: 'cursos', label: 'Cursos & Certs', count: cursos.length },
-        ].map((tab) => {
-          const isActive = activeFilter === tab.key;
-          return (
-            <button
-              key={tab.key}
-              type="button"
-              onClick={() => setActiveFilter(tab.key)}
-              className={`px-3.5 py-1.5 text-xs font-mono-hud tracking-[0.16em] uppercase transition-all duration-200 cursor-pointer border whitespace-nowrap flex items-center gap-2 ${
-                isActive
-                  ? 'bg-violet-950/60 border-violet-400 text-white shadow-[0_0_14px_rgba(139,92,246,0.35)]'
-                  : 'bg-[#0B0914]/40 border-indigo-500/20 text-indigo-300/60 hover:text-indigo-100 hover:border-indigo-400/35'
-              }`}
-            >
-              <span>{tab.label}</span>
-              <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-xs ${
-                  isActive ? 'bg-violet-500/30 text-violet-200' : 'bg-indigo-950/40 text-indigo-400/50'
-                }`}
-              >
-                {tab.count}
-              </span>
-            </button>
-          );
-        })}
-      </nav>
 
-      {/* ─── SECCIÓN 1: CARRERAS TRONCALES (NIVEL 1) ─── */}
+      {/* ─── SECCIÓN 1: CARRERAS TRONCALES ─── */}
       {(activeFilter === 'todos' || activeFilter === 'carreras') && carreras.length > 0 && (
         <section aria-labelledby="heading-carreras" className="space-y-4">
           <div className="flex items-center gap-3">
@@ -604,11 +567,9 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
                 id="heading-carreras"
                 className="font-serif text-lg md:text-xl text-white font-semibold tracking-wide uppercase"
               >
-                Carreras & Títulos de Grado
+                Carreras
               </h3>
-              <p className="text-xs text-indigo-300/60 font-mono-hud tracking-wider">
-                Formación académica troncal, ingeniería de software y ciencias de la computación
-              </p>
+
             </div>
             <div className="flex-1 h-px bg-gradient-to-r from-violet-500/30 to-transparent ml-2" />
           </div>
@@ -621,7 +582,7 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
         </section>
       )}
 
-      {/* ─── SECCIÓN 2: FORMACIÓN PROFESIONAL & BOOTCAMPS (NIVEL 2) ─── */}
+      {/* ─── SECCIÓN 2: FORMACIÓN PROFESIONAL ─── */}
       {(activeFilter === 'todos' || activeFilter === 'formacion') && formacion.length > 0 && (
         <section aria-labelledby="heading-formacion" className="space-y-4">
           <div className="flex items-center gap-3">
@@ -633,11 +594,9 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
                 id="heading-formacion"
                 className="font-serif text-lg md:text-xl text-white font-semibold tracking-wide uppercase"
               >
-                Formación Profesional & Bootcamps
+                Formación Profesional
               </h3>
-              <p className="text-xs text-indigo-300/60 font-mono-hud tracking-wider">
-                Programas intensivos de especialización y desarrollo full stack aplicado
-              </p>
+
             </div>
             <div className="flex-1 h-px bg-gradient-to-r from-fuchsia-500/30 to-transparent ml-2" />
           </div>
@@ -650,7 +609,7 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
         </section>
       )}
 
-      {/* ─── SECCIÓN 3: CURSOS Y CERTIFICACIONES (NIVEL 3) ─── */}
+      {/* ─── SECCIÓN 3: CURSOS Y CERTIFICACIONES─── */}
       {(activeFilter === 'todos' || activeFilter === 'cursos') && cursos.length > 0 && (
         <section aria-labelledby="heading-cursos" className="space-y-4">
           <div className="flex items-center gap-3">
@@ -664,9 +623,7 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
               >
                 Cursos & Certificaciones Continuas
               </h3>
-              <p className="text-xs text-indigo-300/60 font-mono-hud tracking-wider">
-                Micro-credenciales, tecnologías especializadas y aprendizaje continuo
-              </p>
+
             </div>
             <div className="flex-1 h-px bg-gradient-to-r from-indigo-500/30 to-transparent ml-2" />
           </div>
@@ -679,17 +636,6 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
         </section>
       )}
 
-      {/* Estado vacío para filtros específicos sin elementos */}
-      {activeFilter !== 'todos' &&
-        ((activeFilter === 'carreras' && carreras.length === 0) ||
-          (activeFilter === 'formacion' && formacion.length === 0) ||
-          (activeFilter === 'cursos' && cursos.length === 0)) && (
-          <div className="text-center py-12 border border-indigo-500/10 bg-indigo-950/10">
-            <p className="text-xs font-mono-hud text-indigo-300/50 tracking-widest uppercase">
-              ◊ No hay registros cargados en esta categoría actualmente ◊
-            </p>
-          </div>
-        )}
     </div>
   );
 }
