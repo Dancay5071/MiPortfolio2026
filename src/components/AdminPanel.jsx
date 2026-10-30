@@ -698,7 +698,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       const payload = {
         name: profileName.trim(),
         title: profileTitle.trim(),
-        description: profileDesc.trim(),
+        description: '',
         url_foto: finalImgUrl,
         cv_url: profileCvUrl.trim(),
       };
@@ -1108,16 +1108,6 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                   onChange={(e) => setProfileTitle(e.target.value)}
                   className={CX.input}
                   required
-                />
-              </Field>
-
-              <Field label="DESCRIPCIÓN / BIO">
-                <textarea
-                  value={profileDesc}
-                  onChange={(e) => setProfileDesc(e.target.value)}
-                  className={`${CX.input} resize-none`}
-                  rows={3}
-                  placeholder="Breve reseña sobre vos..."
                 />
               </Field>
 
