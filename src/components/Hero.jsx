@@ -92,7 +92,7 @@ function AvatarFrame({ imgUrl, name }) {
           <img
             src={imgUrl}
             alt={`Foto de perfil de ${name}`}
-            crossOrigin="anonymous"
+            referrerPolicy="no-referrer"
             loading="eager"
             onLoad={() => setLoaded(true)}
             onError={() => setLoaded(true)}

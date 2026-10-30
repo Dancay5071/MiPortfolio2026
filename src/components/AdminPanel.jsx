@@ -1222,6 +1222,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                     <img
                       src={profilePreview}
                       alt="Preview"
+                      referrerPolicy="no-referrer"
                       className="w-14 h-14 rounded-xl object-cover border border-indigo-400/20 shadow-[0_0_12px_rgba(99,102,241,0.15)]"
                     />
                   )}
@@ -1579,6 +1580,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
                         <img
                           src={projPreview}
                           alt="Preview"
+                          referrerPolicy="no-referrer"
                           className="w-20 h-14 object-cover rounded-lg border border-indigo-400/20 shadow-[0_0_10px_rgba(99,102,241,0.12)]"
                         />
                       )}

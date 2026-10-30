@@ -75,6 +75,7 @@ function ProjectPortal({ src, alt, isActive }) {
         <img
           src={src}
           alt={alt}
+          referrerPolicy="no-referrer"
           onLoad={() => setLoaded(true)}
           className={[
             'w-full h-full object-cover transform-gpu',
