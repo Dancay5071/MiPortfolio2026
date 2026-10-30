@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { requestCvAccess } from '../services/api';
 
@@ -13,6 +13,14 @@ export default function CvRequestModal({ isOpen, onClose }) {
   const [errorMessage, setErrorMessage] = useState('');
   const [cvUrl, setCvUrl] = useState('');
 
+  const handleClose = useCallback(() => {
+    onClose();
+    setTimeout(() => {
+      setStatus('idle');
+      setErrorMessage('');
+    }, 300);
+  }, [onClose]);
+
   // Cerrar el modal con tecla 'Escape'
   useEffect(() => {
     if (!isOpen) return;
@@ -21,15 +29,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen]);
-
-  const handleClose = () => {
-    onClose();
-    setTimeout(() => {
-      setStatus('idle');
-      setErrorMessage('');
-    }, 300);
-  };
+  }, [isOpen, handleClose]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;

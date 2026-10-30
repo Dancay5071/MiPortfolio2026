@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getEducation } from '../services/api';
 
 const MESES = { ene: 0, feb: 1, mar: 2, abr: 3, may: 4, jun: 5, jul: 6, ago: 7, sep: 8, oct: 9, nov: 10, dic: 11 };
@@ -551,9 +551,34 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
     );
   }
 
-  // ─── MODO PÚBLICO───
+  // ─── MODO PÚBLICO ───
   return (
     <div className="w-full space-y-10">
+      {/* Selector de Categorías (Pills de filtro rápido) */}
+      <nav aria-label="Filtro de educación" className="flex items-center justify-center gap-2 flex-wrap pb-2">
+        {[
+          { id: 'todos', label: 'Todos', count: data.length },
+          { id: 'carreras', label: 'Carreras', count: carreras.length },
+          { id: 'formacion', label: 'Formación Prof.', count: formacion.length },
+          { id: 'cursos', label: 'Cursos', count: cursos.length },
+        ].filter(f => f.id === 'todos' || f.count > 0).map(tab => {
+          const isActive = activeFilter === tab.id;
+          return (
+            <button
+              key={tab.id}
+              type="button"
+              onClick={() => setActiveFilter(tab.id)}
+              className={`px-3 py-1.5 text-[11px] font-mono-hud tracking-[0.16em] uppercase transition-all duration-200 border cursor-pointer ${
+                isActive
+                  ? 'bg-violet-950/60 border-violet-400 text-white shadow-[0_0_12px_rgba(139,92,246,0.3)]'
+                  : 'bg-black/30 border-white/10 text-indigo-200/60 hover:text-white hover:border-violet-400/30'
+              }`}
+            >
+              {tab.label} <span className="opacity-50 text-[9px]">({tab.count})</span>
+            </button>
+          );
+        })}
+      </nav>
 
       {/* ─── SECCIÓN 1: CARRERAS TRONCALES ─── */}
       {(activeFilter === 'todos' || activeFilter === 'carreras') && carreras.length > 0 && (

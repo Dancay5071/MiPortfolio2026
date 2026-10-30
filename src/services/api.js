@@ -75,7 +75,7 @@ export const sendContactMessage = async ({ name, email, message }) => {
             })
         });
         if (!formspreeRes.ok) {
-            throw new Error('No se pudo enviar el mensaje. Por favor intenta nuevamente.');
+            throw new Error('No se pudo enviar el mensaje. Por favor intenta nuevamente.', { cause: err });
         }
         return { success: true, message: '¡Mensaje enviado con éxito!' };
     }
@@ -139,7 +139,7 @@ const fallbackCvAccess = async ({ name, email, company }) => {
             message: 'Acceso verificado.'
         };
     } catch (err) {
-        throw new Error(err.message || 'No se pudo obtener el currículum.');
+        throw new Error(err.message || 'No se pudo obtener el currículum.', { cause: err });
     }
 };
 

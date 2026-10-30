@@ -335,9 +335,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
   const [profileName, setProfileName] = useState('');
   const [profileTitle, setProfileTitle] = useState('');
   const [profileImageUrl, setProfileImageUrl] = useState('');
-  const [profileDesc, setProfileDesc] = useState('');
   const [profileCvUrl, setProfileCvUrl] = useState('');
-  const [profileCvFile, setProfileCvFile] = useState(null);
   const [profileCvUploading, setProfileCvUploading] = useState(false);
   const [profileFile, setProfileFile] = useState(null);
   const [profilePreview, setProfilePreview] = useState('');
@@ -407,7 +405,6 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         setProfileId(data.id);
         setProfileName(data.nombre || '');
         setProfileTitle(data.titulo || '');
-        setProfileDesc(data.descripcion || '');
         setProfileImageUrl(data.avatar_url || '');
         setProfilePreview(data.avatar_url || '');
         setProfileCvUrl(data.cv_url || '');
@@ -568,7 +565,6 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
       addToast('Subiendo archivo PDF a Supabase Storage...', 'info');
       const url = await uploadCvPdf(file);
       setProfileCvUrl(url);
-      setProfileCvFile(file);
 
       // Guardado PERMANENTE inmediato
       let saved = false;
@@ -577,7 +573,7 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
           await updateProfile({
             name: profileName.trim() || 'Daniela Cabrera',
             title: profileTitle.trim() || '',
-            description: profileDesc.trim() || '',
+            description: '',
             url_foto: profileImageUrl || '',
             cv_url: url
           }, token);
@@ -637,7 +633,6 @@ export default function AdminPanel({ session, addToast, onGuestLogin, onDemoLogo
         if (error) throw error;
       }
       setProfileCvUrl('');
-      setProfileCvFile(null);
       addToast('El CV ha sido quitado permanentemente del perfil', 'info');
     } catch (err) {
       console.error('Error al quitar CV:', err);

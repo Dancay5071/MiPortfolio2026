@@ -14,15 +14,6 @@ const STAGE = {
   },
 };
 
-//Estrellas
-function PolarStarIcon({ className = "" }) {
-  return (
-    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" className={className}>
-      <path d="M12 2L13 11L22 12L13 13L12 22L11 13L2 12L11 11Z" />
-    </svg>
-  );
-}
-
 // Marco de Avatar
 function AvatarFrame({ imgUrl, name }) {
   const [loaded, setLoaded] = useState(false);
@@ -129,14 +120,6 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
 
   const shouldReduceMotion = useReducedMotion();
 
-  const DYNAMIC_PHASE_AURA = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { duration: shouldReduceMotion ? 0 : 2.5, ease: [0.25, 0.1, 0.25, 1] },
-    },
-  };
-
   const DYNAMIC_PHASE_AVATAR = {
     hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 20, scale: shouldReduceMotion ? 1 : 0.95 },
     visible: {
@@ -169,15 +152,6 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
       initial="hidden"
       animate="visible"
     >
-
-      <motion.div
-        variants={DYNAMIC_PHASE_AURA}
-        className="contents"
-        aria-hidden="true"
-      >
-       
-      </motion.div>
-
       {/*Contenedor Principal*/}
       <div className="flex flex-col md:flex-row items-center justify-center gap-8 md:gap-14 lg:gap-20 py-2 md:py-4 px-4 md:px-8 w-full">
 
