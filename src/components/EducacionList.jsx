@@ -156,6 +156,12 @@ function CarreraHeroCard({ edu }) {
             {edu.titulo}
           </h3>
 
+          {/* Institución */}
+          <p className="flex items-center gap-2 text-sm md:text-base text-violet-200/80 mt-1 font-sans-body">
+            <span className="text-violet-400 text-xs shrink-0" aria-hidden="true">◊</span>
+            <span className="font-medium">{edu.institucion}</span>
+          </p>
+
           {/* Header de Metadatos */}
           {edu.rango && edu.rango !== 'S/F' && (
             <div className="flex items-center gap-2.5 flex-wrap mb-2">
@@ -172,12 +178,6 @@ function CarreraHeroCard({ edu }) {
               </span>
             </div>
           )}
-
-          {/* Institución */}
-          <p className="flex items-center gap-2 text-sm md:text-base text-violet-200/80 mt-1 font-sans-body">
-            <span className="text-violet-400 text-xs shrink-0" aria-hidden="true">◊</span>
-            <span className="font-medium">{edu.institucion}</span>
-          </p>
 
           {/* Resumen o Botón de Revelar Núcleos Temáticos */}
           {edu.descripcion && (
