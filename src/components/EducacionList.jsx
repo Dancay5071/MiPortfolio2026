@@ -313,43 +313,62 @@ function FormacionCard({ edu }) {
         {/* Descripción / Contenidos */}
         {edu.descripcion && (
           <div className="mt-4 pt-3 border-t border-fuchsia-500/15">
-            {items.length > 1 ? (
-              <>
-                <button
-                  type="button"
-                  onClick={() => setIsExpanded(!isExpanded)}
-                  className="inline-flex items-center gap-2 text-xs font-mono-hud tracking-wider text-fuchsia-300 hover:text-white transition-colors cursor-pointer"
-                  aria-expanded={isExpanded}
-                >
-                  <span className="text-amber-300 text-xs" aria-hidden="true">◊</span>
-                  <span>{isExpanded ? 'Ocultar detalles' : 'Ver competencias clave'}</span>
-                  <span className="text-fuchsia-400/50">[{isExpanded ? '−' : '+'}]</span>
-                </button>
+            {/* Botón de Despliegue con estilo Grimorio */}
+            <button
+              type="button"
+              onClick={() => setIsExpanded(!isExpanded)}
+              className="inline-flex items-center gap-2.5 text-xs font-mono-hud tracking-[0.18em] uppercase text-fuchsia-300 hover:text-white transition-all cursor-pointer group/btn"
+              aria-expanded={isExpanded}
+            >
+              <span
+                className={`text-amber-300 text-xs drop-shadow-[0_0_8px_rgba(251,191,36,0.5)] transition-transform duration-300 ${
+                  isExpanded ? 'rotate-90' : 'group-hover/btn:rotate-45'
+                }`}
+                aria-hidden="true"
+              >
+                ◊
+              </span>
+              <span>{isExpanded ? 'Ocultar materias y competencias' : 'Revelar materias clave & competencias'}</span>
+              <span className="text-fuchsia-400/60 text-[11px] font-sans">
+                [{isExpanded ? '−' : '+'}]
+              </span>
+            </button>
 
-                <AnimatePresence initial={false}>
-                  {isExpanded && (
-                    <motion.ul
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.35 }}
-                      className="overflow-hidden mt-3 space-y-2 pl-1"
-                    >
-                      {items.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs md:text-[13px] text-indigo-100/90 leading-relaxed font-sans-body">
-                          <span className="text-fuchsia-400/60 shrink-0 text-[10px] mt-0.5">◊</span>
-                          <span>{item}</span>
-                        </li>
-                      ))}
-                    </motion.ul>
-                  )}
-                </AnimatePresence>
-              </>
-            ) : (
-              <p className="text-xs md:text-sm text-indigo-100/90 leading-relaxed font-sans-body">
-                {edu.descripcion}
-              </p>
-            )}
+            <AnimatePresence initial={false}>
+              {isExpanded && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.35, ease: 'easeOut' }}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 pt-2 space-y-2">
+                    {items.length > 1 ? (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {items.map((item, idx) => (
+                          <div
+                            key={idx}
+                            className="flex items-start gap-2 bg-fuchsia-950/20 border border-fuchsia-500/20 px-3 py-2 transition-colors hover:border-fuchsia-400/35"
+                          >
+                            <span className="text-amber-200/80 text-xs shrink-0 mt-0.5" aria-hidden="true">
+                              ◊
+                            </span>
+                            <span className="text-xs md:text-[13px] text-indigo-50/95 leading-relaxed font-sans-body">
+                              {item}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-xs md:text-sm text-indigo-100/90 leading-relaxed font-sans-body bg-fuchsia-950/20 border border-fuchsia-500/15 p-3">
+                        {edu.descripcion}
+                      </p>
+                    )}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
         )}
       </div>
@@ -357,9 +376,20 @@ function FormacionCard({ edu }) {
   );
 }
 
-// ─── COMPONENTE: NIVEL 3 ───
+// ─── COMPONENTE: NIVEL 3 · CURSOS Y CERTIFICACIONES ───
 function CursoCompactCard({ edu }) {
   const theme = getTheme(edu.tipo);
+  const [isExpanded, setIsExpanded] = useState(false);
+
+  const items = useMemo(() => {
+    if (!edu.descripcion) return [];
+    return edu.descripcion
+      .split(/\s*-\s+/)
+      .map((s) => s.trim())
+      .filter(Boolean);
+  }, [edu.descripcion]);
+
+  const hasDescripcion = Boolean(edu.descripcion && edu.descripcion.trim());
 
   return (
     <motion.article
@@ -367,32 +397,93 @@ function CursoCompactCard({ edu }) {
       whileInView={{ opacity: 1, scale: 1 }}
       viewport={{ once: true, margin: '-20px' }}
       transition={{ duration: 0.4 }}
-      className={`relative flex items-center gap-3.5 p-3.5 bg-[#0b0916]/70 backdrop-blur-md border ${theme.cardBorder} ${theme.cardGlow} transition-all duration-200 hover:-translate-y-0.5 rounded-none`}
+      className={`relative flex flex-col justify-between p-4 bg-[#0b0916]/70 backdrop-blur-md border ${theme.cardBorder} ${theme.cardGlow} transition-all duration-200 hover:-translate-y-0.5 rounded-none`}
     >
-      {/* Insignia Compacta */}
-      <div
-        className={`w-9 h-9 shrink-0 rotate-45 border ${theme.iconBorder} flex items-center justify-center bg-[#0d091a]/80`}
-        aria-hidden="true"
-      >
-        <span className={`-rotate-45 text-[9px] font-mono-hud font-bold ${theme.siglasClass}`}>
-          {edu.siglas}
-        </span>
-      </div>
+      <div className="flex items-start gap-3.5">
+        {/* Insignia Compacta */}
+        <div
+          className={`w-9 h-9 shrink-0 rotate-45 border ${theme.iconBorder} flex items-center justify-center bg-[#0d091a]/80 mt-0.5`}
+          aria-hidden="true"
+        >
+          <span className={`-rotate-45 text-[9px] font-mono-hud font-bold ${theme.siglasClass}`}>
+            {edu.siglas}
+          </span>
+        </div>
 
-      <div className="flex-1 min-w-0">
-        <h5 className="font-sans-body text-xs md:text-sm font-medium text-indigo-100 truncate leading-snug">
-          {edu.titulo}
-        </h5>
-        <div className="flex items-center gap-2 text-[11px] text-indigo-200/80 mt-0.5 truncate font-mono-hud">
-          <span className="truncate">{edu.institucion}</span>
-          {edu.rango && edu.rango !== 'S/F' && (
-            <>
-              <span className="text-indigo-500/40" aria-hidden="true">·</span>
-              <span className="shrink-0 text-indigo-300/85">{edu.rango}</span>
-            </>
-          )}
+        <div className="flex-1 min-w-0">
+          <h5 className="font-sans-body text-xs md:text-sm font-medium text-indigo-100 leading-snug">
+            {edu.titulo}
+          </h5>
+          <div className="flex items-center gap-2 text-[11px] text-indigo-200/80 mt-1 flex-wrap font-mono-hud">
+            <span className="truncate">{edu.institucion}</span>
+            {edu.rango && edu.rango !== 'S/F' && (
+              <>
+                <span className="text-indigo-500/40" aria-hidden="true">·</span>
+                <span className="shrink-0 text-indigo-300/85">[{edu.rango}]</span>
+              </>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Botón Revelar Materias / Temas Clave */}
+      {hasDescripcion && (
+        <div className="mt-3 pt-2.5 border-t border-indigo-500/15">
+          <button
+            type="button"
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="inline-flex items-center gap-2 text-[11px] font-mono-hud tracking-wider uppercase text-indigo-300 hover:text-white transition-all cursor-pointer group/btn"
+            aria-expanded={isExpanded}
+          >
+            <span
+              className={`text-amber-300 text-[10px] drop-shadow-[0_0_6px_rgba(251,191,36,0.5)] transition-transform duration-300 ${
+                isExpanded ? 'rotate-90' : 'group-hover/btn:rotate-45'
+              }`}
+              aria-hidden="true"
+            >
+              ◊
+            </span>
+            <span>{isExpanded ? 'Ocultar materias clave' : 'Revelar materias clave'}</span>
+            <span className="text-indigo-400/60 text-[10px] font-sans">
+              [{isExpanded ? '−' : '+'}]
+            </span>
+          </button>
+
+          <AnimatePresence initial={false}>
+            {isExpanded && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.35, ease: 'easeOut' }}
+                className="overflow-hidden"
+              >
+                <div className="mt-2.5 pt-2 space-y-1.5 border-t border-indigo-500/10">
+                  {items.length > 1 ? (
+                    <ul className="space-y-1.5 pl-0.5">
+                      {items.map((item, idx) => (
+                        <li
+                          key={idx}
+                          className="flex items-start gap-1.5 text-xs text-indigo-100/90 leading-relaxed font-sans-body"
+                        >
+                          <span className="text-indigo-400/70 text-[9px] shrink-0 mt-1" aria-hidden="true">
+                            ◊
+                          </span>
+                          <span>{item}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : (
+                    <p className="text-xs text-indigo-100/90 leading-relaxed font-sans-body bg-indigo-950/20 border border-indigo-500/15 p-2">
+                      {edu.descripcion}
+                    </p>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
     </motion.article>
   );
 }
