@@ -151,15 +151,8 @@ function CarreraHeroCard({ edu }) {
         {/* Contenido Principal */}
         <div className="flex-1 min-w-0">
           {/* Header de Metadatos */}
-          <div className="flex items-center gap-2.5 flex-wrap mb-2">
-            <span
-              className={`text-xs font-mono-hud tracking-[0.2em] uppercase font-semibold ${theme.badgeText} before:content-['['] after:content-[']'] before:mr-1 after:ml-1 before:opacity-50 after:opacity-50`}
-            >
-              {edu.tipo}
-            </span>
-
-            {/* Estado / Rango de Fechas */}
-            {edu.rango && edu.rango !== 'S/F' && (
+          {edu.rango && edu.rango !== 'S/F' && (
+            <div className="flex items-center gap-2.5 flex-wrap mb-2">
               <span
                 className={`inline-flex items-center gap-1.5 text-xs font-mono-hud tracking-wider px-2.5 py-0.5 border ${isEnCurso
                     ? 'text-amber-200 bg-amber-500/10 border-amber-500/30 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]'
@@ -171,8 +164,8 @@ function CarreraHeroCard({ edu }) {
                 )}
                 <span>{edu.rango}</span>
               </span>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Título de la Carrera */}
           <h3 className="font-serif text-xl md:text-2xl text-white font-medium leading-snug tracking-wide">
@@ -295,18 +288,13 @@ function FormacionCard({ edu }) {
 
           <div className="flex-1 min-w-0">
             {/* Metadatos */}
-            <div className="flex items-center gap-2 flex-wrap mb-1.5">
-              <span
-                className={`text-[11px] font-mono-hud tracking-[0.18em] uppercase ${theme.badgeText} before:content-['['] after:content-[']'] before:mr-0.5 after:ml-0.5 before:opacity-40 after:opacity-40`}
-              >
-                {edu.tipo}
-              </span>
-              {edu.rango && edu.rango !== 'S/F' && (
+            {edu.rango && edu.rango !== 'S/F' && (
+              <div className="flex items-center gap-2 flex-wrap mb-1.5">
                 <span className="text-[11px] font-mono-hud text-fuchsia-200/70 tracking-wider">
                   [{edu.rango}]
                 </span>
-              )}
-            </div>
+              </div>
+            )}
 
             {/* Título */}
             <h4 className="font-serif text-lg text-white font-medium leading-snug">
