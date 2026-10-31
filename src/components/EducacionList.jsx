@@ -287,29 +287,28 @@ function FormacionCard({ edu }) {
             </span>
           </div>
 
+          <div className="flex-1 min-w-0">
+            {/* Metadatos */}
+            {edu.rango && edu.rango !== 'S/F' && (
+              <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                <span className="text-[11px] font-mono-hud text-fuchsia-200/70 tracking-wider">
+                  [{edu.rango}]
+                </span>
+              </div>
+            )}
 
-          {/* Título */}
-          <h4 className="font-serif text-lg text-white font-medium leading-snug">
-            {edu.titulo}
-          </h4>
+            {/* Título */}
+            <h4 className="font-serif text-lg text-white font-medium leading-snug">
+              {edu.titulo}
+            </h4>
 
-          {/* Institución */}
-          <p className="flex items-center gap-1.5 text-xs md:text-sm text-fuchsia-200/75 mt-0.5">
-            <span className="text-fuchsia-400 text-xs shrink-0" aria-hidden="true">◊</span>
-            <span>{edu.institucion}</span>
-          </p>
-        </div>
-      </div>
-
-      <div className="flex-1 min-w-0">
-        {/* Metadatos */}
-        {edu.rango && edu.rango !== 'S/F' && (
-          <div className="flex items-center gap-2 flex-wrap mb-1.5">
-            <span className="text-[11px] font-mono-hud text-fuchsia-200/70 tracking-wider">
-              [{edu.rango}]
-            </span>
+            {/* Institución */}
+            <p className="flex items-center gap-1.5 text-xs md:text-sm text-fuchsia-200/75 mt-0.5">
+              <span className="text-fuchsia-400 text-xs shrink-0" aria-hidden="true">◊</span>
+              <span>{edu.institucion}</span>
+            </p>
           </div>
-        )}
+        </div>
 
         {/* Descripción / Contenidos */}
         {edu.descripcion && (
