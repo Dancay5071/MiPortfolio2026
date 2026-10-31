@@ -150,13 +150,19 @@ function CarreraHeroCard({ edu }) {
 
         {/* Contenido Principal */}
         <div className="flex-1 min-w-0">
+
+          {/* Título de la Carrera */}
+          <h3 className="font-serif text-xl md:text-2xl text-white font-medium leading-snug tracking-wide">
+            {edu.titulo}
+          </h3>
+
           {/* Header de Metadatos */}
           {edu.rango && edu.rango !== 'S/F' && (
             <div className="flex items-center gap-2.5 flex-wrap mb-2">
               <span
                 className={`inline-flex items-center gap-1.5 text-xs font-mono-hud tracking-wider px-2.5 py-0.5 border ${isEnCurso
-                    ? 'text-amber-200 bg-amber-500/10 border-amber-500/30 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]'
-                    : 'text-violet-200/80 bg-violet-950/30 border-violet-500/20'
+                  ? 'text-amber-200 bg-amber-500/10 border-amber-500/30 drop-shadow-[0_0_8px_rgba(251,191,36,0.3)]'
+                  : 'text-violet-200/80 bg-violet-950/30 border-violet-500/20'
                   }`}
               >
                 {isEnCurso && (
@@ -166,11 +172,6 @@ function CarreraHeroCard({ edu }) {
               </span>
             </div>
           )}
-
-          {/* Título de la Carrera */}
-          <h3 className="font-serif text-xl md:text-2xl text-white font-medium leading-snug tracking-wide">
-            {edu.titulo}
-          </h3>
 
           {/* Institución */}
           <p className="flex items-center gap-2 text-sm md:text-base text-violet-200/80 mt-1 font-sans-body">
