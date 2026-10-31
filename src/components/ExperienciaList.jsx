@@ -91,9 +91,9 @@ function DescripcionBlock({ text }) {
 
   if (items.length > 1) {
     return (
-      <ul className="relative z-10 space-y-2 pl-1 mt-3" role="list">
+      <ul className="relative z-10 space-y-2.5 pl-1 mt-3" role="list">
         {items.map((item, i) => (
-          <li key={i} className="flex items-start gap-2.5 leading-relaxed text-[13px] text-indigo-200/80">
+          <li key={i} className="flex items-start gap-2.5 leading-relaxed text-sm text-indigo-100/90 font-sans-body">
             <span className="text-amber-200/70 shrink-0 mt-0.5 text-xs drop-shadow-[0_0_5px_rgba(251,191,36,0.5)]" aria-hidden="true">◊</span>
             <span>{item}</span>
           </li>
@@ -103,7 +103,7 @@ function DescripcionBlock({ text }) {
   }
 
   return (
-    <p className="relative z-10 leading-relaxed text-indigo-200/80 text-[13px] mt-3">
+    <p className="relative z-10 leading-relaxed text-indigo-100/90 text-sm mt-3 font-sans-body">
       {text}
     </p>
   );
@@ -185,7 +185,7 @@ function TimelineItem({ exp, isLatest }) {
             </h3>
 
             {/* Empresa */}
-            <p className="flex items-center gap-1.5 text-sm text-indigo-300/80">
+            <p className="flex items-center gap-1.5 text-sm text-indigo-200/90 font-medium">
               <span className="text-indigo-400/60 text-xs" aria-hidden="true">◊</span>
               {exp.empresa}
             </p>
@@ -197,7 +197,7 @@ function TimelineItem({ exp, isLatest }) {
               'self-start sm:self-auto shrink-0 text-[11px] tracking-wider whitespace-nowrap',
               exp.rango.includes('Actualidad')
                 ? 'text-amber-200/90 before:content-["["] after:content-["]"] before:text-amber-500/40 after:text-amber-500/40 before:mr-1 after:ml-1'
-                : 'text-indigo-200/70 before:content-["["] after:content-["]"] before:text-indigo-500/40 after:text-indigo-500/40 before:mr-1 after:ml-1'
+                : 'text-indigo-200/85 before:content-["["] after:content-["]"] before:text-indigo-500/40 after:text-indigo-500/40 before:mr-1 after:ml-1'
             ].join(' ')}
             aria-label={`Período: ${exp.rango}`}
           >

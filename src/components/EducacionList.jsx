@@ -157,7 +157,7 @@ function CarreraHeroCard({ edu }) {
           </h3>
 
           {/* Institución */}
-          <p className="flex items-center gap-2 text-sm md:text-base text-violet-200/80 mt-1 font-sans-body">
+          <p className="flex items-center gap-2 text-sm md:text-base text-violet-100/90 mt-1 font-sans-body">
             <span className="text-violet-400 text-xs shrink-0" aria-hidden="true">◊</span>
             <span className="font-medium">{edu.institucion}</span>
           </p>
@@ -229,7 +229,7 @@ function CarreraHeroCard({ edu }) {
                                 <span className="text-amber-200/80 text-xs shrink-0 mt-0.5" aria-hidden="true">
                                   ◊
                                 </span>
-                                <span className="text-xs text-indigo-100/85 leading-relaxed font-sans-body">
+                                <span className="text-xs md:text-[13px] text-indigo-50/95 leading-relaxed font-sans-body">
                                   {materia}
                                 </span>
                               </div>
@@ -237,7 +237,7 @@ function CarreraHeroCard({ edu }) {
                           </div>
                         </div>
                       ) : (
-                        <p className="text-sm text-indigo-200/75 leading-relaxed font-sans-body bg-violet-950/20 border border-violet-500/15 p-3">
+                        <p className="text-sm text-indigo-100/95 leading-relaxed font-sans-body bg-violet-950/30 border border-violet-500/20 p-3.5">
                           {edu.descripcion}
                         </p>
                       )}
@@ -303,7 +303,7 @@ function FormacionCard({ edu }) {
             </h4>
 
             {/* Institución */}
-            <p className="flex items-center gap-1.5 text-xs md:text-sm text-fuchsia-200/75 mt-0.5">
+            <p className="flex items-center gap-1.5 text-xs md:text-sm text-fuchsia-100/90 mt-0.5 font-medium">
               <span className="text-fuchsia-400 text-xs shrink-0" aria-hidden="true">◊</span>
               <span>{edu.institucion}</span>
             </p>
@@ -333,10 +333,10 @@ function FormacionCard({ edu }) {
                       animate={{ height: 'auto', opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
                       transition={{ duration: 0.35 }}
-                      className="overflow-hidden mt-3 space-y-1.5 pl-1"
+                      className="overflow-hidden mt-3 space-y-2 pl-1"
                     >
                       {items.map((item, idx) => (
-                        <li key={idx} className="flex items-start gap-2 text-xs text-indigo-200/70 leading-relaxed">
+                        <li key={idx} className="flex items-start gap-2 text-xs md:text-[13px] text-indigo-100/90 leading-relaxed font-sans-body">
                           <span className="text-fuchsia-400/60 shrink-0 text-[10px] mt-0.5">◊</span>
                           <span>{item}</span>
                         </li>
@@ -346,7 +346,7 @@ function FormacionCard({ edu }) {
                 </AnimatePresence>
               </>
             ) : (
-              <p className="text-xs text-indigo-200/70 leading-relaxed">
+              <p className="text-xs md:text-sm text-indigo-100/90 leading-relaxed font-sans-body">
                 {edu.descripcion}
               </p>
             )}
@@ -383,12 +383,12 @@ function CursoCompactCard({ edu }) {
         <h5 className="font-sans-body text-xs md:text-sm font-medium text-indigo-100 truncate leading-snug">
           {edu.titulo}
         </h5>
-        <div className="flex items-center gap-2 text-[11px] text-indigo-300/60 mt-0.5 truncate font-mono-hud">
+        <div className="flex items-center gap-2 text-[11px] text-indigo-200/80 mt-0.5 truncate font-mono-hud">
           <span className="truncate">{edu.institucion}</span>
           {edu.rango && edu.rango !== 'S/F' && (
             <>
               <span className="text-indigo-500/40" aria-hidden="true">·</span>
-              <span className="shrink-0 text-indigo-400/70">{edu.rango}</span>
+              <span className="shrink-0 text-indigo-300/85">{edu.rango}</span>
             </>
           )}
         </div>

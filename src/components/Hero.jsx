@@ -213,7 +213,7 @@ export default function Hero({ profile, onContactClick, onCvClick }) {
             </div>
 
             {/* Título profesional con fallback defensivo */}
-            <p className="uppercase text-[13px] tracking-[0.22em] text-indigo-200 leading-relaxed">
+            <p className="uppercase text-[13px] md:text-sm tracking-[0.22em] text-indigo-100/90 font-medium leading-relaxed">
               {title?.trim() ? title : 'Técnica en Programación & Desarrolladora de Software'}
             </p>
           </motion.div>

@@ -112,7 +112,7 @@ export default function ContactModal({ isOpen, onClose }) {
                   <h3 className="mt-6 font-serif-display text-base uppercase tracking-[0.2em] text-indigo-100">
                     MENSAJE ENVIADO ◊
                   </h3>
-                  <p className="mt-2 text-xs text-indigo-200/60 font-sans-body max-w-xs">
+                  <p className="mt-2 text-xs md:text-sm text-indigo-100/90 font-sans-body max-w-xs leading-relaxed">
                     ¡Gracias por comunicarte! Te responderé a la brevedad.
                   </p>
 

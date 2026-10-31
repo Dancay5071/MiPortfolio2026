@@ -143,7 +143,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
                     <span className="text-amber-200/90 text-xs">◊</span>
                   </h3>
 
-                  <p className="mt-2 text-xs text-indigo-200/70 font-sans-body max-w-xs leading-relaxed">
+                  <p className="mt-2 text-xs md:text-sm text-indigo-100/90 font-sans-body max-w-xs leading-relaxed">
                     ¡Gracias por tu interés, <span className="text-white font-medium">{formData.name}</span>! Se ha habilitado el acceso a mi Currículum Vitae.
                   </p>
 
@@ -178,7 +178,7 @@ export default function CvRequestModal({ isOpen, onClose }) {
                     <h2 id="cv-modal-title" className="font-serif-display text-xl sm:text-2xl font-semibold text-white tracking-wide text-glow">
                       Acceso al Currículum
                     </h2>
-                    <p className="text-xs text-indigo-200/70 font-sans-body leading-relaxed pt-1">
+                    <p className="text-xs md:text-sm text-indigo-100/90 font-sans-body leading-relaxed pt-1">
                       Por favor, indícame tu nombre y correo para acceder al CV completo y datos de contacto directo.
                     </p>
                   </div>

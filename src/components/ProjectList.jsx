@@ -216,7 +216,7 @@ function ProjectCard({ p, index }) {
           </h3>
 
           {/* Descripción */}
-          <p className="text-sm text-indigo-200/60 leading-relaxed line-clamp-2 font-sans-body flex-1">
+          <p className="text-sm text-indigo-100/90 leading-relaxed line-clamp-2 font-sans-body flex-1">
             {p.description}
           </p>
 
