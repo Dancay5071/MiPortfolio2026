@@ -401,7 +401,6 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [activeFilter, setActiveFilter] = useState('todos');
 
   const fetchEducacion = async (isBackground = false) => {
     if (!isBackground) {
@@ -541,35 +540,9 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
 
   // ─── MODO PÚBLICO ───
   return (
-    <div className="w-full space-y-10">
-      {/* Selector de Categorías (Pills de filtro rápido) */}
-      <nav aria-label="Filtro de educación" className="flex items-center justify-center gap-2 flex-wrap pb-2">
-        {[
-          { id: 'todos', label: 'Todos', count: data.length },
-          { id: 'carreras', label: 'Carreras', count: carreras.length },
-          { id: 'formacion', label: 'Formación Prof.', count: formacion.length },
-          { id: 'cursos', label: 'Cursos', count: cursos.length },
-        ].filter(f => f.id === 'todos' || f.count > 0).map(tab => {
-          const isActive = activeFilter === tab.id;
-          return (
-            <button
-              key={tab.id}
-              type="button"
-              onClick={() => setActiveFilter(tab.id)}
-              className={`px-3 py-1.5 text-[11px] font-mono-hud tracking-[0.16em] uppercase transition-all duration-200 border cursor-pointer ${
-                isActive
-                  ? 'bg-violet-950/60 border-violet-400 text-white shadow-[0_0_12px_rgba(139,92,246,0.3)]'
-                  : 'bg-black/30 border-white/10 text-indigo-200/60 hover:text-white hover:border-violet-400/30'
-              }`}
-            >
-              {tab.label} <span className="opacity-50 text-[9px]">({tab.count})</span>
-            </button>
-          );
-        })}
-      </nav>
-
+    <div className="w-full space-y-12">
       {/* ─── SECCIÓN 1: CARRERAS TRONCALES ─── */}
-      {(activeFilter === 'todos' || activeFilter === 'carreras') && carreras.length > 0 && (
+      {carreras.length > 0 && (
         <section aria-labelledby="heading-carreras" className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="text-violet-400 text-base drop-shadow-[0_0_8px_rgba(139,92,246,0.6)]" aria-hidden="true">
@@ -582,7 +555,6 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
               >
                 Carreras
               </h3>
-
             </div>
             <div className="flex-1 h-px bg-gradient-to-r from-violet-500/30 to-transparent ml-2" />
           </div>
@@ -596,7 +568,7 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
       )}
 
       {/* ─── SECCIÓN 2: FORMACIÓN PROFESIONAL ─── */}
-      {(activeFilter === 'todos' || activeFilter === 'formacion') && formacion.length > 0 && (
+      {formacion.length > 0 && (
         <section aria-labelledby="heading-formacion" className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="text-fuchsia-400 text-base drop-shadow-[0_0_8px_rgba(217,70,239,0.5)]" aria-hidden="true">
@@ -609,7 +581,6 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
               >
                 Formación Profesional
               </h3>
-
             </div>
             <div className="flex-1 h-px bg-gradient-to-r from-fuchsia-500/30 to-transparent ml-2" />
           </div>
@@ -623,7 +594,7 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
       )}
 
       {/* ─── SECCIÓN 3: CURSOS Y CERTIFICACIONES─── */}
-      {(activeFilter === 'todos' || activeFilter === 'cursos') && cursos.length > 0 && (
+      {cursos.length > 0 && (
         <section aria-labelledby="heading-cursos" className="space-y-4">
           <div className="flex items-center gap-3">
             <span className="text-indigo-400 text-base drop-shadow-[0_0_8px_rgba(165,180,252,0.4)]" aria-hidden="true">
@@ -636,7 +607,6 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
               >
                 Cursos & Certificaciones Continuas
               </h3>
-
             </div>
             <div className="flex-1 h-px bg-gradient-to-r from-indigo-500/30 to-transparent ml-2" />
           </div>
@@ -648,7 +618,6 @@ export default function EducacionList({ isAdmin = false, onEdit, onDelete }) {
           </div>
         </section>
       )}
-
     </div>
   );
 }

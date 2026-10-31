@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useInView } from 'framer-motion';
 import TiltedScroll from './TiltedScroll';
 import CatHeadLoader from './CatHeadLoader';
@@ -121,7 +121,7 @@ function ProjectPortal({ src, alt, isActive }) {
   );
 }
 
-function ProjectCard({ p, index, selectedTech, onSelectTech }) {
+function ProjectCard({ p, index }) {
   const imgUrl = getImgUrl(p);
   const actionUrl = p.demo_url || p.github_url || '#';
   const glyph = CATEGORY_GLYPHS[p.category] || '·';
@@ -220,35 +220,17 @@ function ProjectCard({ p, index, selectedTech, onSelectTech }) {
             {p.description}
           </p>
 
-          {/* Tecnologías clicables */}
+          {/* Tecnologías */}
           {p.tech_stack.length > 0 && (
-            <div className="flex flex-wrap gap-1.5 pt-1 relative z-20">
-              {p.tech_stack.map((tech, idx) => {
-                const isSelected = Boolean(
-                  selectedTech && selectedTech.toLowerCase() === tech.toLowerCase()
-                );
-                return (
-                  <button
-                    key={idx}
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      onSelectTech?.(tech);
-                    }}
-                    className={[
-                      'px-1.5 py-0.5 cursor-pointer rounded-none',
-                      'text-[9px] font-mono-hud tracking-[0.18em] uppercase transition-all duration-300',
-                      isSelected
-                        ? 'bg-violet-950/80 border border-violet-400 text-amber-200 shadow-[0_0_12px_rgba(139,92,246,0.45)] scale-105'
-                        : 'bg-transparent text-fuchsia-200/60 hover:text-white hover:border-fuchsia-400/40 border border-transparent before:content-["["] after:content-["]"] before:text-fuchsia-500/40 after:text-fuchsia-500/40 before:mr-0.5 after:ml-0.5 hover:scale-105',
-                    ].join(' ')}
-                    title={isSelected ? `Quitar filtro de ${tech}` : `Filtrar proyectos por ${tech}`}
-                  >
-                    {tech}
-                  </button>
-                );
-              })}
+            <div className="flex flex-wrap gap-1.5 pt-1">
+              {p.tech_stack.map((tech, idx) => (
+                <span
+                  key={idx}
+                  className="px-1.5 py-0.5 bg-transparent text-[9px] font-mono-hud tracking-[0.18em] uppercase text-fuchsia-200/60 before:content-['['] after:content-[']'] before:text-fuchsia-500/40 after:text-fuchsia-500/40 before:mr-0.5 after:ml-0.5 group-hover:text-fuchsia-200 group-hover:before:text-fuchsia-400 group-hover:after:text-fuchsia-400 transition-all duration-500"
+                >
+                  {tech}
+                </span>
+              ))}
             </div>
           )}
 
@@ -331,130 +313,37 @@ const FILTERS = [
   { id: 'Aplicaciones de Escritorio', label: 'Desktop', glyph: '◈' },
 ];
 
-function FilterBar({
-  activeFilter,
-  onFilter,
-  availableTechs = [],
-  selectedTech,
-  onSelectTech,
-  onClearTech,
-}) {
+function FilterBar({ activeFilter, onFilter }) {
   return (
-    <div className="flex flex-col items-center gap-5 mb-10 shrink-0 w-full">
-      {/* 1. Categorías Macro */}
-      <div
-        className="flex flex-wrap justify-center gap-4 md:gap-6"
-        role="group"
-        aria-label="Filtrar proyectos por categoría"
-      >
-        {FILTERS.map(f => {
-          const isActive = activeFilter === f.id;
-          return (
-            <button
-              key={f.id}
-              onClick={() => onFilter(f.id)}
-              type="button"
-              aria-current={isActive ? 'true' : undefined}
-              className={[
-                'group relative pb-2 px-1 cursor-pointer',
-                'text-[10px] font-sans-body font-medium tracking-[0.25em] uppercase',
-                'flex items-center gap-2',
-                'transition-all duration-500 ease-out',
-                isActive
-                  ? 'text-indigo-50 drop-shadow-[0_0_8px_rgba(129,140,248,0.7)] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-indigo-400/80 after:to-transparent'
-                  : 'text-indigo-300/40 hover:text-indigo-100 after:absolute after:bottom-0 after:left-1/2 after:w-0 after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-indigo-400/50 after:to-transparent hover:after:w-full hover:after:left-0 after:transition-all after:duration-500',
-                'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0914]',
-              ].join(' ')}
-            >
-              <span aria-hidden="true" className="text-[10px]">{f.glyph}</span>
-              {f.label}
-            </button>
-          );
-        })}
-      </div>
-
-      {/* 2. Píldoras Interactivas de Tecnologías */}
-      {availableTechs.length > 0 && (
-        <div className="w-full max-w-4xl flex flex-col items-center gap-2.5 pt-1">
-          <div className="flex items-center gap-2 text-[9px] font-mono-hud uppercase tracking-[0.22em] text-indigo-300/45">
-            <span className="text-amber-400/60" aria-hidden="true">◊</span>
-            <span>Filtrar por tecnología:</span>
-            {selectedTech && (
-              <button
-                type="button"
-                onClick={onClearTech}
-                className="text-amber-300/90 hover:text-white ml-1.5 cursor-pointer transition-colors underline decoration-dotted"
-              >
-                [Restablecer]
-              </button>
-            )}
-          </div>
-
-          <div
-            className="flex flex-wrap items-center justify-center gap-1.5 md:gap-2 px-2"
-            role="toolbar"
-            aria-label="Píldoras interactivas de tecnologías"
+    <div
+      className="flex flex-wrap justify-center gap-4 md:gap-6 mb-10 shrink-0"
+      role="group"
+      aria-label="Filtrar proyectos por categoría"
+    >
+      {FILTERS.map(f => {
+        const isActive = activeFilter === f.id;
+        return (
+          <button
+            key={f.id}
+            onClick={() => onFilter(f.id)}
+            type="button"
+            aria-current={isActive ? 'true' : undefined}
+            className={[
+              'group relative pb-2 px-1 cursor-pointer',
+              'text-[10px] font-sans-body font-medium tracking-[0.25em] uppercase',
+              'flex items-center gap-2',
+              'transition-all duration-500 ease-out',
+              isActive
+                ? 'text-indigo-50 drop-shadow-[0_0_8px_rgba(129,140,248,0.7)] after:absolute after:bottom-0 after:left-0 after:w-full after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-indigo-400/80 after:to-transparent'
+                : 'text-indigo-300/40 hover:text-indigo-100 after:absolute after:bottom-0 after:left-1/2 after:w-0 after:h-[1px] after:bg-gradient-to-r after:from-transparent after:via-indigo-400/50 after:to-transparent hover:after:w-full hover:after:left-0 after:transition-all after:duration-500',
+              'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-fuchsia-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0B0914]',
+            ].join(' ')}
           >
-            {availableTechs.map(({ label, total, categoryCount }) => {
-              const isSelected = Boolean(
-                selectedTech && selectedTech.toLowerCase() === label.toLowerCase()
-              );
-              const isDimmed = activeFilter !== 'all' && categoryCount === 0;
-
-              return (
-                <button
-                  key={label}
-                  type="button"
-                  onClick={() => onSelectTech(label)}
-                  aria-pressed={isSelected}
-                  className={[
-                    'group relative inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-mono-hud tracking-wider uppercase transition-all duration-300 cursor-pointer rounded-none border',
-                    isSelected
-                      ? 'bg-gradient-to-r from-violet-950/90 via-indigo-950/90 to-violet-950/90 border-amber-400/90 text-amber-200 shadow-[0_0_14px_rgba(251,191,36,0.35)] scale-105 z-10'
-                      : isDimmed
-                        ? 'bg-[#0B0914]/40 border-indigo-400/10 text-indigo-300/30 hover:text-indigo-200 hover:border-indigo-400/30'
-                        : 'bg-[#0B0914]/65 backdrop-blur-md border-indigo-400/15 text-indigo-200/70 hover:text-white hover:border-fuchsia-400/50 hover:shadow-[0_0_12px_rgba(217,70,239,0.22)] hover:scale-[1.03]',
-                  ].join(' ')}
-                  title={
-                    isSelected
-                      ? `Quitar filtro de ${label}`
-                      : isDimmed
-                        ? `${label} (${total} en total · Clic para ver en todas las categorías)`
-                        : `Filtrar proyectos con ${label} (${activeFilter === 'all' ? total : categoryCount})`
-                  }
-                >
-                  <span className={isSelected ? 'font-semibold' : ''}>{label}</span>
-                  <span
-                    className={[
-                      'text-[9px] font-sans-body px-1 py-0.2 rounded-full leading-none transition-colors',
-                      isSelected
-                        ? 'bg-amber-400/20 text-amber-300 font-semibold'
-                        : isDimmed
-                          ? 'text-indigo-400/25'
-                          : 'text-indigo-400/40 group-hover:text-fuchsia-300/80',
-                    ].join(' ')}
-                  >
-                    {activeFilter === 'all' ? total : categoryCount > 0 ? categoryCount : total}
-                  </span>
-                  {isSelected && (
-                    <span
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onClearTech();
-                      }}
-                      className="ml-0.5 text-amber-300 hover:text-white transition-colors cursor-pointer"
-                      title="Quitar filtro"
-                      aria-label="Quitar filtro"
-                    >
-                      ✕
-                    </span>
-                  )}
-                </button>
-              );
-            })}
-          </div>
-        </div>
-      )}
+            <span aria-hidden="true" className="text-[10px]">{f.glyph}</span>
+            {f.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -464,7 +353,6 @@ export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [activeFilter, setActiveFilter] = useState('all');
-  const [selectedTech, setSelectedTech] = useState(null);
 
   const fetchProyectos = async (isBackground = false) => {
     if (!isBackground) {
@@ -489,52 +377,7 @@ export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
     fetchProyectos(true);
   }, []);
 
-  // Extraer tecnologías disponibles ordenadas por popularidad
-  const availableTechs = useMemo(() => {
-    const counts = new Map();
-    data.forEach((p) => {
-      (p.tech_stack || []).forEach((t) => {
-        const clean = t.trim();
-        if (!clean) return;
-        const key = clean.toLowerCase();
-        if (!counts.has(key)) {
-          counts.set(key, { label: clean, total: 0, categoryCount: 0 });
-        }
-        const item = counts.get(key);
-        item.total += 1;
-        if (activeFilter === 'all' || p.category === activeFilter) {
-          item.categoryCount += 1;
-        }
-      });
-    });
-    return Array.from(counts.values()).sort((a, b) => b.total - a.total);
-  }, [data, activeFilter]);
-
-  const handleSelectTech = (tech) => {
-    setSelectedTech((prev) => {
-      if (prev?.toLowerCase() === tech.toLowerCase()) {
-        return null;
-      }
-      // Si la tecnología elegida no está en la categoría actual, pasar a 'all'
-      if (activeFilter !== 'all') {
-        const inCategory = data.some(
-          (p) =>
-            p.category === activeFilter &&
-            (p.tech_stack || []).some((t) => t.toLowerCase() === tech.toLowerCase())
-        );
-        if (!inCategory) {
-          setActiveFilter('all');
-        }
-      }
-      return tech;
-    });
-  };
-
-  const filteredData = data.filter((p) => {
-    const matchesCategory = activeFilter === 'all' || p.category === activeFilter;
-    const matchesTech = !selectedTech || (p.tech_stack || []).some(t => t.toLowerCase() === selectedTech.toLowerCase());
-    return matchesCategory && matchesTech;
-  });
+  const filteredData = activeFilter === 'all' ? data : data.filter(p => p.category === activeFilter);
 
   if (loading) return <SkeletonGrid />;
 
@@ -547,42 +390,17 @@ export default function ProjectList({ isAdmin = false, onEdit, onDelete }) {
   if (!isAdmin) {
     return (
       <div className="flex-1 w-full flex flex-col">
-        <FilterBar
-          activeFilter={activeFilter}
-          onFilter={setActiveFilter}
-          availableTechs={availableTechs}
-          selectedTech={selectedTech}
-          onSelectTech={handleSelectTech}
-          onClearTech={() => setSelectedTech(null)}
-        />
+        <FilterBar activeFilter={activeFilter} onFilter={setActiveFilter} />
 
         {filteredData.length === 0 ? (
-          <div className="text-center text-indigo-300/40 font-mono-hud text-xs tracking-[0.22em] uppercase py-14 w-full flex flex-col items-center gap-3">
-            <span aria-hidden="true" className="block text-2xl text-indigo-300/20">◊</span>
-            <span>Sin proyectos que coincidan con la búsqueda</span>
-            {(activeFilter !== 'all' || selectedTech) && (
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveFilter('all');
-                  setSelectedTech(null);
-                }}
-                className="mt-2 text-[10px] uppercase tracking-widest text-amber-200 hover:text-white border border-amber-400/40 px-4 py-1.5 bg-violet-950/60 transition-all duration-300 hover:shadow-[0_0_12px_rgba(251,191,36,0.25)] cursor-pointer"
-              >
-                Restablecer todos los filtros ✕
-              </button>
-            )}
+          <div className="text-center text-indigo-300/35 font-mono-hud text-xs tracking-[0.22em] uppercase py-10 w-full">
+            <span aria-hidden="true" className="block text-2xl mb-3 text-indigo-300/20">◊</span>
+            Sin proyectos en esta categoría
           </div>
         ) : (
           <TiltedScroll>
             {filteredData.map((p, index) => (
-              <ProjectCard
-                key={p.id}
-                p={p}
-                index={index}
-                selectedTech={selectedTech}
-                onSelectTech={handleSelectTech}
-              />
+              <ProjectCard key={p.id} p={p} index={index} />
             ))}
           </TiltedScroll>
         )}
