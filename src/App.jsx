@@ -11,12 +11,12 @@ import MysticalBackground from './components/MysticalBackground';
 import LoaderGlobal from './components/LoaderGlobal';
 import MouseGlowLayout from './components/MouseGlowLayout';
 import MysticalCursor from './components/MysticalCursor';
-import ContactModal from './components/ContactModal';
-import CvRequestModal from './components/CvRequestModal';
 import { DEMO_EMAIL } from './hooks/useDemoGuard';
 import { getProfile, recordVisit, getVisitStats } from './services/api';
 
 const AdminPanel = lazy(() => import('./components/AdminPanel'));
+const ContactModal = lazy(() => import('./components/ContactModal'));
+const CvRequestModal = lazy(() => import('./components/CvRequestModal'));
 
 const GLOW_VARIANTS = {
   proyectos: [
@@ -292,8 +292,10 @@ function App() {
 
   return (
     <MouseGlowLayout className={`w-full ${activeTab === 'inicio' ? 'h-screen max-h-screen md:overflow-hidden' : 'min-h-screen'}`}>
-      <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />
-      <CvRequestModal isOpen={isCvModalOpen} onClose={() => setIsCvModalOpen(false)} />
+      <Suspense fallback={null}>
+        {isContactOpen && <ContactModal isOpen={isContactOpen} onClose={() => setIsContactOpen(false)} />}
+        {isCvModalOpen && <CvRequestModal isOpen={isCvModalOpen} onClose={() => setIsCvModalOpen(false)} />}
+      </Suspense>
       <MysticalCursor />
       <div className={`relative w-full flex flex-col font-sans bg-[var(--color-light)] text-[var(--color-dark)] ${activeTab === 'inicio' ? 'h-screen max-h-screen md:overflow-hidden' : 'min-h-screen overflow-x-hidden'}`}>
 
@@ -450,10 +452,6 @@ function App() {
           <div className="mystic-toast-container" role="status" aria-live="polite" aria-atomic="true">
             <Toast message={toast.message} type={toast.type} />
           </div>
-        )}
-
-        {isContactOpen && (
-          <ContactModal onClose={() => setIsContactOpen(false)} />
         )}
       </div>
     </MouseGlowLayout>
